@@ -68,7 +68,8 @@ const routes = [
       {
         path: 'caja',
         name: 'Cash',
-        component: () => import('@/views/Cash/CashView.vue')
+        component: () => import('@/views/Cash/CashView.vue'),
+        meta: { role: 'admin' }
       }
     ]
   }
@@ -104,7 +105,12 @@ router.beforeEach(async (to, from, next) => {
   // Si está autenticado e intenta ir a login, redirigir al dashboard
   else if (to.name === 'Login' && userStore.isAuthenticated) {
     next({ name: 'Dashboard' })
-  } 
+  }
+  // Verificar Roles (RBAC)
+  else if (to.meta.role && userStore.userRole !== to.meta.role) {
+    alert('No tienes permisos para acceder a esta sección.')
+    next({ name: 'Dashboard' })
+  }
   // En cualquier otro caso, permitir la navegación
   else {
     next()

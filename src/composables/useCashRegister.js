@@ -25,34 +25,36 @@ export function useCashRegister() {
   })
 
   /**
-   * Carga los movimientos del día y el saldo anterior
-   * @param {Date} date - Fecha a consultar
+   * Carga los movimientos por rango de fechas y el saldo anterior
+   * @param {Date} startDate - Fecha de inicio del rango
+   * @param {Date} endDate - Fecha de fin del rango
    */
-  async function loadDailyData(date) {
+  async function loadRangeData(startDate, endDate) {
     try {
       loading.value = true
       error.value = null
 
-      // Convertir fecha a formato ISO (solo fecha, sin hora)
-      const dateStr = date.toISOString().split('T')[0]
+      // Convertir fechas a formato ISO (solo fecha, sin hora)
+      const startDateStr = startDate.toISOString().split('T')[0]
+      const endDateStr = endDate.toISOString().split('T')[0]
 
-      // Consulta 1: Saldo Anterior (RPC)
+      // Consulta 1: Saldo Anterior (al inicio del rango)
       const { data: balanceData, error: balanceError } = await supabase
-        .rpc('get_previous_balance', { check_date: dateStr })
+        .rpc('get_previous_balance', { check_date: startDateStr })
 
       if (balanceError) throw balanceError
 
       balanceAnterior.value = balanceData || 0
 
-      // Consulta 2: Movimientos del día
-      const startDate = `${dateStr}T00:00:00`
-      const endDate = `${dateStr}T23:59:59`
+      // Consulta 2: Movimientos del rango
+      const startDateTime = `${startDateStr}T00:00:00`
+      const endDateTime = `${endDateStr}T23:59:59`
 
       const { data: transData, error: transError } = await supabase
         .from('transactions')
         .select('*')
-        .gte('created_at', startDate)
-        .lte('created_at', endDate)
+        .gte('created_at', startDateTime)
+        .lte('created_at', endDateTime)
         .order('created_at', { ascending: false })
 
       if (transError) throw transError
@@ -99,7 +101,8 @@ export function useCashRegister() {
       if (insertError) throw insertError
 
       // Recargar datos del día actual
-      await loadDailyData(new Date())
+      const today = new Date()
+      await loadRangeData(today, today)
 
       return { success: true, data }
     } catch (err) {
@@ -114,13 +117,13 @@ export function useCashRegister() {
   /**
    * Genera reporte en texto plano para copiar
    */
-  function generateReport(selectedDate) {
-    const dateStr = selectedDate.toLocaleDateString('es-AR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+  function generateReport(startDate, endDate) {
+    const formatDate = (date) => {
+      return date.toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit'
+      })
+    }
 
     const formatMoney = (amount) => {
       return new Intl.NumberFormat('es-AR', {
@@ -129,11 +132,14 @@ export function useCashRegister() {
       }).format(amount)
     }
 
-    let report = `📊 REPORTE DE CAJA - ${dateStr}\n`
+    const startDateFormatted = formatDate(startDate)
+    const endDateFormatted = formatDate(endDate)
+
+    let report = `📅 REPORTE FINANCIERO: ${startDateFormatted} al ${endDateFormatted}\n`
     report += `${'='.repeat(50)}\n\n`
-    report += `💰 Saldo Anterior: ${formatMoney(balanceAnterior.value)}\n`
-    report += `📈 Ingresos del día: ${formatMoney(ingresosDia.value)}\n`
-    report += `📉 Egresos del día: ${formatMoney(egresosDia.value)}\n`
+    report += `💰 Saldo Inicial del Período: ${formatMoney(balanceAnterior.value)}\n`
+    report += `📈 Ingresos del período: ${formatMoney(ingresosDia.value)}\n`
+    report += `📉 Egresos del período: ${formatMoney(egresosDia.value)}\n`
     report += `${'-'.repeat(50)}\n`
     report += `💵 SALDO FINAL: ${formatMoney(saldoFinal.value)}\n\n`
 
@@ -175,7 +181,7 @@ export function useCashRegister() {
     loading,
     error,
     // Métodos
-    loadDailyData,
+    loadRangeData,
     addManualTransaction,
     generateReport,
     clearError

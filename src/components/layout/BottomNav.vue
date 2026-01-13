@@ -19,17 +19,29 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 
 const route = useRoute()
+const userStore = useUserStore()
 
-const navigation = [
+const navigationItems = [
   { name: 'Inicio', to: '/' },
   { name: 'Socios', to: '/miembros' },
   { name: 'Check-In', to: '/checkin' },
   { name: 'Pagos', to: '/pagos/nuevo' },
-  { name: 'Caja', to: '/caja' }
+  { name: 'Caja', to: '/caja', adminOnly: true }
 ]
+
+const navigation = computed(() => {
+  return navigationItems.filter(item => {
+    if (item.adminOnly) {
+      return userStore.userRole === 'admin'
+    }
+    return true
+  })
+})
 
 function isActive(path) {
   if (path === '/') {

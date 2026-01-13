@@ -4,18 +4,19 @@ import { supabase } from '@/lib/supabase'
 export function useParameters() {
   const concepts = ref([])
   const plans = ref([])
+  const paymentMethods = ref([])
   const loading = ref(false)
   const error = ref(null)
 
   /**
-   * Carga conceptos y planes activos desde Supabase
+   * Carga conceptos, planes y métodos de pago activos desde Supabase
    */
   async function fetchParameters() {
     try {
       loading.value = true
       error.value = null
 
-      const [conceptsResponse, plansResponse] = await Promise.all([
+      const [conceptsResponse, plansResponse, paymentMethodsResponse] = await Promise.all([
         // Cargar conceptos activos
         supabase
           .from('concepts')
@@ -28,14 +29,23 @@ export function useParameters() {
           .from('plans')
           .select('*')
           .eq('activo', true)
+          .order('nombre'),
+        
+        // Cargar métodos de pago activos
+        supabase
+          .from('payment_methods')
+          .select('*')
+          .eq('activo', true)
           .order('nombre')
       ])
 
       if (conceptsResponse.error) throw conceptsResponse.error
       if (plansResponse.error) throw plansResponse.error
+      if (paymentMethodsResponse.error) throw paymentMethodsResponse.error
 
       concepts.value = conceptsResponse.data || []
       plans.value = plansResponse.data || []
+      paymentMethods.value = paymentMethodsResponse.data || []
 
       return { success: true }
     } catch (err) {
@@ -78,6 +88,7 @@ export function useParameters() {
     // Estado
     concepts,
     plans,
+    paymentMethods,
     loading,
     error,
     // Computed

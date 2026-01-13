@@ -60,13 +60,22 @@ const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 
-const navigation = [
+const navigationItems = [
   { name: 'Dashboard', to: '/', icon: LayoutDashboard },
   { name: 'Socios', to: '/miembros', icon: Users },
   { name: 'Check-In', to: '/checkin', icon: CheckCircle },
   { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign },
-  { name: 'Caja', to: '/caja', icon: Wallet }
+  { name: 'Caja', to: '/caja', icon: Wallet, adminOnly: true }
 ]
+
+const navigation = computed(() => {
+  return navigationItems.filter(item => {
+    if (item.adminOnly) {
+      return userStore.userRole === 'admin'
+    }
+    return true
+  })
+})
 
 function isActive(path) {
   if (path === '/') {

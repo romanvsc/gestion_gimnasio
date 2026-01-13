@@ -6,32 +6,50 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Gestión de Caja</h1>
-            <p class="text-gray-400">Control de ingresos y egresos diarios</p>
+            <p class="text-gray-400">Control de ingresos y egresos por período</p>
           </div>
           
-          <!-- Selector de Fecha -->
-          <div class="w-full md:w-64">
-            <BaseInput
-              v-model="selectedDate"
-              type="date"
-              label="Fecha"
-              @change="handleDateChange"
-            />
+          <!-- Selector de Rango de Fechas -->
+          <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <div class="w-full md:w-48">
+              <BaseInput
+                v-model="startDate"
+                type="date"
+                label="Fecha Inicio"
+              />
+            </div>
+            <div class="w-full md:w-48">
+              <BaseInput
+                v-model="endDate"
+                type="date"
+                label="Fecha Fin"
+                :min="startDate"
+              />
+            </div>
+            <div class="flex items-end">
+              <BaseButton
+                variant="primary"
+                @click="handleFilterClick"
+                class="w-full md:w-auto"
+              >
+                Filtrar
+              </BaseButton>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Grid de Resumen (4 tarjetas) -->
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <!-- Saldo Anterior -->
+        <!-- Saldo Inicial del Período -->
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-gray-400 text-sm font-medium mb-2">Saldo Anterior</p>
+              <p class="text-gray-400 text-sm font-medium mb-2">Saldo Inicial del Período</p>
               <p class="text-gray-800 text-3xl font-bold mb-1">
                 {{ formatCurrency(balanceAnterior) }}
               </p>
-              <span class="text-sm text-gray-500">Al inicio del día</span>
+              <span class="text-sm text-gray-500">Al inicio del rango</span>
             </div>
             <div class="p-3 rounded-lg bg-gray-50">
               <Calendar class="w-6 h-6 text-gray-600" />
@@ -119,7 +137,7 @@
       <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h2 class="text-lg font-semibold text-gray-800">
-            Movimientos del Día ({{ transactions.length }})
+            Movimientos del Período ({{ transactions.length }})
           </h2>
         </div>
 
@@ -130,7 +148,7 @@
 
         <div v-else-if="transactions.length === 0" class="p-12 text-center">
           <FileText class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p class="text-gray-500">No hay movimientos registrados en este día</p>
+          <p class="text-gray-500">No hay movimientos registrados en este período</p>
         </div>
 
         <div v-else class="overflow-x-auto">
@@ -245,7 +263,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useCashRegister } from '@/composables/useCashRegister'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -269,15 +287,34 @@ const {
   egresosDia,
   saldoFinal,
   loading,
-  loadDailyData,
+  loadRangeData,
   addManualTransaction,
   generateReport
 } = useCashRegister()
 
-// Estado local
-const selectedDate = ref(new Date().toISOString().split('T')[0])
+// Estado local - Inicializar con primer día del mes hasta hoy
+const initializeDefaultDates = () => {
+  const today = new Date()
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+  
+  return {
+    start: firstDayOfMonth.toISOString().split('T')[0],
+    end: today.toISOString().split('T')[0]
+  }
+}
+
+const defaultDates = initializeDefaultDates()
+const startDate = ref(defaultDates.start)
+const endDate = ref(defaultDates.end)
 const showModal = ref(false)
 const showSuccessModal = ref(false)
+
+// Watcher: Si startDate > endDate, actualizar endDate automáticamente
+watch(startDate, (newStart) => {
+  if (newStart > endDate.value) {
+    endDate.value = newStart
+  }
+})
 
 // Formateo
 const formatCurrency = (amount) => {
@@ -296,9 +333,10 @@ const formatTime = (timestamp) => {
 }
 
 // Métodos
-const handleDateChange = () => {
-  const date = new Date(selectedDate.value + 'T12:00:00')
-  loadDailyData(date)
+const handleFilterClick = () => {
+  const start = new Date(startDate.value + 'T12:00:00')
+  const end = new Date(endDate.value + 'T12:00:00')
+  loadRangeData(start, end)
 }
 
 const openModal = () => {
@@ -315,14 +353,17 @@ const handleSubmit = async (formData) => {
   if (result.success) {
     closeModal()
     showSuccessModal.value = true
+    // Recargar con el rango actual
+    handleFilterClick()
   } else {
     alert('Error al registrar el movimiento: ' + result.error)
   }
 }
 
 const copyReport = async () => {
-  const date = new Date(selectedDate.value + 'T12:00:00')
-  const report = generateReport(date)
+  const start = new Date(startDate.value + 'T12:00:00')
+  const end = new Date(endDate.value + 'T12:00:00')
+  const report = generateReport(start, end)
   
   try {
     await navigator.clipboard.writeText(report)
@@ -335,7 +376,8 @@ const copyReport = async () => {
 
 // Inicialización
 onMounted(() => {
-  const today = new Date()
-  loadDailyData(today)
+  const start = new Date(startDate.value + 'T12:00:00')
+  const end = new Date(endDate.value + 'T12:00:00')
+  loadRangeData(start, end)
 })
 </script>

@@ -88,11 +88,9 @@
                 required
               >
                 <option value="" disabled>Seleccionar método...</option>
-                <option value="efectivo">Efectivo</option>
-                <option value="transferencia">Transferencia</option>
-                <option value="tarjeta_debito">Tarjeta de Débito</option>
-                <option value="tarjeta_credito">Tarjeta de Crédito</option>
-                <option value="mercadopago">Mercado Pago</option>
+                <option v-for="method in paymentMethods" :key="method.id" :value="method.nombre">
+                  {{ method.nombre }}
+                </option>
               </select>
             </div>
 
@@ -224,7 +222,7 @@ import { useParameters } from '@/composables/useParameters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
 const { createPayment } = usePayments()
-const { plans, loading, error, fetchParameters } = useParameters()
+const { plans, paymentMethods, loading, error, fetchParameters } = useParameters()
 
 const memberSearch = ref('')
 const memberSearchResults = ref([])
@@ -276,14 +274,7 @@ const formattedEndDate = computed(() => {
 })
 
 const paymentMethodLabel = computed(() => {
-  const methods = {
-    efectivo: 'Efectivo',
-    transferencia: 'Transferencia',
-    tarjeta_debito: 'Tarjeta de Débito',
-    tarjeta_credito: 'Tarjeta de Crédito',
-    mercadopago: 'Mercado Pago'
-  }
-  return formData.value.metodo_pago ? methods[formData.value.metodo_pago] : null
+  return formData.value.metodo_pago || '—'
 })
 
 async function searchMembers() {
