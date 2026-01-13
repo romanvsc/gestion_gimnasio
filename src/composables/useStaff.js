@@ -20,6 +20,7 @@ export function useStaff() {
         .order('created_at', { ascending: false })
 
       if (err) throw err
+      console.log('📊 Datos recibidos de Supabase:', data)
       staffList.value = data || []
     } catch (err) {
       error.value = err.message

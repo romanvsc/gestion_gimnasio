@@ -159,7 +159,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { Users, UserPlus, Edit, XCircle, CheckCircle } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -167,6 +167,20 @@ import StaffFormModal from '@/components/staff/StaffFormModal.vue'
 import { useStaff } from '@/composables/useStaff'
 
 const { staffList, loading, loadStaff, toggleStatus } = useStaff()
+
+// Debug: Ver qué datos hay en staffList
+watch(staffList, (newValue) => {
+  console.log('🔍 staffList actualizado:', JSON.parse(JSON.stringify(newValue)))
+  if (newValue.length > 0) {
+    console.log('📝 Primer elemento:', {
+      usuario: newValue[0].usuario,
+      email: newValue[0].email,
+      rol: newValue[0].rol,
+      activo: newValue[0].activo,
+      id: newValue[0].id
+    })
+  }
+}, { deep: true })
 
 const showModal = ref(false)
 const selectedStaff = ref(null)
