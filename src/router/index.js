@@ -70,6 +70,12 @@ const routes = [
         name: 'Cash',
         component: () => import('@/views/Cash/CashView.vue'),
         meta: { role: 'admin' }
+      },
+      {
+        path: 'staff',
+        name: 'Staff',
+        component: () => import('@/views/Staff/StaffListView.vue'),
+        meta: { role: 'admin' }
       }
     ]
   }

@@ -31,7 +31,8 @@ const navigationItems = [
   { name: 'Socios', to: '/miembros' },
   { name: 'Check-In', to: '/checkin' },
   { name: 'Pagos', to: '/pagos/nuevo' },
-  { name: 'Caja', to: '/caja', adminOnly: true }
+  { name: 'Caja', to: '/caja', adminOnly: true },
+  { name: 'Usuarios', to: '/staff', adminOnly: true }
 ]
 
 const navigation = computed(() => {

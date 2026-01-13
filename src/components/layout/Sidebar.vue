@@ -54,7 +54,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, LogOut } from 'lucide-vue-next'
+import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, Settings, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
@@ -65,7 +65,8 @@ const navigationItems = [
   { name: 'Socios', to: '/miembros', icon: Users },
   { name: 'Check-In', to: '/checkin', icon: CheckCircle },
   { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign },
-  { name: 'Caja', to: '/caja', icon: Wallet, adminOnly: true }
+  { name: 'Caja', to: '/caja', icon: Wallet, adminOnly: true },
+  { name: 'Usuarios', to: '/staff', icon: Settings, adminOnly: true }
 ]
 
 const navigation = computed(() => {

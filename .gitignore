@@ -57,4 +57,17 @@ coverage
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Documentation personal/temporal
 AGENTS.md
+TODO.md
+NOTES.md
+
+# SQL dumps y backups
+*.backup.sql
+*.dump.sql
+dump.sql
+backup*.sql
+
+# Archivos de instalación temporal
+INSTALL_*.md
+SETUP_*.md
