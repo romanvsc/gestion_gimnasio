@@ -12,7 +12,7 @@
           <div class="grid grid-cols-2 gap-4">
             <button
               type="button"
-              @click="formData.tipo = 'INGRESO'"
+              @click="handleTipoChange('INGRESO')"
               :class="[
                 'p-4 rounded-lg border-2 font-semibold transition-all',
                 formData.tipo === 'INGRESO'
@@ -25,7 +25,7 @@
             </button>
             <button
               type="button"
-              @click="formData.tipo = 'EGRESO'"
+              @click="handleTipoChange('EGRESO')"
               :class="[
                 'p-4 rounded-lg border-2 font-semibold transition-all',
                 formData.tipo === 'EGRESO'
@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <!-- Categoría -->
+        <!-- Categoría (Dinámico) -->
         <div>
           <label for="categoria" class="block text-sm font-medium text-gray-700 mb-1">
             Categoría <span class="text-red-500">*</span>
@@ -48,15 +48,13 @@
             id="categoria"
             v-model="formData.categoria"
             required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            :disabled="!formData.tipo"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
-            <option value="">Seleccionar...</option>
-            <option value="Cuota">Cuota</option>
-            <option value="Venta Producto">Venta Producto</option>
-            <option value="Servicios">Servicios</option>
-            <option value="Retiro Dueño">Retiro Dueño</option>
-            <option value="Sueldos">Sueldos</option>
-            <option value="Otros">Otros</option>
+            <option value="">{{ formData.tipo ? 'Seleccionar...' : 'Primero selecciona un tipo' }}</option>
+            <option v-for="concept in filteredConcepts" :key="concept.id" :value="concept.nombre">
+              {{ concept.nombre }}
+            </option>
           </select>
         </div>
 
@@ -110,12 +108,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useParameters } from '@/composables/useParameters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-vue-next'
 
 const emit = defineEmits(['close', 'submit'])
+
+const { getConceptsByType, fetchParameters } = useParameters()
 
 const formData = ref({
   tipo: 'INGRESO',
@@ -124,15 +125,30 @@ const formData = ref({
   monto: ''
 })
 
+// Conceptos filtrados según el tipo seleccionado
+const filteredConcepts = computed(() => {
+  return getConceptsByType(formData.value.tipo)
+})
+
 const isFormValid = computed(() => {
   return formData.value.tipo &&
          formData.value.categoria &&
          formData.value.monto > 0
 })
 
+// Cuando cambia el tipo, resetear la categoría seleccionada
+function handleTipoChange(newTipo) {
+  formData.value.tipo = newTipo
+  formData.value.categoria = '' // Reset categoría al cambiar tipo
+}
+
 const handleSubmit = () => {
   if (isFormValid.value) {
     emit('submit', { ...formData.value })
   }
 }
+
+onMounted(async () => {
+  await fetchParameters()
+})
 </script>

@@ -220,8 +220,11 @@
 import { ref, onMounted, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
+import { useParameters } from '@/composables/useParameters'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
-const { plans, loading, error, getPlans, createPayment } = usePayments()
+const { createPayment } = usePayments()
+const { plans, loading, error, fetchParameters } = useParameters()
 
 const memberSearch = ref('')
 const memberSearchResults = ref([])
@@ -369,6 +372,6 @@ function closeSuccessModal() {
 }
 
 onMounted(async () => {
-  await getPlans()
+  await fetchParameters()
 })
 </script>
