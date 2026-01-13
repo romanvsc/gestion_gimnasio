@@ -167,6 +167,82 @@ export function useCashRegister() {
     return report
   }
 
+  /**
+   * Exporta los datos del período a un archivo Excel
+   */
+  async function exportToExcel(startDate, endDate) {
+    try {
+      // Validar que hay datos
+      if (transactions.value.length === 0) {
+        throw new Error('No hay movimientos para exportar en este período')
+      }
+
+      // Importar la librería xlsx
+      const XLSX = await import('xlsx')
+
+      // Formatear fechas para el nombre del archivo
+      const formatDateForFile = (date) => {
+        return date.toLocaleDateString('es-AR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).replace(/\//g, '-')
+      }
+
+      const startFormatted = formatDateForFile(startDate)
+      const endFormatted = formatDateForFile(endDate)
+
+      // Crear hoja de Resumen
+      const resumenData = [
+        ['REPORTE DE CAJA'],
+        ['Período', `${startFormatted} al ${endFormatted}`],
+        [],
+        ['Concepto', 'Valor'],
+        ['Saldo Inicial del Período', balanceAnterior.value],
+        ['Ingresos del Período', ingresosDia.value],
+        ['Egresos del Período', egresosDia.value],
+        ['Saldo Final', saldoFinal.value]
+      ]
+
+      const wsResumen = XLSX.utils.aoa_to_sheet(resumenData)
+
+      // Crear hoja de Movimientos
+      const movimientosData = transactions.value.map(t => {
+        const fecha = new Date(t.created_at)
+        return {
+          'Fecha y Hora': fecha.toLocaleString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          'Tipo': t.tipo === 'INGRESO' ? 'Ingreso' : 'Egreso',
+          'Categoría': t.categoria || '-',
+          'Descripción': t.descripcion || '-',
+          'Monto': t.tipo === 'INGRESO' ? parseFloat(t.monto) : -parseFloat(t.monto),
+          'Usuario': t.created_by ? t.created_by.substring(0, 8) : 'N/A'
+        }
+      })
+
+      const wsMovimientos = XLSX.utils.json_to_sheet(movimientosData)
+
+      // Crear libro de trabajo
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen')
+      XLSX.utils.book_append_sheet(wb, wsMovimientos, 'Movimientos')
+
+      // Generar y descargar archivo
+      const fileName = `Caja_Gym_${startFormatted}_al_${endFormatted}.xlsx`
+      XLSX.writeFile(wb, fileName)
+
+      return { success: true }
+    } catch (err) {
+      console.error('Error exportando a Excel:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
   function clearError() {
     error.value = null
   }
@@ -184,6 +260,7 @@ export function useCashRegister() {
     loadRangeData,
     addManualTransaction,
     generateReport,
+    exportToExcel,
     clearError
   }
 }

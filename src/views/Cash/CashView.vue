@@ -125,11 +125,12 @@
         <BaseButton
           variant="secondary"
           size="lg"
-          @click="copyReport"
+          @click="handleExportExcel"
+          :disabled="exportingExcel"
           class="flex items-center justify-center gap-2"
         >
-          <Copy class="w-5 h-5" />
-          Copiar Reporte
+          <FileSpreadsheet class="w-5 h-5" />
+          {{ exportingExcel ? 'Generando...' : 'Exportar Excel' }}
         </BaseButton>
       </div>
 
@@ -274,7 +275,7 @@ import {
   ArrowUpCircle,
   Wallet,
   Plus,
-  Copy,
+  FileSpreadsheet,
   FileText,
   CreditCard,
   CheckCircle
@@ -289,7 +290,7 @@ const {
   loading,
   loadRangeData,
   addManualTransaction,
-  generateReport
+  exportToExcel
 } = useCashRegister()
 
 // Estado local - Inicializar con primer día del mes hasta hoy
@@ -308,6 +309,7 @@ const startDate = ref(defaultDates.start)
 const endDate = ref(defaultDates.end)
 const showModal = ref(false)
 const showSuccessModal = ref(false)
+const exportingExcel = ref(false)
 
 // Watcher: Si startDate > endDate, actualizar endDate automáticamente
 watch(startDate, (newStart) => {
@@ -360,17 +362,32 @@ const handleSubmit = async (formData) => {
   }
 }
 
-const copyReport = async () => {
-  const start = new Date(startDate.value + 'T12:00:00')
-  const end = new Date(endDate.value + 'T12:00:00')
-  const report = generateReport(start, end)
+const handleExportExcel = async () => {
+  // Validar que hay datos
+  if (transactions.value.length === 0) {
+    alert('⚠️ No hay movimientos para exportar en este período')
+    return
+  }
+
+  exportingExcel.value = true
   
   try {
-    await navigator.clipboard.writeText(report)
-    alert('✅ Reporte copiado al portapapeles')
+    const start = new Date(startDate.value + 'T12:00:00')
+    const end = new Date(endDate.value + 'T12:00:00')
+    
+    const result = await exportToExcel(start, end)
+    
+    if (result.success) {
+      // El archivo ya fue descargado automáticamente
+      alert('✅ Reporte exportado exitosamente')
+    } else {
+      throw new Error(result.error)
+    }
   } catch (err) {
-    console.error('Error al copiar:', err)
-    alert('❌ Error al copiar el reporte')
+    console.error('Error al exportar:', err)
+    alert(`❌ Error al exportar: ${err.message}`)
+  } finally {
+    exportingExcel.value = false
   }
 }
 
