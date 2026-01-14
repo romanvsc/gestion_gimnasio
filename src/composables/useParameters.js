@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { runQuery } from '@/lib/asyncHandler'
 
 export function useParameters() {
   const concepts = ref([])
@@ -16,36 +17,39 @@ export function useParameters() {
       loading.value = true
       error.value = null
 
-      const [conceptsResponse, plansResponse, paymentMethodsResponse] = await Promise.all([
+      // Usar runQuery en paralelo con Promise.all
+      const [conceptsData, plansData, paymentMethodsData] = await Promise.all([
         // Cargar conceptos activos
-        supabase
-          .from('concepts')
-          .select('*')
-          .eq('activo', true)
-          .order('nombre'),
+        runQuery(() =>
+          supabase
+            .from('concepts')
+            .select('*')
+            .eq('activo', true)
+            .order('nombre')
+        ),
         
         // Cargar planes activos
-        supabase
-          .from('plans')
-          .select('id, nombre, dias_duracion, precio, precio_socio, activo')
-          .eq('activo', true)
-          .order('nombre'),
+        runQuery(() =>
+          supabase
+            .from('plans')
+            .select('id, nombre, dias_duracion, precio, precio_socio, activo')
+            .eq('activo', true)
+            .order('nombre')
+        ),
         
         // Cargar métodos de pago activos
-        supabase
-          .from('payment_methods')
-          .select('*')
-          .eq('activo', true)
-          .order('nombre')
+        runQuery(() =>
+          supabase
+            .from('payment_methods')
+            .select('*')
+            .eq('activo', true)
+            .order('nombre')
+        )
       ])
 
-      if (conceptsResponse.error) throw conceptsResponse.error
-      if (plansResponse.error) throw plansResponse.error
-      if (paymentMethodsResponse.error) throw paymentMethodsResponse.error
-
-      concepts.value = conceptsResponse.data || []
-      plans.value = plansResponse.data || []
-      paymentMethods.value = paymentMethodsResponse.data || []
+      concepts.value = conceptsData || []
+      plans.value = plansData || []
+      paymentMethods.value = paymentMethodsData || []
 
       return { success: true }
     } catch (err) {

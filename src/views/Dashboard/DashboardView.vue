@@ -178,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
@@ -211,18 +211,23 @@ const recentCheckIns = ref([
   { id: 3, name: 'Carlos López', dni: '11223344', time: '14:00', status: 'vencido', statusLabel: 'Vencido' }
 ])
 
-onMounted(async () => {
+async function loadStats() {
   loading.value = true
-  await gymStore.getStats()
-  stats.value = gymStore.stats
-  loading.value = false
+  try {
+    await gymStore.getStats()
+    stats.value = gymStore.stats
+  } catch (err) {
+    console.error('Error cargando estadísticas:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(async () => {
+  await loadStats()
 })
 
 function formatCurrency(value) {
   return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
-
-onMounted(async () => {
-  await gymStore.getStats()
-})
 </script>

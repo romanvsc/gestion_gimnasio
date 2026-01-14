@@ -54,13 +54,31 @@ export const useUserStore = defineStore('user', () => {
   async function initSession() {
     try {
       loading.value = true
-      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      error.value = null
+      
+      const { data, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError) {
+        console.error('Error obteniendo sesión:', sessionError)
+        // Resetear todo si hay error
+        session.value = null
+        user.value = null
+        userRole.value = null
+        return
+      }
+      
+      const currentSession = data?.session
       
       if (currentSession) {
         session.value = currentSession
         user.value = currentSession.user
         // Verificar el rol del usuario
         await checkUserRole(currentSession.user.id)
+      } else {
+        // No hay sesión, resetear todo
+        session.value = null
+        user.value = null
+        userRole.value = null
       }
 
       // Escuchar cambios en la autenticación (incluyendo refresh de token)
@@ -91,6 +109,10 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       console.error('Error al inicializar sesión:', err)
       error.value = err.message
+      // IMPORTANTE: Resetear todo en caso de error crítico
+      session.value = null
+      user.value = null
+      userRole.value = null
     } finally {
       loading.value = false
     }

@@ -264,7 +264,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { useCashRegister } from '@/composables/useCashRegister'
 import BaseButton from '@/components/ui/BaseButton.vue'

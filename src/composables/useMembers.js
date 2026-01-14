@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { runQuery } from '@/lib/asyncHandler'
 import imageCompression from 'browser-image-compression'
 
 export function useMembers() {
@@ -18,22 +19,21 @@ export function useMembers() {
       loading.value = true
       error.value = null
 
-      let query = supabase
-        .from('v_socios_estado')
-        .select('*')
-      
-      // Filtrar solo activos si includeInactive es false
-      if (!includeInactive) {
-        query = query.eq('activo', true)
-      }
-      
-      query = query
-        .order('estado_cuota', { ascending: false }) // Vencidos primero
-        .order('apellido', { ascending: true })
-
-      const { data, error: fetchError } = await query
-
-      if (fetchError) throw fetchError
+      // El wrapper runQuery se encarga de: navigator.onLine, reintentos, backoff
+      const data = await runQuery(() => {
+        let query = supabase
+          .from('v_socios_estado')
+          .select('*')
+        
+        // Filtrar solo activos si includeInactive es false
+        if (!includeInactive) {
+          query = query.eq('activo', true)
+        }
+        
+        return query
+          .order('estado_cuota', { ascending: false }) // Vencidos primero
+          .order('apellido', { ascending: true })
+      })
 
       members.value = data || []
       return { success: true, data }
@@ -54,13 +54,13 @@ export function useMembers() {
       loading.value = true
       error.value = null
 
-      const { data, error: fetchError } = await supabase
-        .from('members')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      if (fetchError) throw fetchError
+      const data = await runQuery(() =>
+        supabase
+          .from('members')
+          .select('*')
+          .eq('id', id)
+          .single()
+      )
 
       currentMember.value = data
       return { success: true, data }
@@ -81,13 +81,13 @@ export function useMembers() {
       loading.value = true
       error.value = null
 
-      const { data, error: createError } = await supabase
-        .from('members')
-        .insert([memberData])
-        .select()
-        .single()
-
-      if (createError) throw createError
+      const data = await runQuery(() =>
+        supabase
+          .from('members')
+          .insert([memberData])
+          .select()
+          .single()
+      )
 
       return { success: true, data }
     } catch (err) {

@@ -116,13 +116,19 @@ async function loadLastAccesses() {
       .order('created_at', { ascending: false })
       .limit(20)
 
-    if (fetchError) throw fetchError
+    if (fetchError) {
+      console.error('Error en query attendance:', fetchError)
+      throw new Error(`Error al consultar accesos: ${fetchError.message}`)
+    }
 
     accesses.value = data || []
   } catch (err) {
     console.error('Error cargando accesos:', err)
-    error.value = 'Error al cargar los accesos'
+    error.value = err.message || 'Error al cargar los accesos'
+    // Resetear en caso de error
+    accesses.value = []
   } finally {
+    // CRÍTICO: Siempre liberar el loading
     loading.value = false
   }
 }

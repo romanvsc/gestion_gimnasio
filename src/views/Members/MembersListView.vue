@@ -237,7 +237,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMembers } from '@/composables/useMembers'
 import { Receipt, CalendarClock } from 'lucide-vue-next'

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { runQuery } from '@/lib/asyncHandler'
 
 export function useCashRegister() {
   const transactions = ref([])
@@ -39,10 +40,9 @@ export function useCashRegister() {
       const endDateStr = endDate.toISOString().split('T')[0]
 
       // Consulta 1: Saldo Anterior (al inicio del rango)
-      const { data: balanceData, error: balanceError } = await supabase
-        .rpc('get_previous_balance', { check_date: startDateStr })
-
-      if (balanceError) throw balanceError
+      const balanceData = await runQuery(() =>
+        supabase.rpc('get_previous_balance', { check_date: startDateStr })
+      )
 
       balanceAnterior.value = balanceData || 0
 
@@ -50,14 +50,14 @@ export function useCashRegister() {
       const startDateTime = `${startDateStr}T00:00:00`
       const endDateTime = `${endDateStr}T23:59:59`
 
-      const { data: transData, error: transError } = await supabase
-        .from('transactions')
-        .select('*')
-        .gte('created_at', startDateTime)
-        .lte('created_at', endDateTime)
-        .order('created_at', { ascending: false })
-
-      if (transError) throw transError
+      const transData = await runQuery(() =>
+        supabase
+          .from('transactions')
+          .select('*')
+          .gte('created_at', startDateTime)
+          .lte('created_at', endDateTime)
+          .order('created_at', { ascending: false })
+      )
 
       transactions.value = transData || []
 
@@ -65,6 +65,11 @@ export function useCashRegister() {
     } catch (err) {
       console.error('Error cargando datos de caja:', err)
       error.value = err.message
+      
+      // Resetear valores en caso de error
+      transactions.value = []
+      balanceAnterior.value = 0
+      
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -83,7 +88,9 @@ export function useCashRegister() {
       // Obtener usuario actual (created_by)
       const { data: { user } } = await supabase.auth.getUser()
 
-      if (!user) throw new Error('Usuario no autenticado')
+      if (!user) {
+        throw new Error('Usuario no autenticado. Por favor, inicia sesión nuevamente.')
+      }
 
       const { data, error: insertError } = await supabase
         .from('transactions')
@@ -98,7 +105,10 @@ export function useCashRegister() {
         .select()
         .single()
 
-      if (insertError) throw insertError
+      if (insertError) {
+        console.error('Error insertando transacción:', insertError)
+        throw new Error(`Error al registrar transacción: ${insertError.message}`)
+      }
 
       // Recargar datos del día actual
       const today = new Date()
@@ -110,6 +120,7 @@ export function useCashRegister() {
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
+      // CRÍTICO: Siempre liberar el loading
       loading.value = false
     }
   }
