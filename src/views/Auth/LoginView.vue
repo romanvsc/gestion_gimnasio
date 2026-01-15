@@ -42,10 +42,10 @@
       <div class="w-full max-w-md">
         <!-- Título de bienvenida -->
         <div class="text-center lg:text-left mb-8">
-          <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+          <h1 class="text-3xl lg:text-4xl font-bold text-page-title mb-2">
             Iniciar Sesión
           </h1>
-          <p class="text-gray-500">
+          <p class="text-page-subtitle">
             Por favor, ingresa tus datos para acceder.
           </p>
         </div>

@@ -9,10 +9,10 @@
       </div>
 
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">
           {{ isEditing ? 'Editar Socio' : 'Nuevo Socio' }}
         </h1>
-        <p class="text-gray-600">
+        <p class="text-page-subtitle">
           {{ isEditing ? 'Actualiza la información del socio' : 'Completa el formulario para agregar un nuevo socio' }}
         </p>
       </div>

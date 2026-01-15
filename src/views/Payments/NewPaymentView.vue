@@ -2,8 +2,8 @@
   <div class="bg-gray-50 min-h-screen">
     <div class="max-w-6xl mx-auto px-4 py-8">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Registrar Pago</h1>
-        <p class="text-gray-600">Registra un nuevo pago de membresía</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Registrar Pago</h1>
+        <p class="text-page-subtitle">Registra un nuevo pago de membresía</p>
       </div>
 
       <!-- Grid de 2 columnas -->

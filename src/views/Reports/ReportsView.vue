@@ -3,8 +3,8 @@
     <div class="max-w-7xl mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Reportes y Análisis</h1>
-        <p class="text-gray-600">Métricas clave para la toma de decisiones estratégicas</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Reportes y Análisis</h1>
+        <p class="text-page-subtitle">Métricas clave para la toma de decisiones estratégicas</p>
       </div>
 
       <!-- Filtro de Rango de Fechas -->

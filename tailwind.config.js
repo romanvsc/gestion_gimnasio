@@ -31,6 +31,13 @@ export default {
           800: '#075985',
           900: '#0c4a6e',
         },
+        // Design System: Colores semánticos para páginas
+        page: {
+          bg: '#f8fafc',        // gray-50: Fondo de todas las páginas
+          title: '#0f172a',      // gray-900: Títulos principales
+          subtitle: '#64748b',   // gray-500: Subtítulos y descripciones
+          muted: '#94a3b8',      // gray-400: Texto muy secundario
+        },
       },
     },
   },

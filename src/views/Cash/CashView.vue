@@ -5,8 +5,8 @@
       <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Gestión de Caja</h1>
-            <p class="text-gray-400">Control de ingresos y egresos por período</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Gestión de Caja</h1>
+            <p class="text-page-subtitle">Control de ingresos y egresos por período</p>
           </div>
           
           <!-- Selector de Rango de Fechas -->
@@ -45,7 +45,7 @@
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-gray-400 text-sm font-medium mb-2">Saldo Inicial del Período</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Saldo Inicial del Período</p>
               <p class="text-gray-800 text-3xl font-bold mb-1">
                 {{ formatCurrency(balanceAnterior) }}
               </p>
@@ -61,7 +61,7 @@
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-gray-400 text-sm font-medium mb-2">Ingresos</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Ingresos</p>
               <p class="text-gray-800 text-3xl font-bold mb-1">
                 {{ formatCurrency(ingresosDia) }}
               </p>
@@ -79,7 +79,7 @@
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-gray-400 text-sm font-medium mb-2">Egresos</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Egresos</p>
               <p class="text-gray-800 text-3xl font-bold mb-1">
                 {{ formatCurrency(egresosDia) }}
               </p>
@@ -97,7 +97,7 @@
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-gray-400 text-sm font-medium mb-2">Saldo Final</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Saldo Final</p>
               <p class="text-gray-800 text-3xl font-bold mb-1">
                 {{ formatCurrency(saldoFinal) }}
               </p>

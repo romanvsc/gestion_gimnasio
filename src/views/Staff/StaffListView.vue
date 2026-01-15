@@ -1,10 +1,11 @@
 <template>
-  <div class="p-4 md:p-6">
+  <div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
-        <p class="text-gray-600 mt-1">Administra el personal del gimnasio</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title">Gestión de Usuarios</h1>
+        <p class="text-page-subtitle mt-1">Administra el personal del gimnasio</p>
       </div>
       <BaseButton @click="openCreateModal" color="primary">
         <UserPlus class="w-5 h-5 mr-2" />
@@ -155,6 +156,7 @@
       @close="closeModal"
       @success="handleSuccess"
     />
+    </div>
   </div>
 </template>
 

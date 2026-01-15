@@ -10,8 +10,8 @@
           <div class="mb-6 flex justify-center">
             <CreditCard class="w-16 h-16 text-gray-200" />
           </div>
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">Acceso al Gimnasio</h1>
-          <p class="text-gray-600 text-lg">Escanea o ingresa tu DNI</p>
+          <h1 class="text-3xl md:text-4xl font-bold text-page-title mb-2">Acceso al Gimnasio</h1>
+          <p class="text-page-subtitle text-lg">Escanea o ingresa tu DNI</p>
         </div>
 
         <!-- Buscador Gigante Centrado -->

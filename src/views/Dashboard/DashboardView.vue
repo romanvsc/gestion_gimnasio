@@ -3,8 +3,8 @@
     <div class="max-w-7xl mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
-        <p class="text-gray-400 mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Dashboard</h1>
+        <p class="text-page-subtitle mb-6">
           Bienvenido a {{ settings.nombre_gimnasio }}, {{ userStore.userEmail }}
           <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
             Admin

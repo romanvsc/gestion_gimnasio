@@ -3,8 +3,8 @@
     <div class="max-w-3xl mx-auto px-4">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Configuración del Sistema</h1>
-        <p class="text-gray-600">Personaliza la información y apariencia de tu gimnasio</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Configuración del Sistema</h1>
+        <p class="text-page-subtitle">Personaliza la información y apariencia de tu gimnasio</p>
       </div>
 
       <!-- Tarjeta de Configuración -->
