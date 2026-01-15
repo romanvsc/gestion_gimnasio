@@ -65,7 +65,7 @@ import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore'
 import { useSettings } from '@/composables/useSettings'
 import { confirmAlert } from '@/lib/alerts'
-import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, Settings, LogOut } from 'lucide-vue-next'
+import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, Settings, BarChart3, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
@@ -77,6 +77,7 @@ const navigationItems = [
   { name: 'Socios', to: '/miembros', icon: Users },
   { name: 'Check-In', to: '/checkin', icon: CheckCircle },
   { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign },
+  { name: 'Reportes', to: '/reports', icon: BarChart3, adminOnly: true },
   { name: 'Caja', to: '/caja', icon: Wallet, adminOnly: true },
   { name: 'Usuarios', to: '/staff', icon: Settings, adminOnly: true },
   { name: 'Configuración', to: '/settings', icon: Settings, adminOnly: true }
