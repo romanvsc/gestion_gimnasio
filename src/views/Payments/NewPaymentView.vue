@@ -1,29 +1,48 @@
 <template>
   <div class="bg-gray-50 min-h-screen">
-    <div class="max-w-6xl mx-auto px-4 py-8">
-      <div class="mb-8">
+    <div class="max-w-6xl mx-auto px-4 py-6 md:py-8">
+      
+      <!-- Header con botón volver -->
+      <div class="mb-6 md:mb-8">
+        <BaseButton variant="ghost" @click="$router.back()" class="mb-4">
+          <ArrowLeft class="w-4 h-4 mr-2" />
+          Volver
+        </BaseButton>
+        
         <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Registrar Pago</h1>
         <p class="text-page-subtitle">Registra un nuevo pago de membresía</p>
       </div>
 
-      <!-- Grid de 2 columnas -->
       <form @submit.prevent="handleSubmit">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- En móvil: Resumen arriba (sticky) -->
+        <div class="lg:hidden mb-6 sticky top-0 z-10">
+          <PaymentSummaryCard
+            :monto="formData.monto"
+            :plan-name="selectedPlanName"
+            :fecha-inicio="formattedStartDate"
+            :fecha-fin="formattedEndDate"
+            :duracion="durationDays"
+            :metodo-pago="paymentMethodLabel"
+            :tarifa-badge="tarifaBadge"
+            compact
+          />
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
           
-          <!-- Columna Izquierda: Formulario -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Datos del Pago</h2>
+          <!-- Columna Izquierda: Formulario (3/5) -->
+          <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-5 md:p-6 space-y-6">
+            <h2 class="text-lg font-semibold text-gray-900">Datos del Pago</h2>
             
             <!-- Buscar Socio -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Buscar Socio *
               </label>
-              <input
+              <BaseInput
                 v-model="memberSearch"
-                type="text"
                 placeholder="Nombre, apellido o DNI..."
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="text-base md:text-lg"
                 @input="searchMembers"
               />
               
@@ -33,7 +52,7 @@
                   v-for="member in memberSearchResults"
                   :key="member.id"
                   type="button"
-                  class="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+                  class="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors border-b border-gray-100 last:border-b-0 touch-manipulation"
                   @click="selectMember(member)"
                 >
                   <p class="font-medium text-gray-900">{{ member.nombre }} {{ member.apellido }}</p>
@@ -42,56 +61,80 @@
               </div>
 
               <!-- Socio seleccionado -->
-              <div v-if="selectedMember" class="mt-2 bg-primary-50 border border-primary-200 rounded-lg p-3">
-                <div class="flex justify-between items-center">
-                  <div>
-                    <p class="font-medium text-primary-900">{{ selectedMember.nombre }} {{ selectedMember.apellido }}</p>
+              <div v-if="selectedMember" class="mt-3 bg-primary-50 border border-primary-200 rounded-lg p-4">
+                <div class="flex justify-between items-start gap-3">
+                  <div class="flex-1">
+                    <p class="font-semibold text-primary-900">{{ selectedMember.nombre }} {{ selectedMember.apellido }}</p>
                     <p class="text-sm text-primary-700">DNI: {{ selectedMember.dni }}</p>
+                    <span v-if="selectedMember.es_socio_club" class="inline-flex items-center gap-1 mt-2 text-xs font-medium text-yellow-800 bg-yellow-100 px-2 py-1 rounded-full border border-yellow-300">
+                      🏆 Socio Club
+                    </span>
                   </div>
-                  <button
-                    type="button"
-                    class="text-gray-400 hover:text-red-600 transition-colors"
+                  <BaseButton
+                    variant="ghost"
+                    size="sm"
                     @click="clearMember"
+                    class="flex-shrink-0"
                   >
                     ✕
-                  </button>
+                  </BaseButton>
                 </div>
               </div>
             </div>
 
             <!-- Seleccionar Plan -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-sm font-medium text-gray-700 mb-3">
                 Plan *
               </label>
-              <select
-                v-model="formData.plan_id"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                required
-                @change="updateDates"
-              >
-                <option value="" disabled>Seleccionar plan...</option>
-                <option v-for="plan in plans" :key="plan.id" :value="plan.id">
-                  {{ plan.nombre }} - ${{ plan.precio }} ({{ plan.dias_duracion }} días)
-                </option>
-              </select>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  v-for="plan in plans"
+                  :key="plan.id"
+                  type="button"
+                  :class="[
+                    'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
+                    formData.plan_id === plan.id
+                      ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 shadow-sm'
+                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
+                  ]"
+                  @click="selectPlan(plan)"
+                >
+                  <p class="font-semibold text-gray-900 mb-1">{{ plan.nombre }}</p>
+                  <p class="text-sm text-gray-500 mb-2">{{ plan.dias_duracion }} días</p>
+                  <div class="flex items-baseline gap-2">
+                    <p class="text-xl md:text-2xl font-bold text-primary-600">
+                      ${{ selectedMember?.es_socio_club ? (plan.precio_socio || plan.precio) : plan.precio }}
+                    </p>
+                    <p v-if="selectedMember?.es_socio_club && plan.precio_socio && plan.precio_socio !== plan.precio" class="text-sm text-gray-400 line-through">
+                      ${{ plan.precio }}
+                    </p>
+                  </div>
+                </button>
+              </div>
             </div>
 
             <!-- Método de Pago -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-sm font-medium text-gray-700 mb-3">
                 Método de Pago *
               </label>
-              <select
-                v-model="formData.metodo_pago"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                required
-              >
-                <option value="" disabled>Seleccionar método...</option>
-                <option v-for="method in paymentMethods" :key="method.id" :value="method.nombre">
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="method in paymentMethods"
+                  :key="method.id"
+                  type="button"
+                  :class="[
+                    'px-5 py-3 rounded-lg border-2 font-medium transition-all touch-manipulation',
+                    formData.metodo_pago === method.nombre
+                      ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300 active:bg-gray-50'
+                  ]"
+                  @click="formData.metodo_pago = method.nombre"
+                >
                   {{ method.nombre }}
-                </option>
-              </select>
+                </button>
+              </div>
             </div>
 
             <!-- Fecha de Inicio -->
@@ -99,10 +142,9 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Fecha de Inicio *
               </label>
-              <input
+              <BaseInput
                 v-model="formData.fecha_inicio"
                 type="date"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 required
                 @change="updateDates"
               />
@@ -115,118 +157,98 @@
             >
               {{ error }}
             </div>
+
+            <!-- Botones (móvil) -->
+            <div class="lg:hidden flex flex-col gap-3 pt-4">
+              <BaseButton
+                type="submit"
+                variant="primary"
+                size="lg"
+                :disabled="!isFormValid || loading"
+                :loading="loading"
+                full-width
+              >
+                Registrar Pago
+              </BaseButton>
+              <BaseButton
+                type="button"
+                variant="outline"
+                size="lg"
+                :disabled="loading"
+                full-width
+                @click="resetForm"
+              >
+                Limpiar Formulario
+              </BaseButton>
+            </div>
           </div>
 
-          <!-- Columna Derecha: Resumen de Pago -->
-          <div class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl shadow-sm border border-primary-100 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-6">Resumen de Pago</h2>
-            
-            <div class="space-y-6">
-              <!-- Monto a Pagar -->
-              <div class="text-center py-6 bg-white rounded-lg shadow-sm">
-                <p class="text-sm text-gray-600 mb-2">Monto a Pagar</p>
-                <p class="text-5xl font-bold text-primary-600">
-                  {{ formData.monto ? `$${formData.monto}` : '$0' }}
-                </p>
-                <!-- Badge de tarifa aplicada -->
-                <div v-if="tarifaBadge" class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium" :class="tarifaBadge.class">
-                  <span>{{ tarifaBadge.icon }}</span>
-                  <span>{{ tarifaBadge.text }}</span>
-                </div>
-              </div>
-
-              <!-- Plan Seleccionado -->
-              <div class="bg-white rounded-lg p-4 shadow-sm">
-                <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Plan Seleccionado</p>
-                <p class="text-base font-medium text-gray-900">
-                  {{ selectedPlanName || 'Ningún plan seleccionado' }}
-                </p>
-              </div>
-
-              <!-- Fechas -->
-              <div class="bg-white rounded-lg p-4 shadow-sm space-y-3">
-                <div>
-                  <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Fecha de Inicio</p>
-                  <p class="text-base font-medium text-gray-900">
-                    {{ formattedStartDate || '—' }}
-                  </p>
-                </div>
-                <div class="border-t border-gray-100 pt-3">
-                  <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Fecha de Fin</p>
-                  <p class="text-base font-medium text-gray-900">
-                    {{ formattedEndDate || '—' }}
-                  </p>
-                </div>
-                <div v-if="durationDays" class="border-t border-gray-100 pt-3">
-                  <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Duración</p>
-                  <p class="text-base font-medium text-primary-600">
-                    {{ durationDays }} días
-                  </p>
-                </div>
-              </div>
-
-              <!-- Método de Pago -->
-              <div class="bg-white rounded-lg p-4 shadow-sm">
-                <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Método de Pago</p>
-                <p class="text-base font-medium text-gray-900">
-                  {{ paymentMethodLabel || '—' }}
-                </p>
+          <!-- Columna Derecha: Resumen (2/5) - Solo desktop -->
+          <div class="hidden lg:block lg:col-span-2">
+            <div class="sticky top-6 space-y-4">
+              <PaymentSummaryCard
+                :monto="formData.monto"
+                :plan-name="selectedPlanName"
+                :fecha-inicio="formattedStartDate"
+                :fecha-fin="formattedEndDate"
+                :duracion="durationDays"
+                :metodo-pago="paymentMethodLabel"
+                :tarifa-badge="tarifaBadge"
+              />
+              
+              <!-- Botones (desktop) -->
+              <div class="space-y-3">
+                <BaseButton
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  :disabled="!isFormValid || loading"
+                  :loading="loading"
+                  full-width
+                >
+                  Registrar Pago
+                </BaseButton>
+                <BaseButton
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  :disabled="loading"
+                  full-width
+                  @click="resetForm"
+                >
+                  Limpiar Formulario
+                </BaseButton>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Botones -->
-        <div class="mt-6 flex gap-3">
-          <button
-            type="submit"
-            :disabled="!selectedMember || loading"
-            class="flex-1 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            {{ loading ? 'Procesando...' : 'Registrar Pago' }}
-          </button>
-
-          <button
-            type="button"
-            @click="resetForm"
-            :disabled="loading"
-            class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors disabled:opacity-50"
-          >
-            Limpiar
-          </button>
-        </div>
       </form>
 
       <!-- Modal de éxito -->
-      <div v-if="showSuccessModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl max-w-md mx-4">
-          <div class="text-center">
-            <h3 class="text-xl font-bold mb-2">Pago Registrado</h3>
-            <p class="text-gray-600 mb-6">
-              El pago se ha registrado exitosamente.
-            </p>
-            <BaseButton
-              variant="primary"
-              full-width
-              @click="closeSuccessModal"
-            >
-              Aceptar
-            </BaseButton>
-          </div>
-        </div>
-      </div>
+      <SuccessModal
+        v-model="showSuccessModal"
+        title="¡Pago Registrado!"
+        message="El pago se ha registrado exitosamente y la membresía ha sido actualizada."
+        @close="closeSuccessModal"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import { ArrowLeft } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
 import { useParameters } from '@/composables/useParameters'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import PaymentSummaryCard from '@/components/payments/PaymentSummaryCard.vue'
+import SuccessModal from '@/components/ui/SuccessModal.vue'
 
+const router = useRouter()
 const { createPayment } = usePayments()
 const { plans, paymentMethods, loading, error, fetchParameters } = useParameters()
 
@@ -246,7 +268,7 @@ const formData = ref({
 
 let searchTimeout = null
 
-// Computed properties para el resumen
+// Computed properties
 const selectedPlanName = computed(() => {
   if (!formData.value.plan_id) return null
   const plan = plans.value.find(p => p.id == formData.value.plan_id)
@@ -283,7 +305,6 @@ const paymentMethodLabel = computed(() => {
   return formData.value.metodo_pago || '—'
 })
 
-// Badge de tarifa aplicada
 const tarifaBadge = computed(() => {
   if (!selectedMember.value || !formData.value.plan_id || !formData.value.monto) return null
   
@@ -292,7 +313,7 @@ const tarifaBadge = computed(() => {
   if (isSocioClub) {
     return {
       icon: '🏆',
-      text: 'Tarifa Club Aplicada',
+      text: 'Tarifa Club',
       class: 'bg-yellow-100 text-yellow-800 border border-yellow-300'
     }
   } else {
@@ -304,6 +325,14 @@ const tarifaBadge = computed(() => {
   }
 })
 
+const isFormValid = computed(() => {
+  return selectedMember.value && 
+         formData.value.plan_id && 
+         formData.value.metodo_pago &&
+         formData.value.fecha_inicio
+})
+
+// Métodos
 async function searchMembers() {
   if (searchTimeout) clearTimeout(searchTimeout)
   
@@ -347,6 +376,11 @@ function clearMember() {
   selectedMember.value = null
   formData.value.member_id = ''
   memberSearch.value = ''
+}
+
+function selectPlan(plan) {
+  formData.value.plan_id = plan.id
+  updateDates()
 }
 
 function updateDates() {
