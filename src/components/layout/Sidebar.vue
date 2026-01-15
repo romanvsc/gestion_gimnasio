@@ -3,8 +3,16 @@
     <div class="flex flex-col w-64">
       <div class="flex flex-col h-0 flex-1 bg-gray-800">
         <!-- Logo/Header -->
-        <div class="flex items-center h-16 flex-shrink-0 px-4 bg-gray-900">
-          <h1 class="text-white text-xl font-bold">Gimnasio</h1>
+        <div class="flex items-center justify-center h-16 flex-shrink-0 px-4 bg-gray-900">
+          <img 
+            v-if="settings.logo_url" 
+            :src="settings.logo_url" 
+            :alt="settings.nombre_gimnasio"
+            class="h-10 max-w-full object-contain"
+          >
+          <h1 v-else class="text-white text-xl font-bold">
+            {{ settings.nombre_gimnasio }}
+          </h1>
         </div>
 
         <!-- Navigation -->
@@ -55,12 +63,14 @@ import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore'
+import { useSettings } from '@/composables/useSettings'
 import { confirmAlert } from '@/lib/alerts'
 import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, Settings, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const { settings } = useSettings()
 
 const navigationItems = [
   { name: 'Dashboard', to: '/', icon: LayoutDashboard },
@@ -68,7 +78,8 @@ const navigationItems = [
   { name: 'Check-In', to: '/checkin', icon: CheckCircle },
   { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign },
   { name: 'Caja', to: '/caja', icon: Wallet, adminOnly: true },
-  { name: 'Usuarios', to: '/staff', icon: Settings, adminOnly: true }
+  { name: 'Usuarios', to: '/staff', icon: Settings, adminOnly: true },
+  { name: 'Configuración', to: '/settings', icon: Settings, adminOnly: true }
 ]
 
 const navigation = computed(() => {

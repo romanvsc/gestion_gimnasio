@@ -76,6 +76,12 @@ const routes = [
         name: 'Staff',
         component: () => import('@/views/Staff/StaffListView.vue'),
         meta: { role: 'admin' }
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('@/views/Settings/SettingsView.vue'),
+        meta: { role: 'admin' }
       }
     ]
   }

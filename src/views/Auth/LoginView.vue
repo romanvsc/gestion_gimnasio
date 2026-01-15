@@ -5,11 +5,20 @@
       <div class="bg-white rounded-2xl shadow-xl p-10">
         <!-- Logo y título -->
         <div class="text-center mb-8">
-          <div class="mx-auto h-20 w-20 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
-            <Dumbbell class="h-10 w-10 text-emerald-600" />
+          <!-- Logo institucional o icono por defecto -->
+          <div class="mx-auto mb-4 flex items-center justify-center">
+            <img 
+              v-if="settings.logo_url" 
+              :src="settings.logo_url" 
+              :alt="settings.nombre_gimnasio"
+              class="h-20 max-w-xs object-contain"
+            >
+            <div v-else class="h-20 w-20 bg-emerald-50 rounded-2xl flex items-center justify-center">
+              <Dumbbell class="h-10 w-10 text-emerald-600" />
+            </div>
           </div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">
-            Gestión Gimnasio
+            {{ settings.nombre_gimnasio }}
           </h1>
           <p class="text-gray-500">
             Inicia sesión para continuar
@@ -93,10 +102,12 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { useSettings } from '@/composables/useSettings'
 import { Dumbbell } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()
+const { settings } = useSettings()
 
 // Estado del formulario
 const email = ref('')

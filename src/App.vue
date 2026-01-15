@@ -19,9 +19,11 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Toaster } from 'vue-sonner'
 import { useUserStore } from './stores/userStore'
+import { useSettings } from './composables/useSettings'
 import { supabase } from './lib/supabase'
 
 const userStore = useUserStore()
+const { fetchSettings } = useSettings()
 const componentKey = ref(0)
 let debounceTimer = null
 
@@ -67,6 +69,9 @@ const handleVisibilityChange = async () => {
 // Inicializar la sesión al cargar la app
 onMounted(async () => {
   await userStore.initSession()
+  
+  // Cargar configuración global del gimnasio
+  await fetchSettings()
   
   // Agregar listener para detectar cuando el usuario vuelve a la pestaña
   document.addEventListener('visibilitychange', handleVisibilityChange)

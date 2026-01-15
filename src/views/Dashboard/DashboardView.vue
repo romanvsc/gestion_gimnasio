@@ -5,7 +5,7 @@
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
         <p class="text-gray-400 mb-6">
-          Bienvenido, {{ userStore.userEmail }}
+          Bienvenido a {{ settings.nombre_gimnasio }}, {{ userStore.userEmail }}
           <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
             Admin
           </span>
@@ -182,6 +182,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
+import { useSettings } from '@/composables/useSettings'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -193,6 +194,7 @@ import LastAccessModal from '@/components/modals/LastAccessModal.vue'
 const router = useRouter()
 const userStore = useUserStore()
 const gymStore = useGymStore()
+const { settings } = useSettings()
 
 const loading = ref(false)
 const showLastAccessModal = ref(false)
