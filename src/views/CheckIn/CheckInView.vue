@@ -115,9 +115,6 @@
         </div>
 
         <!-- Mensaje Inicial -->
-        <div v-else class="text-center text-gray-400 text-xl max-w-md">
-          <p>Comienza escribiendo el DNI, nombre o apellido del socio</p>
-        </div>
       </div>
 
       <!-- Aside Lateral: Live Feed de Últimos Accesos -->
