@@ -1,10 +1,21 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+      
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Socios</h1>
-        <p class="text-page-subtitle">Gestiona los miembros del gimnasio</p>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-page-title">Socios</h1>
+          <p class="text-page-subtitle">Gestiona los miembros del gimnasio</p>
+        </div>
+        <BaseButton 
+          variant="primary" 
+          size="lg"
+          @click="goToNewMember"
+        >
+          <UserPlus class="w-5 h-5 mr-2" />
+          Nuevo Socio
+        </BaseButton>
       </div>
 
       <!-- Loading -->
@@ -17,136 +28,166 @@
         {{ error }}
       </div>
 
-      <!-- Contenedor principal -->
-      <div v-else class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <!-- Header de la tarjeta -->
-        <div class="px-6 py-4 border-b border-gray-100">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <h2 class="text-lg font-semibold text-gray-800">Lista de Socios</h2>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  v-model="showInactive"
-                  @change="handleToggleInactive"
-                  class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
-                />
-                <span class="text-sm text-gray-600">Mostrar inactivos</span>
-              </label>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-3">
-              <input
+      <template v-else>
+        <!-- Filtros -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+              <BaseInput
                 v-model="searchQuery"
-                type="text"
                 placeholder="Buscar por nombre, apellido o DNI..."
-                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-              />
-              <button
-                @click="goToNewMember"
-                class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors text-sm whitespace-nowrap"
+                size="lg"
               >
-                + Nuevo Socio
-              </button>
+                <template #prefix>
+                  <Search class="w-5 h-5 text-gray-400" />
+                </template>
+              </BaseInput>
+            </div>
+            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer touch-manipulation">
+              <input 
+                type="checkbox" 
+                v-model="showInactive"
+                @change="handleToggleInactive"
+                class="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              Mostrar inactivos
+            </label>
+          </div>
+        </div>
+
+        <!-- Empty state (cuando no hay socios) -->
+        <div v-if="filteredMembers.length === 0" class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+          <Users class="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p class="text-lg font-medium text-gray-600">No se encontraron socios</p>
+          <p class="text-sm text-gray-400 mt-1">Prueba ajustando los filtros o agrega un nuevo socio</p>
+        </div>
+
+        <!-- Vista Mobile: Cards -->
+        <div v-else class="md:hidden space-y-3">
+          <div
+            v-for="member in filteredMembers"
+            :key="member.id"
+            class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 touch-manipulation active:bg-gray-50 transition-colors"
+            @click="goToMemberDetail(member.id)"
+          >
+            <div class="flex items-start gap-4">
+              <!-- Avatar -->
+              <div class="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                <img
+                  v-if="member.foto_url"
+                  :src="member.foto_url"
+                  :alt="`${member.nombre} ${member.apellido}`"
+                  class="w-14 h-14 rounded-full object-cover"
+                />
+                <span v-else class="text-lg font-bold text-primary-700">
+                  {{ getInitials(member.nombre, member.apellido) }}
+                </span>
+              </div>
+              
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 truncate flex items-center gap-2">
+                  {{ member.nombre }} {{ member.apellido }}
+                  <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">🏆</span>
+                </h3>
+                <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
+                
+                <!-- Badges -->
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <StatusBadge :status="member.estado_cuota" type="cuota" size="sm" />
+                  <StatusBadge :status="member.estado_apto_fisico" type="apto" size="sm" />
+                  <StatusBadge 
+                    v-if="!member.activo"
+                    type="secondary"
+                    size="sm"
+                  >
+                    Inactivo
+                  </StatusBadge>
+                </div>
+              </div>
+
+              <!-- Chevron -->
+              <ChevronRight class="w-5 h-5 text-gray-400 flex-shrink-0" />
             </div>
           </div>
         </div>
 
-        <!-- Tabla Desktop -->
-        <div v-if="filteredMembers.length > 0" class="hidden md:block overflow-x-auto">
-          <table class="min-w-full">
-            <thead class="bg-gray-50">
+        <!-- Vista Desktop: Tabla -->
+        <div v-if="filteredMembers.length > 0" class="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Foto
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Socio
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  DNI
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contacto
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado Cuota
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Socio</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">DNI</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contacto</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Cuota</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Apto Físico</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody class="bg-white">
-              <tr
-                v-for="member in filteredMembers"
+            <tbody class="divide-y divide-gray-100">
+              <tr 
+                v-for="member in filteredMembers" 
                 :key="member.id"
-                :class="[
-                  'border-b border-gray-100 hover:bg-gray-50 transition-colors',
-                  !member.activo && 'opacity-60'
-                ]"
+                class="hover:bg-gray-50 transition-colors"
+                :class="{ 'opacity-60': !member.activo }"
               >
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="h-10 w-10 flex-shrink-0">
-                    <img
-                      v-if="member.foto_url"
-                      :src="member.foto_url"
-                      :alt="`${member.nombre} ${member.apellido}`"
-                      class="h-10 w-10 rounded-full object-cover"
-                    />
-                    <div v-else class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-                      <span class="text-sm font-semibold text-slate-600">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                      <img
+                        v-if="member.foto_url"
+                        :src="member.foto_url"
+                        :alt="`${member.nombre} ${member.apellido}`"
+                        class="w-10 h-10 rounded-full object-cover"
+                      />
+                      <span v-else class="text-sm font-bold text-primary-700">
                         {{ getInitials(member.nombre, member.apellido) }}
                       </span>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="cursor-pointer" @click="goToMemberDetail(member.id)">
-                    <div class="text-sm font-medium text-gray-900 hover:text-primary-600 flex items-center gap-2">
-                      {{ member.nombre }} {{ member.apellido }}
-                      <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">⭐</span>
+                    <div>
+                      <p class="font-medium text-gray-900 flex items-center gap-2">
+                        {{ member.nombre }} {{ member.apellido }}
+                        <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">🏆</span>
+                      </p>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ member.dni }}</div>
+                <td class="px-6 py-4 text-gray-600">{{ member.dni }}</td>
+                <td class="px-6 py-4">
+                  <p class="text-gray-600">{{ member.email || '—' }}</p>
+                  <p class="text-sm text-gray-400">{{ member.telefono || '—' }}</p>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ member.email || '-' }}</div>
-                  <div class="text-sm text-gray-500">{{ member.telefono || '-' }}</div>
+                <td class="px-6 py-4 text-center">
+                  <StatusBadge :status="member.estado_cuota" type="cuota" />
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge
-                    :status="member.estado_cuota"
-                    :label="member.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
-                  />
+                <td class="px-6 py-4 text-center">
+                  <StatusBadge :status="member.estado_apto_fisico" type="apto" />
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge
-                    :type="member.activo ? 'success' : 'secondary'"
-                  >
+                <td class="px-6 py-4 text-center">
+                  <StatusBadge :status="member.activo ? 'activo' : 'inactivo'" type="estado">
                     {{ member.activo ? 'Activo' : 'Inactivo' }}
                   </StatusBadge>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4">
                   <div class="flex items-center justify-center gap-2">
-                    <button
+                    <BaseButton
+                      variant="ghost"
+                      size="sm"
+                      @click="goToMemberDetail(member.id)"
+                      title="Ver detalle"
+                    >
+                      <Eye class="w-5 h-5" />
+                    </BaseButton>
+                    <BaseButton
+                      variant="ghost"
+                      size="sm"
                       @click.stop="openHistoryModal(member, 'payments')"
-                      class="p-2 hover:bg-primary-50 rounded-lg transition-colors group"
-                      title="Ver Pagos"
+                      title="Historial de pagos"
                     >
-                      <Receipt class="w-5 h-5 text-gray-400 group-hover:text-primary-600" />
-                    </button>
-                    <button
-                      @click.stop="openHistoryModal(member, 'attendance')"
-                      class="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
-                      title="Ver Asistencias"
-                    >
-                      <CalendarClock class="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
-                    </button>
+                      <Receipt class="w-5 h-5" />
+                    </BaseButton>
                   </div>
                 </td>
               </tr>
@@ -154,76 +195,11 @@
           </table>
         </div>
 
-        <!-- Cards Mobile -->
-        <div v-if="filteredMembers.length > 0" class="md:hidden">
-          <div
-            v-for="member in filteredMembers"
-            :key="member.id"
-            :class="[
-              'p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors last:border-b-0',
-              !member.activo && 'opacity-60'
-            ]"
-            @click="goToMemberDetail(member.id)"
-          >
-            <div class="flex items-start mb-3">
-              <div class="h-10 w-10 flex-shrink-0">
-                <img
-                  v-if="member.foto_url"
-                  :src="member.foto_url"
-                  :alt="`${member.nombre} ${member.apellido}`"
-                  class="h-10 w-10 rounded-full object-cover"
-                />
-                <div v-else class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-                  <span class="text-sm font-semibold text-slate-600">
-                    {{ getInitials(member.nombre, member.apellido) }}
-                  </span>
-                </div>
-              </div>
-              <div class="ml-3 flex-1">
-                <h3 class="text-sm font-medium text-gray-900 flex items-center gap-1">
-                  {{ member.nombre }} {{ member.apellido }}
-                  <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">⭐</span>
-                </h3>
-                <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
-              </div>
-            </div>
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex gap-2 flex-wrap">
-                <StatusBadge
-                  :status="member.estado_cuota"
-                  :label="member.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
-                  size="sm"
-                />
-                <StatusBadge
-                  :type="member.activo ? 'success' : 'secondary'"
-                  size="sm"
-                >
-                  {{ member.activo ? 'Activo' : 'Inactivo' }}
-                </StatusBadge>
-              </div>
-              <div class="flex gap-2">
-                <button
-                  @click.stop="openHistoryModal(member, 'payments')"
-                  class="p-2 hover:bg-primary-50 rounded-lg transition-colors"
-                >
-                  <Receipt class="w-5 h-5 text-primary-600" />
-                </button>
-                <button
-                  @click.stop="openHistoryModal(member, 'attendance')"
-                  class="p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  <CalendarClock class="w-5 h-5 text-blue-600" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sin resultados -->
-        <div v-if="filteredMembers.length === 0" class="p-8 text-center">
-          <p class="text-gray-500">No se encontraron socios</p>
-        </div>
-      </div>
+        <!-- Contador -->
+        <p v-if="filteredMembers.length > 0" class="text-sm text-gray-500 mt-4 text-center md:text-left">
+          {{ filteredMembers.length }} socio(s) encontrado(s)
+        </p>
+      </template>
     </div>
 
     <!-- Modal de Historial -->
@@ -237,10 +213,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMembers } from '@/composables/useMembers'
-import { Receipt, CalendarClock } from 'lucide-vue-next'
+import { Search, UserPlus, ChevronRight, Users, Eye, Receipt } from 'lucide-vue-next'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import MemberHistoryModal from '@/components/modals/MemberHistoryModal.vue'
 
@@ -253,19 +231,16 @@ const showHistoryModal = ref(false)
 const selectedMemberId = ref('')
 const selectedMemberName = ref('')
 
-// Función para obtener iniciales
 function getInitials(nombre, apellido) {
   const firstInitial = nombre ? nombre.charAt(0).toUpperCase() : ''
   const lastInitial = apellido ? apellido.charAt(0).toUpperCase() : ''
   return firstInitial + lastInitial
 }
 
-// Manejar cambio en toggle de inactivos
 async function handleToggleInactive() {
   await getMembers(showInactive.value)
 }
 
-// Filtrar socios por búsqueda
 const filteredMembers = computed(() => {
   if (!searchQuery.value) return members.value
 

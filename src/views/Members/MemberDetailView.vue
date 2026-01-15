@@ -4,7 +4,8 @@
       <!-- Header con Botón Volver -->
       <div class="mb-8">
         <BaseButton variant="ghost" @click="goBack">
-          ← Volver
+          <ArrowLeft class="w-4 h-4 mr-2" />
+          Volver
         </BaseButton>
       </div>
 
@@ -111,7 +112,7 @@
                  'Sin pagos registrados' }}
             </p>
             <p v-if="memberData.fecha_fin_cuota" class="text-xs text-gray-600 mt-2">
-              {{ memberData.estado_cuota === 'activo' ? 'Vence:' : 'Venció:' }} {{ formatDate(memberData.fecha_fin_cuota) }}
+              {{ memberData.estado_cuota === 'activo' ? 'Vence:' : 'Vence:' }} {{ formatDate(memberData.fecha_fin_cuota) }}
             </p>
           </div>
 
@@ -344,7 +345,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import { 
   Star, User, CalendarCheck, Heart, Activity, Weight, 
-  Ruler, History 
+  Ruler, History, ArrowLeft 
 } from 'lucide-vue-next'
 
 const route = useRoute()
