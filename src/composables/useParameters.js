@@ -75,6 +75,103 @@ export function useParameters() {
   }
 
   /**
+   * Carga TODOS los planes (activos e inactivos) para gestión
+   */
+  async function fetchAllPlans() {
+    try {
+      const data = await runQuery(() =>
+        supabase
+          .from('plans')
+          .select('id, nombre, dias_duracion, precio, precio_socio, activo')
+          .order('nombre')
+      )
+      plans.value = data || []
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error cargando planes:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
+   * Carga TODOS los métodos de pago para gestión
+   */
+  async function fetchAllPaymentMethods() {
+    try {
+      const data = await runQuery(() =>
+        supabase
+          .from('payment_methods')
+          .select('*')
+          .order('nombre')
+      )
+      paymentMethods.value = data || []
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error cargando métodos de pago:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
+   * Crea un nuevo plan
+   */
+  async function createPlan(planData) {
+    try {
+      const data = await runQuery(() =>
+        supabase
+          .from('plans')
+          .insert([planData])
+          .select()
+          .single()
+      )
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error creando plan:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
+   * Actualiza un plan existente
+   */
+  async function updatePlan(id, planData) {
+    try {
+      const data = await runQuery(() =>
+        supabase
+          .from('plans')
+          .update(planData)
+          .eq('id', id)
+          .select()
+          .single()
+      )
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error actualizando plan:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
+   * Actualiza un método de pago
+   */
+  async function updatePaymentMethod(id, methodData) {
+    try {
+      const data = await runQuery(() =>
+        supabase
+          .from('payment_methods')
+          .update(methodData)
+          .eq('id', id)
+          .select()
+          .single()
+      )
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error actualizando método de pago:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
    * Obtiene conceptos para INGRESOS (computed)
    */
   const incomeConcepts = computed(() => getConceptsByType('INGRESO'))
@@ -100,6 +197,11 @@ export function useParameters() {
     expenseConcepts,
     // Métodos
     fetchParameters,
+    fetchAllPlans,
+    fetchAllPaymentMethods,
+    createPlan,
+    updatePlan,
+    updatePaymentMethod,
     getConceptsByType,
     clearError
   }
