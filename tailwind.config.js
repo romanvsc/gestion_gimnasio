@@ -3,6 +3,7 @@ export default {
   content: [
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // Habilita modo oscuro con clase
   theme: {
     extend: {
       colors: {
@@ -19,18 +20,37 @@ export default {
           900: '#0f172a',
           950: '#020617',
         },
+        // ============================================
+        // 🎨 PALETA WHITE LABEL - EDITAR AQUÍ PARA CAMBIAR MARCA
+        // ============================================
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#f4f0fa',
+          100: '#e6def4',
+          200: '#d0bfea',
+          300: '#b499dd',
+          400: '#9571ce',
+          500: '#794ebd',
+          600: '#5F388C', // <--- Color Principal de la marca
+          700: '#562f7e',
+          800: '#492969',
+          900: '#3d2355',
+          950: '#261239',
         },
+        // Paleta secundaria para acentos (Cyan/Teal complementario)
+        secondary: {
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0d9488', // <--- Color secundario principal
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+          950: '#042f2e',
+        },
+        // ============================================
         // Design System: Colores semánticos para páginas
         page: {
           bg: '#f8fafc',        // gray-50: Fondo de todas las páginas

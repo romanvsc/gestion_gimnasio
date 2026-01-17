@@ -9,7 +9,7 @@
           <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
             Admin
           </span>
-          <span v-else-if="userStore.isStaff" class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded">
+          <span v-else-if="userStore.isStaff" class="ml-2 px-2 py-1 bg-secondary-100 text-secondary-800 text-xs font-semibold rounded">
             Staff
           </span>
         </p>
@@ -40,23 +40,23 @@
 
           <button
             @click="router.push({ name: 'CheckIn' })"
-            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-100 transition-all duration-200 group text-center"
+            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center"
           >
-            <div class="p-3 bg-purple-50 text-purple-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
+            <div class="p-3 bg-primary-50 text-primary-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
               <CheckCircle class="w-6 h-6" />
             </div>
-            <span class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Check-In</span>
+            <span class="font-semibold text-gray-900 group-hover:text-primary-700 transition-colors">Check-In</span>
             <span class="text-xs text-gray-400 mt-1">Control de acceso</span>
           </button>
 
           <button
             @click="showLastAccessModal = true"
-            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-100 transition-all duration-200 group text-center"
+            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-secondary-100 transition-all duration-200 group text-center"
           >
-            <div class="p-3 bg-blue-50 text-blue-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
+            <div class="p-3 bg-secondary-50 text-secondary-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
               <ListChecks class="w-6 h-6" />
             </div>
-            <span class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Últimos Accesos</span>
+            <span class="font-semibold text-gray-900 group-hover:text-secondary-700 transition-colors">Últimos Accesos</span>
             <span class="text-xs text-gray-400 mt-1">Historial reciente</span>
           </button>
         </div>
@@ -85,8 +85,8 @@
             trend="+8%"
             :icon="Users"
             route="/miembros"
-            icon-bg-color="bg-blue-50"
-            icon-color="text-blue-600"
+            icon-bg-color="bg-secondary-50"
+            icon-color="text-secondary-600"
           />
           
           <StatCard
@@ -95,8 +95,8 @@
             trend="+5%"
             :icon="Activity"
             route="/checkin"
-            icon-bg-color="bg-purple-50"
-            icon-color="text-purple-600"
+            icon-bg-color="bg-primary-50"
+            icon-color="text-primary-600"
           />
           
           <StatCard

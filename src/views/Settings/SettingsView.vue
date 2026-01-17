@@ -32,8 +32,8 @@
       <!-- SECCIÓN 1: Identidad Visual -->
       <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-            <ImageIcon class="w-5 h-5 text-violet-600" />
+          <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+            <ImageIcon class="w-5 h-5 text-primary-600" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Identidad Visual</h2>
@@ -96,8 +96,8 @@
       <!-- SECCIÓN 2: Información del Gimnasio -->
       <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-            <Building2 class="w-5 h-5 text-blue-600" />
+          <div class="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center">
+            <Building2 class="w-5 h-5 text-secondary-600" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Información del Gimnasio</h2>
@@ -243,8 +243,8 @@
       <!-- SECCIÓN 5: Métodos de Pago -->
       <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-            <Wallet class="w-5 h-5 text-purple-600" />
+          <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+            <Wallet class="w-5 h-5 text-primary-600" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Métodos de Pago</h2>
@@ -260,7 +260,7 @@
               @click="togglePaymentMethod(method)"
               class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all touch-manipulation"
               :class="method.activo 
-                ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-500' 
+                ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500' 
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
             >
               <span class="flex items-center gap-2">

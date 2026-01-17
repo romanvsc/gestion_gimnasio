@@ -1,14 +1,30 @@
 <template>
-  <div class="min-h-screen flex flex-col lg:flex-row">
+  <div class="min-h-screen flex flex-col lg:flex-row animate-fade-in">
     <!-- Panel izquierdo - Hero con imagen de fondo (oculto en móviles) -->
     <div 
       class="hidden lg:flex lg:w-1/2 relative overflow-hidden"
     >
-      <!-- Fondo con overlay azul -->
+      <!-- Fondo con overlay -->
       <div class="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-800/90 to-primary-700/85"></div>
       
-      <!-- Imagen de fondo con patrón -->
-      <div class="absolute inset-0 opacity-30" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.1&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+      <!-- Logo como fondo completo (estilo imagen de portada) -->
+      <div 
+        v-if="settingsReady && settings.logo_url" 
+        class="absolute inset-0 pointer-events-none"
+      >
+        <img 
+          :src="settings.logo_url" 
+          :alt="settings.nombre_gimnasio"
+          class="w-full h-full object-cover opacity-[0.2] mix-blend-overlay grayscale"
+        />
+      </div>
+      
+      <!-- Patrón decorativo (mientras carga o si no hay logo) -->
+      <div 
+        v-else-if="!settingsReady || !settings.logo_url"
+        class="absolute inset-0 opacity-30" 
+        style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.1&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"
+      ></div>
       
       <!-- Contenido del hero - Typewriter effect -->
       <div class="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
@@ -39,7 +55,20 @@
 
     <!-- Panel derecho - Formulario de login -->
     <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white">
-      <div class="w-full max-w-md">
+      <div class="w-full max-w-md animate-slide-up">
+        <!-- Logo para móvil -->
+        <div class="lg:hidden flex justify-center mb-6">
+          <img 
+            v-if="settingsReady && settings.logo_url" 
+            :src="settings.logo_url" 
+            :alt="settings.nombre_gimnasio"
+            class="h-16 w-auto object-contain"
+          />
+          <div v-else class="h-16 w-16 rounded-2xl bg-primary-600 flex items-center justify-center">
+            <Dumbbell class="w-8 h-8 text-white" />
+          </div>
+        </div>
+
         <!-- Título de bienvenida -->
         <div class="text-center lg:text-left mb-8">
           <h1 class="text-3xl lg:text-4xl font-bold text-page-title mb-2">
@@ -54,7 +83,7 @@
         <form @submit.prevent="handleLogin" class="space-y-5">
           <!-- Campo de Email -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            <label for="email-input" class="block text-sm font-medium text-gray-700 mb-1.5">
               Correo Electrónico *
             </label>
             <div class="relative">
@@ -62,22 +91,35 @@
                 <Mail class="h-5 w-5 text-gray-400" />
               </div>
               <input
+                id="email-input"
+                ref="emailInput"
                 v-model="email"
                 type="email"
                 placeholder="tucorreo@ejemplo.com"
                 autocomplete="email"
                 required
-                @focus="clearErrors"
-                class="w-full pl-10 pr-4 py-3 text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white transition-all duration-200"
-                :class="{ 'border-red-300 focus:ring-red-500 bg-red-50': emailError }"
+                @input="validateEmailRealTime"
+                @focus="clearFieldError('email')"
+                class="w-full pl-10 pr-4 py-3 text-gray-900 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
+                :class="{ 
+                  'border-red-400 focus:ring-red-500/20 focus:border-red-500 bg-red-50': emailError,
+                  'border-green-400': email && !emailError && isValidEmail(email)
+                }"
               />
+              <!-- Indicador de validación -->
+              <div v-if="email && !emailError && isValidEmail(email)" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <CheckCircle2 class="h-5 w-5 text-green-500" />
+              </div>
             </div>
-            <p v-if="emailError" class="mt-1.5 text-sm text-red-600">{{ emailError }}</p>
+            <p v-if="emailError" class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+              <AlertCircle class="h-3.5 w-3.5" />
+              {{ emailError }}
+            </p>
           </div>
 
           <!-- Campo de Contraseña -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1.5">
               Contraseña *
             </label>
             <div class="relative">
@@ -85,41 +127,73 @@
                 <Lock class="h-5 w-5 text-gray-400" />
               </div>
               <input
+                id="password-input"
                 :type="showPassword ? 'text' : 'password'"
                 v-model="password"
                 placeholder="••••••"
                 autocomplete="current-password"
                 required
-                @focus="clearErrors"
-                class="w-full pl-10 pr-12 py-3 text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white transition-all duration-200"
-                :class="{ 'border-red-300 focus:ring-red-500 bg-red-50': passwordError }"
+                @input="validatePasswordRealTime"
+                @focus="clearFieldError('password')"
+                @keydown="checkCapsLock"
+                @keyup="checkCapsLock"
+                class="w-full pl-10 pr-12 py-3 text-gray-900 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
+                :class="{ 
+                  'border-red-400 focus:ring-red-500/20 focus:border-red-500 bg-red-50': passwordError,
+                  'border-green-400': password && !passwordError && password.length >= 6
+                }"
               />
               <button 
                 type="button"
                 @click="showPassword = !showPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
               >
                 <EyeOff v-if="showPassword" class="h-5 w-5" />
                 <Eye v-else class="h-5 w-5" />
               </button>
             </div>
-            <p v-if="passwordError" class="mt-1.5 text-sm text-red-600">{{ passwordError }}</p>
+            <!-- Indicador de Caps Lock -->
+            <p v-if="capsLockOn" class="mt-1.5 text-sm text-amber-600 flex items-center gap-1">
+              <AlertTriangle class="h-3.5 w-3.5" />
+              Bloq Mayús está activado
+            </p>
+            <p v-else-if="passwordError" class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+              <AlertCircle class="h-3.5 w-3.5" />
+              {{ passwordError }}
+            </p>
+          </div>
+
+          <!-- Recordarme -->
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                v-model="rememberMe"
+                class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-offset-0 transition-colors"
+              />
+              <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                Recordar mi correo
+              </span>
+            </label>
           </div>
 
           <!-- Error general -->
-          <div 
-            v-if="generalError" 
-            class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center"
-          >
-            <AlertCircle class="h-5 w-5 mr-2 flex-shrink-0" />
-            {{ generalError }}
-          </div>
+          <Transition name="shake">
+            <div 
+              v-if="generalError" 
+              class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center"
+            >
+              <AlertCircle class="h-5 w-5 mr-2 flex-shrink-0" />
+              {{ generalError }}
+            </div>
+          </Transition>
 
           <!-- Botón de submit -->
           <button
             type="submit"
             :disabled="!isFormValid || userStore.loading"
-            class="w-full bg-primary-900 hover:bg-primary-800 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center group"
+            class="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center group shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 disabled:shadow-none"
           >
             <span v-if="!userStore.loading" class="flex items-center">
               Iniciar Sesión
@@ -153,7 +227,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useSettings } from '@/composables/useSettings'
@@ -166,12 +240,20 @@ import {
   Eye, 
   EyeOff, 
   ArrowRight,
-  AlertCircle 
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()
-const { settings } = useSettings()
+const { settings, fetchSettings, loading: settingsLoading } = useSettings()
+
+// Estado para saber si los settings ya cargaron
+const settingsReady = ref(false)
+
+// Refs para elementos del DOM
+const emailInput = ref(null)
 
 // Estado del formulario
 const email = ref('')
@@ -180,27 +262,62 @@ const emailError = ref('')
 const passwordError = ref('')
 const generalError = ref('')
 const showPassword = ref(false)
+const rememberMe = ref(false)
+const capsLockOn = ref(false)
 
 // Estado del efecto typewriter
 const displayedText = ref('')
 const isTyping = ref(true)
-const fullText = computed(() => `Bienvenido a ${settings.nombre_gimnasio || 'nuestro gimnasio'}`)
+const fullText = ref('Bienvenido a nuestro gimnasio')
+let typewriterInterval = null
 
 // Validación del formulario
 const isFormValid = computed(() => {
-  return email.value.trim() !== '' && password.value.trim() !== ''
+  return email.value.trim() !== '' && 
+         password.value.trim() !== '' && 
+         isValidEmail(email.value) &&
+         password.value.length >= 6
 })
 
-// Efecto typewriter
-onMounted(() => {
+// Cargar email guardado y autofocus
+onMounted(async () => {
+  // Cargar configuración del gimnasio primero
+  const result = await fetchSettings()
+  console.log('fetchSettings result:', result)
+  console.log('settings después de fetch:', settings.nombre_gimnasio, settings.logo_url)
+  settingsReady.value = true
+  
+  // Actualizar el texto del typewriter con el nombre real
+  fullText.value = `Bienvenido a ${settings.nombre_gimnasio || 'nuestro gimnasio'}`
+  console.log('fullText set to:', fullText.value)
+  
+  // Cargar email guardado
+  const savedEmail = localStorage.getItem('rememberedEmail')
+  if (savedEmail) {
+    email.value = savedEmail
+    rememberMe.value = true
+  }
+  
+  // Autofocus en el campo email
+  await nextTick()
+  if (emailInput.value) {
+    emailInput.value.focus()
+  }
+  
+  // Iniciar typewriter (ahora con settings cargados)
   startTypewriter()
 })
 
 // Reiniciar typewriter si cambia el nombre del gimnasio
-watch(() => settings.nombre_gimnasio, () => {
-  displayedText.value = ''
-  isTyping.value = true
-  startTypewriter()
+watch(() => settings.nombre_gimnasio, (newName) => {
+  if (newName && settingsReady.value) {
+    // Limpiar intervalo anterior
+    if (typewriterInterval) clearInterval(typewriterInterval)
+    displayedText.value = ''
+    isTyping.value = true
+    fullText.value = `Bienvenido a ${newName}`
+    startTypewriter()
+  }
 })
 
 function startTypewriter() {
@@ -208,12 +325,13 @@ function startTypewriter() {
   const text = fullText.value
   const typingSpeed = 800 / text.length
   
-  const typeInterval = setInterval(() => {
+  typewriterInterval = setInterval(() => {
     if (currentIndex < text.length) {
       displayedText.value += text[currentIndex]
       currentIndex++
     } else {
-      clearInterval(typeInterval)
+      clearInterval(typewriterInterval)
+      typewriterInterval = null
       setTimeout(() => {
         isTyping.value = false
       }, 500)
@@ -221,7 +339,38 @@ function startTypewriter() {
   }, typingSpeed)
 }
 
-// Limpiar errores
+// Detectar Caps Lock
+function checkCapsLock(event) {
+  capsLockOn.value = event.getModifierState && event.getModifierState('CapsLock')
+}
+
+// Validación en tiempo real - Email
+function validateEmailRealTime() {
+  if (email.value && !isValidEmail(email.value)) {
+    emailError.value = 'Formato de email inválido'
+  } else {
+    emailError.value = ''
+  }
+}
+
+// Validación en tiempo real - Password
+function validatePasswordRealTime() {
+  if (password.value && password.value.length < 6) {
+    passwordError.value = 'Mínimo 6 caracteres'
+  } else {
+    passwordError.value = ''
+  }
+}
+
+// Limpiar error de un campo específico
+function clearFieldError(field) {
+  if (field === 'email') emailError.value = ''
+  if (field === 'password') passwordError.value = ''
+  generalError.value = ''
+  userStore.clearError()
+}
+
+// Limpiar todos los errores
 function clearErrors() {
   emailError.value = ''
   passwordError.value = ''
@@ -266,6 +415,13 @@ async function handleLogin() {
     return
   }
 
+  // Guardar o eliminar email según preferencia
+  if (rememberMe.value) {
+    localStorage.setItem('rememberedEmail', email.value.trim())
+  } else {
+    localStorage.removeItem('rememberedEmail')
+  }
+
   const result = await userStore.login(email.value.trim(), password.value)
 
   if (result.success) {
@@ -277,10 +433,40 @@ async function handleLogin() {
 </script>
 
 <style scoped>
+/* Animación de entrada - Fade In */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animación de entrada - Slide Up */
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Animación del cursor parpadeante */
 .cursor-blink {
   animation: blink 1s step-end infinite;
-  color: #0284c7; /* primary-600 */
+  color: #5F388C; /* primary-600 */
   font-weight: 300;
 }
 
@@ -297,5 +483,29 @@ async function handleLogin() {
 .typewriter {
   display: inline-block;
   word-break: break-word;
+}
+
+/* Animación de shake para errores */
+.shake-enter-active {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Ocultar el botón nativo de mostrar/ocultar contraseña del navegador */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Para navegadores basados en WebKit (Chrome, Edge, Safari) */
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-textfield-decoration-container {
+  visibility: hidden;
+  pointer-events: none;
 }
 </style>

@@ -127,7 +127,7 @@
             </label>
             <select
               v-model="form.rol"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               :disabled="loading"
               required
             >
@@ -138,10 +138,10 @@
           </div>
 
           <!-- Email info (en editar) -->
-          <div v-if="isEditing" class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div v-if="isEditing" class="bg-primary-50 border border-primary-200 rounded-lg p-3">
             <div class="flex items-start">
-              <AlertCircle class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-              <div class="text-sm text-blue-800">
+              <AlertCircle class="w-5 h-5 text-primary-600 mr-2 flex-shrink-0 mt-0.5" />
+              <div class="text-sm text-primary-800">
                 <p class="font-medium mb-1">Email: {{ staff?.email }}</p>
                 <p class="text-xs">El email no se puede modificar una vez creado</p>
               </div>

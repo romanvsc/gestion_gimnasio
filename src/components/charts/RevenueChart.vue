@@ -48,13 +48,13 @@ const chartData = computed(() => ({
     {
       label: 'Ingresos',
       data: monthsData.value.map(m => m.amount),
-      borderColor: '#2563eb', // primary-600
-      backgroundColor: 'rgba(37, 99, 235, 0.1)', // primary-600 con transparencia
+      borderColor: '#5F388C', // primary-600
+      backgroundColor: 'rgba(95, 56, 140, 0.1)', // primary-600 con transparencia
       borderWidth: 3,
       fill: true,
       tension: 0.4, // Línea curva
       pointRadius: 5,
-      pointBackgroundColor: '#2563eb',
+      pointBackgroundColor: '#5F388C',
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
       pointHoverRadius: 7,

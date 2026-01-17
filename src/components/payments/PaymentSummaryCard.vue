@@ -1,6 +1,6 @@
 <template>
   <div :class="[
-    'bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl shadow-sm border border-primary-100 p-6',
+    'bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl shadow-sm border border-primary-200 p-6',
     compact ? 'p-4' : 'p-6'
   ]">
     <h3 :class="[

@@ -101,10 +101,10 @@
               <p class="text-gray-800 text-3xl font-bold mb-1">
                 {{ formatCurrency(saldoFinal) }}
               </p>
-              <span class="text-sm text-blue-600 font-semibold">En caja ahora</span>
+              <span class="text-sm text-primary-600 font-semibold">En caja ahora</span>
             </div>
-            <div class="p-3 rounded-lg bg-blue-50">
-              <Wallet class="w-6 h-6 text-blue-600" />
+            <div class="p-3 rounded-lg bg-primary-50">
+              <Wallet class="w-6 h-6 text-primary-600" />
             </div>
           </div>
         </div>
@@ -192,7 +192,7 @@
                     <!-- Badge si está vinculado a un pago -->
                     <span
                       v-if="transaction.payment_id"
-                      class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"
+                      class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
                     >
                       <CreditCard class="w-3 h-3" />
                       Cuota

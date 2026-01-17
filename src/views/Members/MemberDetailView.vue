@@ -22,7 +22,7 @@
       <!-- Contenido -->
       <div v-else-if="memberData" class="space-y-6">
         <!-- Encabezado con Foto y Datos Principales -->
-        <div class="bg-gradient-to-r from-primary-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl shadow-lg p-6 text-white">
           <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
             <!-- Foto del Socio -->
             <div class="flex-shrink-0">
@@ -158,10 +158,10 @@
           </div>
 
           <!-- Tarjeta: Salud (IMC) -->
-          <div class="rounded-lg shadow-sm border-2 bg-purple-50 border-purple-200 p-6">
+          <div class="rounded-lg shadow-sm border-2 bg-primary-50 border-primary-200 p-6">
             <div class="flex items-center gap-3 mb-3">
-              <div class="p-2 rounded-lg bg-purple-100">
-                <Activity class="w-6 h-6 text-purple-600" />
+              <div class="p-2 rounded-lg bg-primary-100">
+                <Activity class="w-6 h-6 text-primary-600" />
               </div>
               <h3 class="text-lg font-semibold text-gray-900">Salud</h3>
             </div>
@@ -179,11 +179,11 @@
                 </span>
                 <span class="font-semibold text-gray-900">{{ memberData.altura }} m</span>
               </div>
-              <div class="pt-2 border-t border-purple-200">
+              <div class="pt-2 border-t border-primary-200">
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-gray-600">IMC:</span>
                   <div class="flex items-center gap-2">
-                    <span class="font-bold text-purple-700 text-lg">{{ calculatedIMC }}</span>
+                    <span class="font-bold text-primary-700 text-lg">{{ calculatedIMC }}</span>
                     <span :class="[
                       'inline-flex h-3 w-3 rounded-full',
                       imcColor

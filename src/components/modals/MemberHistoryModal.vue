@@ -108,7 +108,7 @@
               class="bg-gray-50 rounded-lg p-3 border border-gray-200 flex items-center justify-between"
             >
               <div class="flex items-center gap-3">
-                <CalendarClock class="w-5 h-5 text-blue-600" />
+                <CalendarClock class="w-5 h-5 text-primary-600" />
                 <div>
                   <p class="text-sm font-medium text-gray-900">{{ formatDateTime(att.created_at) }}</p>
                 </div>
