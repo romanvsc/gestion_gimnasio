@@ -5,7 +5,7 @@
       <div class="mb-8">
         <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Dashboard</h1>
         <p class="text-page-subtitle mb-6">
-          Bienvenido a {{ settings.nombre_gimnasio }}, {{ userStore.userEmail }}
+          Bienvenido de nuevo, {{ settings.nombre_gimnasio }}. Esto es lo que está pasando hoy.
           <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
             Admin
           </span>
@@ -149,7 +149,12 @@
             </BaseButton>
           </div>
 
-          <div class="overflow-x-auto">
+          <!-- Loading de check-ins -->
+          <div v-if="loadingCheckIns" class="flex justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+
+          <div v-else class="overflow-x-auto">
             <table class="w-full">
               <thead>
                 <tr class="border-b border-gray-100">
@@ -196,11 +201,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
 import { useSettings } from '@/composables/useSettings'
+import { supabase } from '@/lib/supabase'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -213,6 +219,7 @@ const gymStore = useGymStore()
 const { settings } = useSettings()
 
 const loading = ref(false)
+const loadingCheckIns = ref(false)
 const showLastAccessModal = ref(false)
 const stats = ref({
   totalMembers: 0,
@@ -222,12 +229,7 @@ const stats = ref({
   monthlyRevenue: 0
 })
 
-// Mock data para últimos check-ins
-const recentCheckIns = ref([
-  { id: 1, name: 'Juan Pérez', dni: '12345678', time: '14:30', status: 'activo', statusLabel: 'Al día' },
-  { id: 2, name: 'María García', dni: '87654321', time: '14:15', status: 'activo', statusLabel: 'Al día' },
-  { id: 3, name: 'Carlos López', dni: '11223344', time: '14:00', status: 'vencido', statusLabel: 'Vencido' }
-])
+const recentCheckIns = ref([])
 
 async function loadStats() {
   loading.value = true
@@ -241,8 +243,56 @@ async function loadStats() {
   }
 }
 
+async function loadRecentCheckIns() {
+  loadingCheckIns.value = true
+  try {
+    const { data, error } = await supabase
+      .from('attendance')
+      .select('*, members(nombre, apellido, dni)')
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    if (error) throw error
+
+    recentCheckIns.value = (data || []).map(acceso => ({
+      id: acceso.id,
+      name: acceso.members ? `${acceso.members.nombre} ${acceso.members.apellido}` : 'Socio desconocido',
+      dni: acceso.members?.dni || '-',
+      time: formatTime(acceso.created_at),
+      status: acceso.acceso_permitido ? 'activo' : 'vencido',
+      statusLabel: acceso.acceso_permitido ? 'Al día' : 'Vencido'
+    }))
+  } catch (err) {
+    console.error('Error cargando check-ins recientes:', err)
+  } finally {
+    loadingCheckIns.value = false
+  }
+}
+
+function formatTime(timestamp) {
+  if (!timestamp) return '-'
+  const fecha = new Date(timestamp)
+  const hoy = new Date()
+  const esHoy = fecha.toDateString() === hoy.toDateString()
+  
+  const hora = fecha.toLocaleTimeString('es-AR', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  })
+  
+  if (esHoy) return hora
+  
+  return fecha.toLocaleDateString('es-AR', { 
+    day: '2-digit', 
+    month: '2-digit' 
+  }) + ' ' + hora
+}
+
 onMounted(async () => {
-  await loadStats()
+  await Promise.all([
+    loadStats(),
+    loadRecentCheckIns()
+  ])
 })
 
 function formatCurrency(value) {
