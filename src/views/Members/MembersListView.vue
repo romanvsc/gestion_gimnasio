@@ -86,9 +86,15 @@
               
               <!-- Info -->
               <div class="flex-1 min-w-0">
-                <h3 class="font-semibold text-gray-900 truncate flex items-center gap-2">
+                <h3 class="font-semibold text-gray-900 truncate flex items-center gap-1.5">
                   {{ member.nombre }} {{ member.apellido }}
-                  <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">🏆</span>
+                  <img 
+                    v-if="member.es_socio_club" 
+                    src="https://img.icons8.com/pulsar-gradient/50/instagram-check-mark.png" 
+                    alt="Socio Club" 
+                    title="Socio Club"
+                    class="w-5 h-5"
+                  />
                 </h3>
                 <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
                 
@@ -147,9 +153,15 @@
                       </span>
                     </div>
                     <div>
-                      <p class="font-medium text-gray-900 flex items-center gap-2">
+                      <p class="font-medium text-gray-900 flex items-center gap-1.5">
                         {{ member.nombre }} {{ member.apellido }}
-                        <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">🏆</span>
+                        <img 
+                          v-if="member.es_socio_club" 
+                          src="https://img.icons8.com/pulsar-gradient/50/instagram-check-mark.png" 
+                          alt="Socio Club" 
+                          title="Socio Club"
+                          class="w-5 h-5"
+                        />
                       </p>
                     </div>
                   </div>
