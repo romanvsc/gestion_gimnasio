@@ -204,12 +204,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
 import { useSettings } from '@/composables/useSettings'
 import { supabase } from '@/lib/supabase'
+import { errorAlert } from '@/lib/alerts'
+import { formatCurrency, formatTime } from '@/utils/formatters'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -234,6 +236,7 @@ const stats = ref({
 })
 
 const recentCheckIns = ref([])
+let checkInsSubscription = null
 
 async function loadStats() {
   loading.value = true
@@ -242,6 +245,7 @@ async function loadStats() {
     stats.value = gymStore.stats
   } catch (err) {
     console.error('Error cargando estadísticas:', err)
+    errorAlert('Error', 'No se pudieron cargar las estadísticas')
   } finally {
     loading.value = false
   }
@@ -269,39 +273,20 @@ async function loadRecentCheckIns() {
     }))
   } catch (err) {
     console.error('Error cargando check-ins recientes:', err)
+    errorAlert('Error', 'No se pudo cargar el historial reciente')
   } finally {
     loadingCheckIns.value = false
   }
 }
 
-function formatTime(timestamp) {
-  if (!timestamp) return '-'
-  const fecha = new Date(timestamp)
-  const hoy = new Date()
-  const esHoy = fecha.toDateString() === hoy.toDateString()
-  
-  const hora = fecha.toLocaleTimeString('es-AR', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  })
-  
-  if (esHoy) return hora
-  
-  return fecha.toLocaleDateString('es-AR', { 
-    day: '2-digit', 
-    month: '2-digit' 
-  }) + ' ' + hora
-}
-
-onMounted(async () => {
-  await Promise.all([
-    loadStats(),
+function handleRealtimeInsert(payload) {
+  // Cuando entra un nuevo check-in
+  if (payload.new) {
+    // 1. Recargar estadísticas (sube el contador de "Asistencia Hoy")
+    loadStats()
+    // 2. Recargar tabla de últimos accesos
     loadRecentCheckIns()
-  ])
-})
-
-function formatCurrency(value) {
-  return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  }
 }
 
 function goToMember(memberId) {
@@ -309,4 +294,27 @@ function goToMember(memberId) {
     router.push({ name: 'MemberDetail', params: { id: memberId } })
   }
 }
+
+onMounted(async () => {
+  await Promise.all([
+    loadStats(),
+    loadRecentCheckIns()
+  ])
+
+  // Suscripción Realtime a la tabla 'attendance'
+  checkInsSubscription = supabase
+    .channel('dashboard-attendance')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'attendance' },
+      handleRealtimeInsert
+    )
+    .subscribe()
+})
+
+onUnmounted(() => {
+  if (checkInsSubscription) {
+    supabase.removeChannel(checkInsSubscription)
+  }
+})
 </script>
