@@ -14,50 +14,50 @@
           </span>
         </p>
 
-        <!-- Action Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Action Cards - Optimizado para Mobile/Tablet -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           <button
             @click="router.push({ name: 'NewMember' })"
-            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center"
+            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center min-h-[100px]"
           >
-            <div class="p-3 bg-primary-50 text-primary-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
-              <UserPlus class="w-6 h-6" />
+            <div class="p-2 md:p-3 bg-primary-50 text-primary-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
+              <UserPlus class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="font-semibold text-gray-900 group-hover:text-primary-700 transition-colors">Nuevo Socio</span>
-            <span class="text-xs text-gray-400 mt-1">Registrar nueva alta</span>
+            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-primary-700 transition-colors">Nuevo Socio</span>
+            <span class="text-xs text-gray-400 mt-1 hidden md:block">Registrar nueva alta</span>
           </button>
 
           <button
             @click="router.push({ name: 'NewPayment' })"
-            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-100 transition-all duration-200 group text-center"
+            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-100 transition-all duration-200 group text-center min-h-[100px]"
           >
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
-              <BadgeDollarSign class="w-6 h-6" />
+            <div class="p-2 md:p-3 bg-emerald-50 text-emerald-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
+              <BadgeDollarSign class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">Registrar Pago</span>
-            <span class="text-xs text-gray-400 mt-1">Ingresar cuota</span>
+            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-emerald-700 transition-colors">Registrar Pago</span>
+            <span class="text-xs text-gray-400 mt-1 hidden md:block">Ingresar cuota</span>
           </button>
 
           <button
             @click="router.push({ name: 'CheckIn' })"
-            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center"
+            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center min-h-[100px]"
           >
-            <div class="p-3 bg-primary-50 text-primary-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
-              <CheckCircle class="w-6 h-6" />
+            <div class="p-2 md:p-3 bg-primary-50 text-primary-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
+              <CheckCircle class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="font-semibold text-gray-900 group-hover:text-primary-700 transition-colors">Check-In</span>
-            <span class="text-xs text-gray-400 mt-1">Control de acceso</span>
+            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-primary-700 transition-colors">Check-In</span>
+            <span class="text-xs text-gray-400 mt-1 hidden md:block">Control de acceso</span>
           </button>
 
           <button
             @click="showLastAccessModal = true"
-            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-secondary-100 transition-all duration-200 group text-center"
+            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-secondary-100 transition-all duration-200 group text-center min-h-[100px]"
           >
-            <div class="p-3 bg-secondary-50 text-secondary-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
-              <ListChecks class="w-6 h-6" />
+            <div class="p-2 md:p-3 bg-secondary-50 text-secondary-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
+              <ListChecks class="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <span class="font-semibold text-gray-900 group-hover:text-secondary-700 transition-colors">Últimos Accesos</span>
-            <span class="text-xs text-gray-400 mt-1">Historial reciente</span>
+            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-secondary-700 transition-colors">Últimos Accesos</span>
+            <span class="text-xs text-gray-400 mt-1 hidden md:block">Historial reciente</span>
           </button>
         </div>
       </div>
@@ -73,7 +73,6 @@
           <StatCard
             title="Ingresos del Mes"
             :value="'$' + formatCurrency(stats.monthlyRevenue)"
-            trend="+12%"
             :icon="Wallet"
             icon-bg-color="bg-primary-50"
             icon-color="text-primary-600"
@@ -82,7 +81,6 @@
           <StatCard
             title="Socios Activos"
             :value="stats.activeMembers"
-            trend="+8%"
             :icon="Users"
             route="/miembros"
             icon-bg-color="bg-secondary-50"
@@ -92,7 +90,6 @@
           <StatCard
             title="Asistencia Hoy"
             :value="stats.todayAttendance"
-            trend="+5%"
             :icon="Activity"
             route="/checkin"
             icon-bg-color="bg-primary-50"
@@ -102,7 +99,6 @@
           <StatCard
             title="Socios Vencidos"
             :value="stats.expiredMembers"
-            trend="-3%"
             :icon="AlertCircle"
             route="/miembros"
             icon-bg-color="bg-red-50"
@@ -168,12 +164,13 @@
                 <tr 
                   v-for="checkin in recentCheckIns" 
                   :key="checkin.id"
-                  class="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                  @click="goToMember(checkin.memberId)"
+                  class="border-b border-gray-50 hover:bg-primary-50 transition-colors cursor-pointer"
                 >
-                  <td class="py-3 px-4 text-sm text-gray-800">{{ checkin.name }}</td>
-                  <td class="py-3 px-4 text-sm text-gray-500">{{ checkin.dni }}</td>
-                  <td class="py-3 px-4 text-sm text-gray-500">{{ checkin.time }}</td>
-                  <td class="py-3 px-4">
+                  <td class="py-4 px-4 text-sm text-gray-800 font-medium">{{ checkin.name }}</td>
+                  <td class="py-4 px-4 text-sm text-gray-500">{{ checkin.dni }}</td>
+                  <td class="py-4 px-4 text-sm text-gray-500">{{ checkin.time }}</td>
+                  <td class="py-4 px-4">
                     <StatusBadge
                       :status="checkin.status"
                       :label="checkin.statusLabel"
@@ -187,6 +184,12 @@
               No hay check-ins recientes
             </div>
           </div>
+        </div>
+
+        <!-- Gráfico de Asistencia Semanal -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-8">
+          <h2 class="text-xl font-bold text-gray-800 mb-6">Asistencia Semanal</h2>
+          <AssistanceChart />
         </div>
 
       </div>
@@ -212,6 +215,7 @@ import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LastAccessModal from '@/components/modals/LastAccessModal.vue'
+import AssistanceChart from '@/components/charts/AssistanceChart.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -256,6 +260,7 @@ async function loadRecentCheckIns() {
 
     recentCheckIns.value = (data || []).map(acceso => ({
       id: acceso.id,
+      memberId: acceso.member_id,
       name: acceso.members ? `${acceso.members.nombre} ${acceso.members.apellido}` : 'Socio desconocido',
       dni: acceso.members?.dni || '-',
       time: formatTime(acceso.created_at),
@@ -297,5 +302,11 @@ onMounted(async () => {
 
 function formatCurrency(value) {
   return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+}
+
+function goToMember(memberId) {
+  if (memberId) {
+    router.push({ name: 'MemberDetail', params: { id: memberId } })
+  }
 }
 </script>
