@@ -16,49 +16,49 @@
 
         <!-- Action Cards - Optimizado para Mobile/Tablet -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <button
+          <DashboardActionCard
+            title="Nuevo Socio"
+            subtitle="Registrar nueva alta"
+            :icon="UserPlus"
+            icon-bg-class="bg-primary-50"
+            icon-text-class="text-primary-600"
+            hover-border-class="hover:border-primary-100"
+            title-hover-class="group-hover:text-primary-700"
             @click="router.push({ name: 'NewMember' })"
-            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center min-h-[100px]"
-          >
-            <div class="p-2 md:p-3 bg-primary-50 text-primary-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
-              <UserPlus class="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-primary-700 transition-colors">Nuevo Socio</span>
-            <span class="text-xs text-gray-400 mt-1 hidden md:block">Registrar nueva alta</span>
-          </button>
+          />
 
-          <button
+          <DashboardActionCard
+            title="Registrar Pago"
+            subtitle="Ingresar cuota"
+            :icon="BadgeDollarSign"
+            icon-bg-class="bg-emerald-50"
+            icon-text-class="text-emerald-600"
+            hover-border-class="hover:border-emerald-100"
+            title-hover-class="group-hover:text-emerald-700"
             @click="router.push({ name: 'NewPayment' })"
-            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-100 transition-all duration-200 group text-center min-h-[100px]"
-          >
-            <div class="p-2 md:p-3 bg-emerald-50 text-emerald-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
-              <BadgeDollarSign class="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-emerald-700 transition-colors">Registrar Pago</span>
-            <span class="text-xs text-gray-400 mt-1 hidden md:block">Ingresar cuota</span>
-          </button>
+          />
 
-          <button
+          <DashboardActionCard
+            title="Check-In"
+            subtitle="Control de acceso"
+            :icon="CheckCircle"
+            icon-bg-class="bg-primary-50"
+            icon-text-class="text-primary-600"
+            hover-border-class="hover:border-primary-100"
+            title-hover-class="group-hover:text-primary-700"
             @click="router.push({ name: 'CheckIn' })"
-            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center min-h-[100px]"
-          >
-            <div class="p-2 md:p-3 bg-primary-50 text-primary-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
-              <CheckCircle class="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-primary-700 transition-colors">Check-In</span>
-            <span class="text-xs text-gray-400 mt-1 hidden md:block">Control de acceso</span>
-          </button>
+          />
 
-          <button
+          <DashboardActionCard
+            title="Últimos Accesos"
+            subtitle="Historial reciente"
+            :icon="ListChecks"
+            icon-bg-class="bg-secondary-50"
+            icon-text-class="text-secondary-600"
+            hover-border-class="hover:border-secondary-100"
+            title-hover-class="group-hover:text-secondary-700"
             @click="showLastAccessModal = true"
-            class="flex flex-col items-center justify-center p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-secondary-100 transition-all duration-200 group text-center min-h-[100px]"
-          >
-            <div class="p-2 md:p-3 bg-secondary-50 text-secondary-600 rounded-full mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200">
-              <ListChecks class="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <span class="font-semibold text-sm md:text-base text-gray-900 group-hover:text-secondary-700 transition-colors">Últimos Accesos</span>
-            <span class="text-xs text-gray-400 mt-1 hidden md:block">Historial reciente</span>
-          </button>
+          />
         </div>
       </div>
 
@@ -164,10 +164,18 @@
                 <tr 
                   v-for="checkin in recentCheckIns" 
                   :key="checkin.id"
-                  @click="goToMember(checkin.memberId)"
-                  class="border-b border-gray-50 hover:bg-primary-50 transition-colors cursor-pointer"
+                  class="border-b border-gray-50 hover:bg-primary-50 transition-colors"
                 >
-                  <td class="py-4 px-4 text-sm text-gray-800 font-medium">{{ checkin.name }}</td>
+                  <td class="py-4 px-4 text-sm text-gray-800 font-medium">
+                    <BaseButton
+                      variant="ghost"
+                      size="sm"
+                      class="w-full justify-start px-0 py-0 hover:bg-transparent focus:ring-0"
+                      @click="goToMember(checkin.memberId)"
+                    >
+                      {{ checkin.name }}
+                    </BaseButton>
+                  </td>
                   <td class="py-4 px-4 text-sm text-gray-500">{{ checkin.dni }}</td>
                   <td class="py-4 px-4 text-sm text-gray-500">{{ checkin.time }}</td>
                   <td class="py-4 px-4">
@@ -209,11 +217,12 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
 import { useSettings } from '@/composables/useSettings'
-import { supabase } from '@/lib/supabase'
 import { errorAlert } from '@/lib/alerts'
-import { formatCurrency, formatTime } from '@/utils/formatters'
+import { formatCurrency } from '@/utils/formatters'
+import { useAttendance } from '@/composables/useAttendance'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
+import DashboardActionCard from '@/components/dashboard/DashboardActionCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LastAccessModal from '@/components/modals/LastAccessModal.vue'
@@ -225,7 +234,6 @@ const gymStore = useGymStore()
 const { settings } = useSettings()
 
 const loading = ref(false)
-const loadingCheckIns = ref(false)
 const showLastAccessModal = ref(false)
 const stats = ref({
   totalMembers: 0,
@@ -235,8 +243,16 @@ const stats = ref({
   monthlyRevenue: 0
 })
 
-const recentCheckIns = ref([])
-let checkInsSubscription = null
+const {
+  recentCheckIns,
+  loadingRecent: loadingCheckIns,
+  loadRecentCheckIns,
+  subscribeToAttendanceInserts,
+  unsubscribe
+} = useAttendance({ recentLimit: 5 })
+
+let unsubscribeRealtime = null
+let statsRefreshTimer = null
 
 async function loadStats() {
   loading.value = true
@@ -251,42 +267,11 @@ async function loadStats() {
   }
 }
 
-async function loadRecentCheckIns() {
-  loadingCheckIns.value = true
-  try {
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('*, members(nombre, apellido, dni)')
-      .order('created_at', { ascending: false })
-      .limit(5)
-
-    if (error) throw error
-
-    recentCheckIns.value = (data || []).map(acceso => ({
-      id: acceso.id,
-      memberId: acceso.member_id,
-      name: acceso.members ? `${acceso.members.nombre} ${acceso.members.apellido}` : 'Socio desconocido',
-      dni: acceso.members?.dni || '-',
-      time: formatTime(acceso.created_at),
-      status: acceso.acceso_permitido ? 'activo' : 'vencido',
-      statusLabel: acceso.acceso_permitido ? 'Al día' : 'Vencido'
-    }))
-  } catch (err) {
-    console.error('Error cargando check-ins recientes:', err)
-    errorAlert('Error', 'No se pudo cargar el historial reciente')
-  } finally {
-    loadingCheckIns.value = false
-  }
-}
-
-function handleRealtimeInsert(payload) {
-  // Cuando entra un nuevo check-in
-  if (payload.new) {
-    // 1. Recargar estadísticas (sube el contador de "Asistencia Hoy")
+function scheduleStatsRefresh() {
+  if (statsRefreshTimer) clearTimeout(statsRefreshTimer)
+  statsRefreshTimer = setTimeout(() => {
     loadStats()
-    // 2. Recargar tabla de últimos accesos
-    loadRecentCheckIns()
-  }
+  }, 800)
 }
 
 function goToMember(memberId) {
@@ -301,20 +286,16 @@ onMounted(async () => {
     loadRecentCheckIns()
   ])
 
-  // Suscripción Realtime a la tabla 'attendance'
-  checkInsSubscription = supabase
-    .channel('dashboard-attendance')
-    .on(
-      'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'attendance' },
-      handleRealtimeInsert
-    )
-    .subscribe()
+  unsubscribeRealtime = subscribeToAttendanceInserts({
+    channelName: 'dashboard-attendance',
+    onInsert: scheduleStatsRefresh,
+    limit: 5
+  })
 })
 
 onUnmounted(() => {
-  if (checkInsSubscription) {
-    supabase.removeChannel(checkInsSubscription)
-  }
+  if (statsRefreshTimer) clearTimeout(statsRefreshTimer)
+  if (typeof unsubscribeRealtime === 'function') unsubscribeRealtime()
+  unsubscribe()
 })
 </script>
