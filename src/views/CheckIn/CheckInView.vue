@@ -37,11 +37,8 @@
           <div
             v-for="member in searchResults"
             :key="member.id"
-            @click="canCheckIn(member) && handleCheckIn(member)"
-            :class="[
-              'transform transition-transform',
-              canCheckIn(member) ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-not-allowed opacity-90'
-            ]"
+            @click="handleCheckIn(member)"
+            class="transform transition-transform cursor-pointer hover:scale-[1.02]"
           >
             <!-- ACCESO PERMITIDO -->
             <div
@@ -210,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 
@@ -222,6 +219,7 @@ const showModal = ref(false)
 const modalData = ref({ allowed: true, message: '' })
 
 let searchTimeout = null
+let realtimeSubscription = null
 
 async function searchMembers() {
   if (searchTimeout) clearTimeout(searchTimeout)
@@ -337,10 +335,9 @@ async function handleCheckIn(member) {
     modalData.value = { allowed, message }
     showModal.value = true
 
-    // Limpiar búsqueda y recargar recientes
+    // Limpiar búsqueda (Realtime se encarga de actualizar el feed)
     searchQuery.value = ''
     searchResults.value = []
-    await loadRecentCheckIns()
   } catch (error) {
     console.error('Error en check-in:', error)
     alert('Error al registrar check-in')
@@ -384,7 +381,29 @@ function formatTime(dateString) {
   })
 }
 
+// Suscripción a Supabase Realtime para actualizar el feed en vivo
+function subscribeToAttendance() {
+  realtimeSubscription = supabase
+    .channel('public:attendance')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'attendance' },
+      () => {
+        // Cuando entra un nuevo check-in, recargamos la lista
+        loadRecentCheckIns()
+      }
+    )
+    .subscribe()
+}
+
 onMounted(() => {
   loadRecentCheckIns()
+  subscribeToAttendance()
+})
+
+onUnmounted(() => {
+  if (realtimeSubscription) {
+    supabase.removeChannel(realtimeSubscription)
+  }
 })
 </script>
