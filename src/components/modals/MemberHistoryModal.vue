@@ -86,7 +86,7 @@
                     </div>
                     <div>
                       <span class="text-gray-500">Monto:</span>
-                      <span class="ml-2 font-semibold text-primary-600">{{ formatCurrency(payment.monto) }}</span>
+                      <span class="ml-2 font-semibold text-primary-600">{{ formatCurrencyFull(payment.monto) }}</span>
                     </div>
                   </div>
                 </div>
@@ -133,6 +133,7 @@
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { X, Receipt, CalendarClock } from 'lucide-vue-next'
+import { formatDate, formatDateTime, formatCurrencyFull } from '@/utils/formatters'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 
 const props = defineProps({
@@ -153,35 +154,6 @@ const payments = ref([])
 const attendances = ref([])
 const loading = ref(false)
 const error = ref(null)
-
-function formatDate(dateStr) {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('es-AR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-}
-
-function formatDateTime(timestamp) {
-  const date = new Date(timestamp)
-  return date.toLocaleString('es-AR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-function formatCurrency(amount) {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 0
-  }).format(amount)
-}
 
 async function loadPayments() {
   try {

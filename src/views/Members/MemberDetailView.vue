@@ -62,10 +62,10 @@
                 <span 
                   :class="[
                     'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold text-white',
-                    statusColors.badge
+                    cuotaStatusInfo.badge
                   ]"
                 >
-                  {{ statusColors.label }}
+                  {{ cuotaStatusInfo.label }}
                 </span>
               </div>
             </div>
@@ -85,77 +85,24 @@
         <!-- Grilla de Tarjetas de Información -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Tarjeta: Estado de Cuota -->
-          <div 
-            :class="[
-              'rounded-lg shadow-sm border-2 p-6',
-              statusColors.card
-            ]"
-          >
-            <div class="flex items-center gap-3 mb-3">
-              <div :class="[
-                'p-2 rounded-lg',
-                statusColors.iconBg
-              ]">
-                <CalendarCheck :class="[
-                  'w-6 h-6',
-                  statusColors.icon
-                ]" />
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900">Estado de Cuota</h3>
-            </div>
-            <p :class="[
-              'text-sm font-medium',
-              statusColors.text
-            ]">
-              {{ memberData.estado_cuota === 'activo' ? 'El socio está al día' : 
-                 memberData.estado_cuota === 'vencido' ? 'Cuota vencida' :
-                 'Sin pagos registrados' }}
-            </p>
-            <p v-if="memberData.fecha_fin_cuota" class="text-xs text-gray-600 mt-2">
-              {{ memberData.estado_cuota === 'activo' ? 'Vence:' : 'Vence:' }} {{ formatDate(memberData.fecha_fin_cuota) }}
-            </p>
-          </div>
+          <MemberStatusCard
+            title="Estado de Cuota"
+            :icon="CalendarCheck"
+            :status="cuotaStatusInfo.status"
+            :statusText="cuotaStatusInfo.description"
+            :dateLabel="cuotaStatusInfo.dateLabel"
+            :dateValue="memberData.fecha_fin_cuota"
+          />
 
           <!-- Tarjeta: Apto Físico -->
-          <div 
-            :class="[
-              'rounded-lg shadow-sm border-2 p-6',
-              memberData.estado_apto_fisico === 'vencido' ? 'bg-yellow-50 border-yellow-300' : 
-              memberData.estado_apto_fisico === 'vigente' ? 'bg-blue-50 border-blue-200' :
-              'bg-gray-50 border-gray-200'
-            ]"
-          >
-            <div class="flex items-center gap-3 mb-3">
-              <div :class="[
-                'p-2 rounded-lg',
-                memberData.estado_apto_fisico === 'vencido' ? 'bg-yellow-100' : 
-                memberData.estado_apto_fisico === 'vigente' ? 'bg-blue-100' :
-                'bg-gray-100'
-              ]">
-                <Heart :class="[
-                  'w-6 h-6',
-                  memberData.estado_apto_fisico === 'vencido' ? 'text-yellow-700' : 
-                  memberData.estado_apto_fisico === 'vigente' ? 'text-blue-600' :
-                  'text-gray-600'
-                ]" />
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900">Apto Físico</h3>
-            </div>
-            <p :class="[
-              'text-sm font-medium',
-              memberData.estado_apto_fisico === 'vencido' ? 'text-yellow-800' : 
-              memberData.estado_apto_fisico === 'vigente' ? 'text-blue-700' :
-              'text-gray-700'
-            ]">
-              {{ memberData.estado_apto_fisico === 'vigente' ? 'Vigente' : 
-                 memberData.estado_apto_fisico === 'vencido' ? 'Apto físico vencido' :
-                 'Sin apto físico' }}
-            </p>
-            <p v-if="memberData.apto_fisico" class="text-xs text-gray-600 mt-2">
-              {{ memberData.estado_apto_fisico === 'vigente' ? 'Vence:' : 'Venció:' }} 
-              {{ formatDate(memberData.apto_fisico) }}
-            </p>
-          </div>
+          <MemberStatusCard
+            title="Apto Físico"
+            :icon="Heart"
+            :status="aptoStatusInfo.status"
+            :statusText="aptoStatusInfo.description"
+            :dateLabel="aptoStatusInfo.dateLabel"
+            :dateValue="memberData.apto_fisico"
+          />
 
           <!-- Tarjeta: Salud (IMC) -->
           <div class="rounded-lg shadow-sm border-2 bg-primary-50 border-primary-200 p-6">
@@ -184,10 +131,7 @@
                   <span class="text-sm text-gray-600">IMC:</span>
                   <div class="flex items-center gap-2">
                     <span class="font-bold text-primary-700 text-lg">{{ calculatedIMC }}</span>
-                    <span :class="[
-                      'inline-flex h-3 w-3 rounded-full',
-                      imcColor
-                    ]"></span>
+                    <span :class="['inline-flex h-3 w-3 rounded-full', imcColor]"></span>
                   </div>
                 </div>
                 <p :class="['text-xs mt-1', imcTextColor]">
@@ -219,11 +163,11 @@
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Fecha de Nacimiento</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ formatDate(memberData.fecha_nacimiento) || '-' }}</dd>
+              <dd class="mt-1 text-sm text-gray-900">{{ formatDateLong(memberData.fecha_nacimiento) }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Fecha de Alta</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ formatDate(memberData.fecha_alta) || '-' }}</dd>
+              <dd class="mt-1 text-sm text-gray-900">{{ formatDateLong(memberData.fecha_alta) }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Plan Asignado</dt>
@@ -240,96 +184,11 @@
         </div>
 
         <!-- Historial de Pagos -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <History class="w-5 h-5" />
-              Historial de Pagos
-            </h2>
-            <BaseButton
-              color="primary"
-              size="sm"
-              @click="goToNewPayment"
-            >
-              + Registrar Pago
-            </BaseButton>
-          </div>
-
-          <!-- Loading de pagos -->
-          <div v-if="loadingPayments" class="text-center py-8">
-            <p class="text-gray-600">Cargando historial...</p>
-          </div>
-
-          <!-- Sin pagos -->
-          <div v-else-if="payments.length === 0" class="text-center py-12 text-gray-500">
-            <History class="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p class="text-lg font-medium">No hay pagos registrados</p>
-            <p class="text-sm">Registra el primer pago para este socio</p>
-          </div>
-
-          <!-- Tabla de Pagos -->
-          <div v-else class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha Pago
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Plan
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Periodo
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Monto
-                  </th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Método
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr 
-                  v-for="payment in payments" 
-                  :key="payment.id"
-                  :class="[
-                    'hover:bg-gray-50 transition-colors',
-                    isPaymentExpired(payment.fecha_fin) && 'opacity-60'
-                  ]"
-                >
-                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ formatDate(payment.created_at) }}
-                  </td>
-                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ payment.plans?.nombre || getPlanName(payment.plan_id) }}
-                  </td>
-                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {{ formatDate(payment.fecha_inicio) }} - {{ formatDate(payment.fecha_fin) }}
-                  </td>
-                  <td class="px-4 py-4 whitespace-nowrap">
-                    <span class="text-sm font-semibold text-emerald-600">
-                      ${{ payment.monto }}
-                    </span>
-                  </td>
-                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ payment.metodo_pago }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Total de Pagos -->
-            <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
-              <span class="text-sm text-gray-600">
-                Total de pagos: <span class="font-semibold">{{ payments.length }}</span>
-              </span>
-              <span class="text-lg font-bold text-gray-900">
-                Total recaudado: <span class="text-emerald-600">${{ totalAmount }}</span>
-              </span>
-            </div>
-          </div>
-        </div>
+        <MemberPaymentsHistory
+          :payments="payments"
+          :loading="loadingPayments"
+          @new-payment="goToNewPayment"
+        />
       </div>
     </div>
   </div>
@@ -341,11 +200,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
+import { formatDateLong } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import MemberStatusCard from '@/components/members/MemberStatusCard.vue'
+import MemberPaymentsHistory from '@/components/members/MemberPaymentsHistory.vue'
 import { 
   Star, User, CalendarCheck, Heart, Activity, Weight, 
-  Ruler, History, ArrowLeft 
+  Ruler, ArrowLeft 
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -357,39 +219,62 @@ const memberData = ref(null)
 const payments = ref([])
 const loadingPayments = ref(false)
 
-// Computed: Colores dinámicos según estado de cuota
-const statusColors = computed(() => {
+// Computed: Info del estado de cuota
+const cuotaStatusInfo = computed(() => {
   if (!memberData.value) return {}
   
   const estado = memberData.value.estado_cuota
   
   if (estado === 'activo') {
     return {
-      card: 'bg-emerald-50 border-emerald-200',
-      iconBg: 'bg-emerald-100',
-      icon: 'text-emerald-700',
-      text: 'text-emerald-700',
+      status: 'success',
       badge: 'bg-emerald-600',
-      label: 'Cuota al día'
+      label: 'Cuota al día',
+      description: 'El socio está al día',
+      dateLabel: 'Vence'
     }
   } else if (estado === 'vencido') {
     return {
-      card: 'bg-red-50 border-red-300',
-      iconBg: 'bg-red-100',
-      icon: 'text-red-700',
-      text: 'text-red-700',
+      status: 'danger',
       badge: 'bg-red-600',
-      label: 'Cuota Vencida'
+      label: 'Cuota Vencida',
+      description: 'Cuota vencida',
+      dateLabel: 'Venció'
     }
   } else {
-    // sin_pago o cualquier otro estado
     return {
-      card: 'bg-gray-50 border-gray-200',
-      iconBg: 'bg-gray-100',
-      icon: 'text-gray-700',
-      text: 'text-gray-700',
+      status: 'default',
       badge: 'bg-gray-500',
-      label: 'Sin pagos'
+      label: 'Sin pagos',
+      description: 'Sin pagos registrados',
+      dateLabel: ''
+    }
+  }
+})
+
+// Computed: Info del estado del apto físico 
+const aptoStatusInfo = computed(() => {
+  if (!memberData.value) return {}
+  
+  const estado = memberData.value.estado_apto_fisico
+  
+  if (estado === 'vigente') {
+    return {
+      status: 'info',
+      description: 'Vigente',
+      dateLabel: 'Vence'
+    }
+  } else if (estado === 'vencido') {
+    return {
+      status: 'warning',
+      description: 'Apto físico vencido',
+      dateLabel: 'Venció'
+    }
+  } else {
+    return {
+      status: 'default',
+      description: 'Sin apto físico',
+      dateLabel: ''
     }
   }
 })
@@ -443,47 +328,6 @@ const planName = computed(() => {
   const plan = plans.value.find(p => p.id === memberData.value.plan_id)
   return plan ? plan.nombre : `Plan ID: ${memberData.value.plan_id}`
 })
-
-// Computed: Total de pagos
-const totalAmount = computed(() => {
-  return payments.value.reduce((sum, payment) => sum + parseFloat(payment.monto || 0), 0)
-})
-
-// Función: Formatear fecha
-function formatDate(dateString) {
-  if (!dateString) return '-'
-  try {
-    // Manejar tanto fechas ISO completas (con hora) como fechas simples
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return '-'
-    return date.toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    })
-  } catch (err) {
-    console.error('Error formateando fecha:', err)
-    return '-'
-  }
-}
-
-// Función: Verificar si un pago está expirado
-function isPaymentExpired(fechaFin) {
-  if (!fechaFin) return false
-  const today = new Date()
-  const endDate = new Date(fechaFin + 'T00:00:00')
-  return endDate < today
-}
-
-// Función: Obtener nombre del plan por ID o desde el JOIN
-function getPlanName(planId, planObject) {
-  // Si viene el objeto del JOIN, usarlo
-  if (planObject?.nombre) return planObject.nombre
-  // Si no, buscar en el array de planes
-  if (!planId) return '-'
-  const plan = plans.value.find(p => p.id === planId)
-  return plan ? plan.nombre : `Plan ${planId}`
-}
 
 // Función: Cargar historial de pagos
 async function loadPayments() {
