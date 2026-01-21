@@ -53,12 +53,12 @@
               </h1>
               <p class="text-white/90 text-lg mb-2">DNI: {{ memberData.dni }}</p>
               <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-                <StatusBadge 
-                  :type="memberData.activo ? 'success' : 'secondary'"
-                  class="bg-white/20 border-white/40"
+                <span 
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold shadow-sm"
+                  :class="memberData.activo ? 'bg-emerald-400 text-emerald-950' : 'bg-gray-600 text-gray-100'"
                 >
                   {{ memberData.activo ? 'Activo' : 'Inactivo' }}
-                </StatusBadge>
+                </span>
                 <span 
                   :class="[
                     'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold text-white',
@@ -202,7 +202,7 @@ import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { formatDateLong } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
-import StatusBadge from '@/components/ui/StatusBadge.vue'
+
 import MemberStatusCard from '@/components/members/MemberStatusCard.vue'
 import MemberPaymentsHistory from '@/components/members/MemberPaymentsHistory.vue'
 import { 
