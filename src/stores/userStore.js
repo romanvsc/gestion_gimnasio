@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { toast } from 'vue-sonner'
 
 export const useUserStore = defineStore('user', () => {
   // Estado
@@ -17,7 +18,7 @@ export const useUserStore = defineStore('user', () => {
   const isStaff = computed(() => userRole.value === 'staff' || userRole.value === 'admin')
 
   // Acciones
-  
+
   /**
    * Verifica el rol del usuario en la tabla staff
    */
@@ -55,9 +56,9 @@ export const useUserStore = defineStore('user', () => {
     try {
       loading.value = true
       error.value = null
-      
+
       const { data, error: sessionError } = await supabase.auth.getSession()
-      
+
       if (sessionError) {
         console.error('Error obteniendo sesión:', sessionError)
         // Resetear todo si hay error
@@ -66,9 +67,9 @@ export const useUserStore = defineStore('user', () => {
         userRole.value = null
         return
       }
-      
+
       const currentSession = data?.session
-      
+
       if (currentSession) {
         session.value = currentSession
         user.value = currentSession.user
@@ -84,10 +85,10 @@ export const useUserStore = defineStore('user', () => {
       // Escuchar cambios en la autenticación (incluyendo refresh de token)
       supabase.auth.onAuthStateChange(async (event, newSession) => {
         console.log('Auth state changed:', event)
-        
+
         session.value = newSession
         user.value = newSession?.user || null
-        
+
         if (newSession?.user) {
           await checkUserRole(newSession.user.id)
         } else {
@@ -98,7 +99,7 @@ export const useUserStore = defineStore('user', () => {
         if (event === 'TOKEN_REFRESHED') {
           console.log('Token refrescado automáticamente')
         }
-        
+
         // Si la sesión expiró, limpiar todo
         if (event === 'SIGNED_OUT') {
           session.value = null
@@ -143,6 +144,7 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       console.error('Error en login:', err)
       error.value = err.message
+      toast.error('Error al iniciar sesión: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -168,6 +170,7 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       console.error('Error en logout:', err)
       error.value = err.message
+      toast.error('Error al cerrar sesión: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -193,6 +196,7 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       console.error('Error en registro:', err)
       error.value = err.message
+      toast.error('Error al registrar usuario: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false

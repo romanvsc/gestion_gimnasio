@@ -8,7 +8,11 @@
       </div>
     </div>
     <!-- Una vez inicializado, mostrar el contenido -->
-    <router-view v-else :key="componentKey" />
+    <router-view v-else v-slot="{ Component }">
+      <Transition name="page" mode="out-in">
+        <component :is="Component" :key="componentKey" />
+      </Transition>
+    </router-view>
     
     <!-- Toaster Global para notificaciones -->
     <Toaster position="top-center" :richColors="true" />
@@ -85,4 +89,14 @@ onUnmounted(() => {
 
 <style scoped>
 /* Estilos específicos del componente principal si son necesarios */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(5px);
+}
 </style>

@@ -16,13 +16,12 @@
 
         <!-- Buscador Gigante Centrado -->
         <div class="w-full max-w-2xl mb-8">
-          <input
+          <BaseInput
             v-model="searchQuery"
-            type="text"
+            size="kiosk"
             placeholder="Ingresa DNI, nombre o apellido..."
-            class="w-full text-2xl p-6 rounded-2xl border-2 border-gray-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 focus:outline-none shadow-lg transition-all"
+            :autofocus="true"
             @input="searchMembers"
-            autofocus
           />
         </div>
 
@@ -210,6 +209,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
+import BaseInput from '@/components/ui/BaseInput.vue'
 
 const searchQuery = ref('')
 const searchResults = ref([])

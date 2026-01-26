@@ -4,20 +4,11 @@ import { useUserStore } from '@/stores/userStore'
 // Importar layouts
 import MainLayout from '@/components/layout/MainLayout.vue'
 
-// Importar vistas
-import LoginView from '@/views/Auth/LoginView.vue'
-import DashboardView from '@/views/Dashboard/DashboardView.vue'
-import MembersListView from '@/views/Members/MembersListView.vue'
-import MemberDetailView from '@/views/Members/MemberDetailView.vue'
-import MemberFormView from '@/views/Members/MemberFormView.vue'
-import CheckInView from '@/views/CheckIn/CheckInView.vue'
-import NewPaymentView from '@/views/Payments/NewPaymentView.vue'
-
 const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: LoginView,
+    component: () => import('@/views/Auth/LoginView.vue'),
     meta: { requiresAuth: false }
   },
   {
@@ -28,37 +19,37 @@ const routes = [
       {
         path: '',
         name: 'Dashboard',
-        component: DashboardView
+        component: () => import('@/views/Dashboard/DashboardView.vue')
       },
       {
         path: 'miembros',
         name: 'Members',
-        component: MembersListView
+        component: () => import('@/views/Members/MembersListView.vue')
       },
       {
         path: 'miembros/nuevo',
         name: 'NewMember',
-        component: MemberFormView
+        component: () => import('@/views/Members/MemberFormView.vue')
       },
       {
         path: 'miembros/:id',
         name: 'MemberDetail',
-        component: MemberDetailView
+        component: () => import('@/views/Members/MemberDetailView.vue')
       },
       {
         path: 'miembros/:id/editar',
         name: 'EditMember',
-        component: MemberFormView
+        component: () => import('@/views/Members/MemberFormView.vue')
       },
       {
         path: 'checkin',
         name: 'CheckIn',
-        component: CheckInView
+        component: () => import('@/views/CheckIn/CheckInView.vue')
       },
       {
         path: 'pagos/nuevo',
         name: 'NewPayment',
-        component: NewPaymentView
+        component: () => import('@/views/Payments/NewPaymentView.vue')
       },
       {
         path: 'caja',

@@ -9,9 +9,20 @@
         </BaseButton>
       </div>
 
-      <!-- Loading -->
-      <div v-if="loading" class="bg-white rounded-lg shadow p-8 text-center">
-        <p class="text-gray-600">Cargando datos del socio...</p>
+      <!-- Loading Skeleton -->
+      <div v-if="loading" class="space-y-6">
+        <!-- Header Skeleton -->
+        <BaseSkeleton height="12rem" rounded="xl" />
+        
+        <!-- Grid Cards Skeleton -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <BaseSkeleton height="10rem" rounded="lg" />
+          <BaseSkeleton height="10rem" rounded="lg" />
+          <BaseSkeleton height="10rem" rounded="lg" />
+        </div>
+
+        <!-- Personal Data Skeleton -->
+        <BaseSkeleton height="16rem" rounded="xl" />
       </div>
 
       <!-- Error -->
@@ -202,6 +213,7 @@ import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { formatDateLong } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 
 import MemberStatusCard from '@/components/members/MemberStatusCard.vue'
 import MemberPaymentsHistory from '@/components/members/MemberPaymentsHistory.vue'

@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery } from '@/lib/asyncHandler'
 import imageCompression from 'browser-image-compression'
+import { toast } from 'vue-sonner'
 
 export function useMembers() {
   const members = ref([])
@@ -24,12 +25,12 @@ export function useMembers() {
         let query = supabase
           .from('v_socios_estado')
           .select('*')
-        
+
         // Filtrar solo activos si includeInactive es false
         if (!includeInactive) {
           query = query.eq('activo', true)
         }
-        
+
         return query
           .order('estado_cuota', { ascending: false }) // Vencidos primero
           .order('apellido', { ascending: true })
@@ -40,6 +41,7 @@ export function useMembers() {
     } catch (err) {
       console.error('Error al obtener socios:', err)
       error.value = err.message
+      toast.error('Error al cargar lista de socios: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -67,6 +69,7 @@ export function useMembers() {
     } catch (err) {
       console.error('Error al obtener socio:', err)
       error.value = err.message
+      toast.error('Error al cargar datos del socio: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -89,10 +92,12 @@ export function useMembers() {
           .single()
       )
 
+      toast.success('Socio creado exitosamente')
       return { success: true, data }
     } catch (err) {
       console.error('Error al crear socio:', err)
       error.value = err.message
+      toast.error('Error al crear socio:' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -117,10 +122,12 @@ export function useMembers() {
       if (updateError) throw updateError
 
       currentMember.value = data
+      toast.success('Datos actualizados correctamente')
       return { success: true, data }
     } catch (err) {
       console.error('Error al actualizar socio:', err)
       error.value = err.message
+      toast.error('Error al actualizar socio: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -142,10 +149,12 @@ export function useMembers() {
 
       if (deleteError) throw deleteError
 
+      toast.success('Socio eliminado correctamente')
       return { success: true }
     } catch (err) {
       console.error('Error al eliminar socio:', err)
       error.value = err.message
+      toast.error('Error al eliminar socio: ' + err.message)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -196,6 +205,7 @@ export function useMembers() {
       return { success: true, url: publicUrl }
     } catch (err) {
       console.error('Error al subir avatar:', err)
+      toast.error('Error al subir imagen: ' + err.message)
       return { success: false, error: err.message }
     }
   }
@@ -226,6 +236,7 @@ export function useMembers() {
       return { success: true }
     } catch (err) {
       console.error('Error al eliminar avatar:', err)
+      toast.error('Error al borrar imagen anterior: ' + err.message)
       return { success: false, error: err.message }
     }
   }

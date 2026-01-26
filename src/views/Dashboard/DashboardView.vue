@@ -62,9 +62,33 @@
         </div>
       </div>
 
-      <!-- Loading -->
-      <div v-if="loading" class="text-center py-8">
-        <p class="text-gray-600">Cargando estadísticas...</p>
+      <!-- Loading Skeleton -->
+      <div v-if="loading" class="space-y-8">
+        <!-- Skeleton para Tarjetas de Métricas -->
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div v-for="i in 4" :key="i" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-start justify-between">
+              <div class="flex-1 space-y-3">
+                <BaseSkeleton width="60%" height="0.875rem" />
+                <BaseSkeleton width="50%" height="2rem" />
+              </div>
+              <BaseSkeleton width="48px" height="48px" rounded="lg" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Skeleton para Tabla de Check-ins -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <BaseSkeleton width="180px" height="1.5rem" class="mb-6" />
+          <div class="space-y-4">
+            <div v-for="i in 4" :key="i" class="flex items-center gap-4 py-3">
+              <BaseSkeleton width="40%" height="1rem" />
+              <BaseSkeleton width="20%" height="1rem" />
+              <BaseSkeleton width="15%" height="1rem" />
+              <BaseSkeleton width="60px" height="24px" rounded="full" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-else>
@@ -224,6 +248,7 @@ import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckC
 import StatCard from '@/components/dashboard/StatCard.vue'
 import DashboardActionCard from '@/components/dashboard/DashboardActionCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LastAccessModal from '@/components/modals/LastAccessModal.vue'
 import AssistanceChart from '@/components/charts/AssistanceChart.vue'
