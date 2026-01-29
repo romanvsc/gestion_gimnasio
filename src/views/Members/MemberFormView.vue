@@ -344,14 +344,84 @@
           </div>
         </div>
 
-        <!-- Error general -->
-        <div 
-          v-if="error" 
-          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
+        <!-- Panel de errores de duplicados -->
+        <Transition
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-200 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
         >
-          <AlertTriangle class="w-5 h-5 flex-shrink-0" />
-          {{ error }}
-        </div>
+          <div 
+            v-if="duplicateErrors.length > 0" 
+            class="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-xl shadow-sm overflow-hidden"
+          >
+            <div class="p-5">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                  <UserX class="w-6 h-6 text-amber-600" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg font-semibold text-amber-800 mb-1">
+                    Socio ya registrado
+                  </h3>
+                  <p class="text-sm text-amber-700 mb-3">
+                    Se encontraron coincidencias con socios existentes en el sistema:
+                  </p>
+                  <ul class="space-y-2">
+                    <li 
+                      v-for="(err, index) in duplicateErrors" 
+                      :key="index"
+                      class="flex items-center gap-2 text-sm text-amber-800 bg-white/60 px-3 py-2 rounded-lg"
+                    >
+                      <span class="w-5 h-5 bg-amber-200 rounded-full flex items-center justify-center text-xs font-bold text-amber-700">{{ index + 1 }}</span>
+                      {{ err }}
+                    </li>
+                  </ul>
+                </div>
+                <button 
+                  type="button"
+                  @click="duplicateErrors = []"
+                  class="flex-shrink-0 p-1.5 text-amber-500 hover:text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
+                >
+                  <X class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
+
+        <!-- Error general -->
+        <Transition
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-200 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
+        >
+          <div 
+            v-if="error" 
+            class="bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-400 rounded-xl shadow-sm overflow-hidden"
+          >
+            <div class="p-5">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle class="w-6 h-6 text-red-600" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg font-semibold text-red-800 mb-1">
+                    Error al guardar
+                  </h3>
+                  <p class="text-sm text-red-700">
+                    {{ error }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
 
         <!-- Botones de acción -->
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
@@ -440,6 +510,7 @@ const photoFile = ref(null)
 const uploadingPhoto = ref(false)
 const fileInput = ref(null)
 const previousPhotoUrl = ref('')
+const duplicateErrors = ref([])
 
 // Formatear precio con separador de miles
 function formatPrice(price) {
@@ -533,12 +604,17 @@ async function handleSubmit() {
     const validation = await validateNoDuplicates(formData.value, excludeId)
     
     if (!validation.valid) {
-      // Mostrar cada error de duplicado
-      validation.errors.forEach(err => {
-        toast.warning(err, { duration: 5000 })
-      })
+      // Mostrar errores de duplicado en el panel profesional
+      duplicateErrors.value = validation.errors
+      // Scroll suave hacia el panel de errores
+      setTimeout(() => {
+        document.querySelector('.border-amber-400')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 100)
       return
     }
+    
+    // Limpiar errores previos si la validación pasó
+    duplicateErrors.value = []
 
     let memberData = { ...formData.value }
     
