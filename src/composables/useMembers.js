@@ -15,20 +15,35 @@ export function useMembers() {
    */
   function translatePostgresError(err) {
     const message = err.message || ''
+    const detail = err.detail || ''
     const code = err.code || ''
-    
+    const constraint = err.constraint || ''
+
+    // Combinar todos los campos para búsqueda
+    const fullError = `${message} ${detail} ${constraint}`.toLowerCase()
+
     // Error de constraint UNIQUE (código 23505)
-    if (code === '23505' || message.includes('duplicate key') || message.includes('unique constraint')) {
-      if (message.includes('dni')) {
-        return 'Ya existe un socio con este DNI'
+    if (code === '23505' || fullError.includes('duplicate key') || fullError.includes('unique constraint') || fullError.includes('already exists')) {
+      if (fullError.includes('dni') || fullError.includes('members_dni')) {
+        return 'Ya existe un socio registrado con este DNI. Por favor, verifica el número ingresado.'
       }
-      if (message.includes('email')) {
-        return 'Ya existe un socio con este email'
+      if (fullError.includes('email') || fullError.includes('members_email')) {
+        return 'Ya existe un socio registrado con este email. Por favor, usa otro email.'
       }
-      return 'Ya existe un registro con estos datos'
+      return 'Ya existe un registro con estos datos. Por favor, verifica la información ingresada.'
     }
-    
-    return message
+
+    // Error de foreign key (código 23503)
+    if (code === '23503' || fullError.includes('foreign key') || fullError.includes('violates foreign key')) {
+      return 'No se puede completar la operación porque hay datos relacionados.'
+    }
+
+    // Error de conexión
+    if (fullError.includes('network') || fullError.includes('connection') || fullError.includes('timeout')) {
+      return 'Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.'
+    }
+
+    return message || 'Ocurrió un error inesperado. Por favor, intenta nuevamente.'
   }
 
   /**
@@ -39,21 +54,21 @@ export function useMembers() {
    */
   async function checkDuplicateDNI(dni, excludeId = null) {
     if (!dni) return { exists: false }
-    
+
     try {
       let query = supabase
         .from('members')
         .select('id, nombre, apellido, dni')
         .eq('dni', dni.trim())
-      
+
       if (excludeId) {
         query = query.neq('id', excludeId)
       }
-      
+
       const { data, error: err } = await query.maybeSingle()
-      
+
       if (err) throw err
-      
+
       return { exists: !!data, member: data }
     } catch (err) {
       console.error('Error verificando DNI duplicado:', err)
@@ -69,21 +84,21 @@ export function useMembers() {
    */
   async function checkDuplicateEmail(email, excludeId = null) {
     if (!email || !email.trim()) return { exists: false }
-    
+
     try {
       let query = supabase
         .from('members')
         .select('id, nombre, apellido, email')
         .eq('email', email.trim().toLowerCase())
-      
+
       if (excludeId) {
         query = query.neq('id', excludeId)
       }
-      
+
       const { data, error: err } = await query.maybeSingle()
-      
+
       if (err) throw err
-      
+
       return { exists: !!data, member: data }
     } catch (err) {
       console.error('Error verificando email duplicado:', err)
@@ -100,22 +115,22 @@ export function useMembers() {
    */
   async function checkDuplicateName(nombre, apellido, excludeId = null) {
     if (!nombre || !apellido) return { exists: false }
-    
+
     try {
       let query = supabase
         .from('members')
         .select('id, nombre, apellido, dni')
         .ilike('nombre', nombre.trim())
         .ilike('apellido', apellido.trim())
-      
+
       if (excludeId) {
         query = query.neq('id', excludeId)
       }
-      
+
       const { data, error: err } = await query.maybeSingle()
-      
+
       if (err) throw err
-      
+
       return { exists: !!data, member: data }
     } catch (err) {
       console.error('Error verificando nombre duplicado:', err)
@@ -131,13 +146,13 @@ export function useMembers() {
    */
   async function validateNoDuplicates(memberData, excludeId = null) {
     const errors = []
-    
+
     // Verificar DNI (obligatorio)
     const dniCheck = await checkDuplicateDNI(memberData.dni, excludeId)
     if (dniCheck.exists) {
       errors.push(`Ya existe un socio con DNI ${memberData.dni}: ${dniCheck.member.nombre} ${dniCheck.member.apellido}`)
     }
-    
+
     // Verificar Email (si tiene)
     if (memberData.email) {
       const emailCheck = await checkDuplicateEmail(memberData.email, excludeId)
@@ -145,13 +160,13 @@ export function useMembers() {
         errors.push(`Ya existe un socio con email ${memberData.email}: ${emailCheck.member.nombre} ${emailCheck.member.apellido}`)
       }
     }
-    
+
     // Verificar Nombre + Apellido
     const nameCheck = await checkDuplicateName(memberData.nombre, memberData.apellido, excludeId)
     if (nameCheck.exists) {
       errors.push(`Ya existe un socio llamado ${memberData.nombre} ${memberData.apellido} (DNI: ${nameCheck.member.dni})`)
     }
-    
+
     return { valid: errors.length === 0, errors }
   }
 
