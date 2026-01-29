@@ -27,7 +27,7 @@ export function useParameters() {
             .eq('activo', true)
             .order('nombre')
         ),
-        
+
         // Cargar planes activos
         runQuery(() =>
           supabase
@@ -36,7 +36,7 @@ export function useParameters() {
             .eq('activo', true)
             .order('nombre')
         ),
-        
+
         // Cargar métodos de pago activos
         runQuery(() =>
           supabase
@@ -68,8 +68,8 @@ export function useParameters() {
    */
   function getConceptsByType(type) {
     if (!type) return []
-    
-    return concepts.value.filter(concept => 
+
+    return concepts.value.filter(concept =>
       concept.tipo === type || concept.tipo === 'AMBOS'
     )
   }
@@ -117,17 +117,45 @@ export function useParameters() {
    */
   async function createPlan(planData) {
     try {
+      // Limpiar datos antes de enviar
+      const cleanData = {
+        nombre: planData.nombre?.trim(),
+        dias_duracion: parseInt(planData.dias_duracion, 10),
+        precio: parseFloat(planData.precio),
+        precio_socio: planData.precio_socio ? parseFloat(planData.precio_socio) : null,
+        activo: planData.activo !== false
+      }
+
+      console.log('📦 Creando plan con datos:', cleanData)
+
       const data = await runQuery(() =>
         supabase
           .from('plans')
-          .insert([planData])
+          .insert([cleanData])
           .select()
           .single()
       )
+
+      console.log('✅ Plan creado exitosamente:', data)
       return { success: true, data }
     } catch (err) {
-      console.error('Error creando plan:', err)
-      return { success: false, error: err.message }
+      console.error('❌ Error creando plan:', err)
+
+      // Traducir errores de Postgres
+      const message = err.message || ''
+      const code = err.code || ''
+
+      let friendlyError = message
+
+      if (code === '23505' || message.includes('duplicate')) {
+        friendlyError = 'Ya existe un plan con este nombre'
+      } else if (code === '42501' || message.includes('permission denied')) {
+        friendlyError = 'No tienes permisos para crear planes. Contacta al administrador.'
+      } else if (code === '23502' || message.includes('violates not-null')) {
+        friendlyError = 'Faltan datos obligatorios para crear el plan'
+      }
+
+      return { success: false, error: friendlyError }
     }
   }
 
@@ -136,18 +164,39 @@ export function useParameters() {
    */
   async function updatePlan(id, planData) {
     try {
+      // Limpiar datos antes de enviar
+      const cleanData = {
+        nombre: planData.nombre?.trim(),
+        dias_duracion: parseInt(planData.dias_duracion, 10),
+        precio: parseFloat(planData.precio),
+        precio_socio: planData.precio_socio ? parseFloat(planData.precio_socio) : null,
+        activo: planData.activo !== false
+      }
+
       const data = await runQuery(() =>
         supabase
           .from('plans')
-          .update(planData)
+          .update(cleanData)
           .eq('id', id)
           .select()
           .single()
       )
       return { success: true, data }
     } catch (err) {
-      console.error('Error actualizando plan:', err)
-      return { success: false, error: err.message }
+      console.error('❌ Error actualizando plan:', err)
+
+      const message = err.message || ''
+      const code = err.code || ''
+
+      let friendlyError = message
+
+      if (code === '23505' || message.includes('duplicate')) {
+        friendlyError = 'Ya existe un plan con este nombre'
+      } else if (code === '42501' || message.includes('permission denied')) {
+        friendlyError = 'No tienes permisos para modificar planes'
+      }
+
+      return { success: false, error: friendlyError }
     }
   }
 

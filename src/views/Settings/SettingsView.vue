@@ -297,6 +297,15 @@
       @close="closePlanModal"
       @save="handleSavePlan"
     />
+
+    <!-- Success Modal Premium -->
+    <SuccessModal
+      v-model="showSuccessModal"
+      :type="successModalConfig.type"
+      :title="successModalConfig.title"
+      :message="successModalConfig.message"
+      :button-text="successModalConfig.buttonText"
+    />
   </div>
 </template>
 
@@ -310,6 +319,7 @@ import { confirmAlert } from '@/lib/alerts'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import PlanModal from '@/components/settings/PlanModal.vue'
+import SuccessModal from '@/components/ui/SuccessModal.vue'
 import { 
   ArrowLeft, 
   ImageIcon, 
@@ -353,6 +363,15 @@ const uploadingLogo = ref(false)
 // Plan modal state
 const showPlanModal = ref(false)
 const selectedPlan = ref(null)
+
+// Success modal state
+const showSuccessModal = ref(false)
+const successModalConfig = reactive({
+  type: 'success',
+  title: '¡Guardado!',
+  message: 'Los cambios se han guardado correctamente.',
+  buttonText: 'Entendido'
+})
 
 // ==================
 // LIFECYCLE
@@ -463,8 +482,15 @@ async function handleSavePlan(planData) {
       })
       
       if (result.success) {
-        toast.success('Plan actualizado')
         await fetchAllPlans()
+        closePlanModal()
+        
+        // Mostrar modal de éxito
+        successModalConfig.type = 'success'
+        successModalConfig.title = '¡Plan actualizado!'
+        successModalConfig.message = `El plan "${planData.nombre}" se ha modificado correctamente.`
+        successModalConfig.buttonText = 'Entendido'
+        showSuccessModal.value = true
       } else {
         toast.error(result.error || 'Error al actualizar')
       }
@@ -479,14 +505,19 @@ async function handleSavePlan(planData) {
       })
       
       if (result.success) {
-        toast.success('Plan creado')
         await fetchAllPlans()
+        closePlanModal()
+        
+        // Mostrar modal de éxito
+        successModalConfig.type = 'success'
+        successModalConfig.title = '¡Plan creado!'
+        successModalConfig.message = `El plan "${planData.nombre}" ya está disponible para asignar a tus socios.`
+        successModalConfig.buttonText = '¡Genial!'
+        showSuccessModal.value = true
       } else {
         toast.error(result.error || 'Error al crear')
       }
     }
-    
-    closePlanModal()
   } catch (err) {
     console.error('Error guardando plan:', err)
     toast.error('Error inesperado')
@@ -526,22 +557,23 @@ async function handleSave() {
   saving.value = true
 
   try {
-    await toast.promise(
-      updateSettings({
-        nombre_gimnasio: formData.nombre_gimnasio.trim(),
-        email_contacto: formData.email_contacto?.trim() || '',
-        whatsapp: formData.whatsapp?.trim() || '',
-        direccion: formData.direccion?.trim() || '',
-        horarios_apertura: formData.horarios_apertura?.trim() || ''
-      }),
-      {
-        loading: 'Guardando...',
-        success: 'Configuración guardada',
-        error: 'Error al guardar'
-      }
-    )
+    await updateSettings({
+      nombre_gimnasio: formData.nombre_gimnasio.trim(),
+      email_contacto: formData.email_contacto?.trim() || '',
+      whatsapp: formData.whatsapp?.trim() || '',
+      direccion: formData.direccion?.trim() || '',
+      horarios_apertura: formData.horarios_apertura?.trim() || ''
+    })
+    
+    // Mostrar modal de éxito
+    successModalConfig.type = 'success'
+    successModalConfig.title = '¡Configuración guardada!'
+    successModalConfig.message = 'Los datos del gimnasio se han actualizado correctamente.'
+    successModalConfig.buttonText = 'Perfecto'
+    showSuccessModal.value = true
   } catch (err) {
     console.error('Error al guardar:', err)
+    toast.error('Error al guardar la configuración')
   } finally {
     saving.value = false
   }

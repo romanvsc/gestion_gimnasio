@@ -14,8 +14,27 @@
       </Transition>
     </router-view>
     
-    <!-- Toaster Global para notificaciones -->
-    <Toaster position="top-center" :richColors="true" />
+    <!-- Toaster Global para notificaciones - Estilizado Premium -->
+    <Toaster 
+      position="top-center" 
+      :richColors="true"
+      :expand="true"
+      :visibleToasts="3"
+      :toastOptions="{
+        style: {
+          padding: '16px 20px',
+          borderRadius: '16px',
+          fontSize: '15px',
+          fontWeight: '500',
+          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05)',
+          background: 'white',
+          border: 'none',
+          gap: '12px'
+        },
+        className: 'premium-toast',
+        descriptionClassName: 'toast-description'
+      }"
+    />
   </div>
 </template>
 
