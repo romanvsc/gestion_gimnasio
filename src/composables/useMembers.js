@@ -11,6 +11,151 @@ export function useMembers() {
   const error = ref(null)
 
   /**
+   * Traduce errores de Postgres a mensajes amigables
+   */
+  function translatePostgresError(err) {
+    const message = err.message || ''
+    const code = err.code || ''
+    
+    // Error de constraint UNIQUE (código 23505)
+    if (code === '23505' || message.includes('duplicate key') || message.includes('unique constraint')) {
+      if (message.includes('dni')) {
+        return 'Ya existe un socio con este DNI'
+      }
+      if (message.includes('email')) {
+        return 'Ya existe un socio con este email'
+      }
+      return 'Ya existe un registro con estos datos'
+    }
+    
+    return message
+  }
+
+  /**
+   * Verifica si existe un socio con el mismo DNI
+   * @param {string} dni - DNI a verificar
+   * @param {string|null} excludeId - ID del socio a excluir (para edición)
+   * @returns {Promise<{exists: boolean, member?: object}>}
+   */
+  async function checkDuplicateDNI(dni, excludeId = null) {
+    if (!dni) return { exists: false }
+    
+    try {
+      let query = supabase
+        .from('members')
+        .select('id, nombre, apellido, dni')
+        .eq('dni', dni.trim())
+      
+      if (excludeId) {
+        query = query.neq('id', excludeId)
+      }
+      
+      const { data, error: err } = await query.maybeSingle()
+      
+      if (err) throw err
+      
+      return { exists: !!data, member: data }
+    } catch (err) {
+      console.error('Error verificando DNI duplicado:', err)
+      return { exists: false, error: err.message }
+    }
+  }
+
+  /**
+   * Verifica si existe un socio con el mismo email
+   * @param {string} email - Email a verificar
+   * @param {string|null} excludeId - ID del socio a excluir (para edición)
+   * @returns {Promise<{exists: boolean, member?: object}>}
+   */
+  async function checkDuplicateEmail(email, excludeId = null) {
+    if (!email || !email.trim()) return { exists: false }
+    
+    try {
+      let query = supabase
+        .from('members')
+        .select('id, nombre, apellido, email')
+        .eq('email', email.trim().toLowerCase())
+      
+      if (excludeId) {
+        query = query.neq('id', excludeId)
+      }
+      
+      const { data, error: err } = await query.maybeSingle()
+      
+      if (err) throw err
+      
+      return { exists: !!data, member: data }
+    } catch (err) {
+      console.error('Error verificando email duplicado:', err)
+      return { exists: false, error: err.message }
+    }
+  }
+
+  /**
+   * Verifica si existe un socio con el mismo nombre y apellido
+   * @param {string} nombre - Nombre a verificar
+   * @param {string} apellido - Apellido a verificar
+   * @param {string|null} excludeId - ID del socio a excluir (para edición)
+   * @returns {Promise<{exists: boolean, member?: object}>}
+   */
+  async function checkDuplicateName(nombre, apellido, excludeId = null) {
+    if (!nombre || !apellido) return { exists: false }
+    
+    try {
+      let query = supabase
+        .from('members')
+        .select('id, nombre, apellido, dni')
+        .ilike('nombre', nombre.trim())
+        .ilike('apellido', apellido.trim())
+      
+      if (excludeId) {
+        query = query.neq('id', excludeId)
+      }
+      
+      const { data, error: err } = await query.maybeSingle()
+      
+      if (err) throw err
+      
+      return { exists: !!data, member: data }
+    } catch (err) {
+      console.error('Error verificando nombre duplicado:', err)
+      return { exists: false, error: err.message }
+    }
+  }
+
+  /**
+   * Verifica todos los posibles duplicados antes de crear/actualizar
+   * @param {object} memberData - Datos del socio
+   * @param {string|null} excludeId - ID a excluir (para edición)
+   * @returns {Promise<{valid: boolean, errors: string[]}>}
+   */
+  async function validateNoDuplicates(memberData, excludeId = null) {
+    const errors = []
+    
+    // Verificar DNI (obligatorio)
+    const dniCheck = await checkDuplicateDNI(memberData.dni, excludeId)
+    if (dniCheck.exists) {
+      errors.push(`Ya existe un socio con DNI ${memberData.dni}: ${dniCheck.member.nombre} ${dniCheck.member.apellido}`)
+    }
+    
+    // Verificar Email (si tiene)
+    if (memberData.email) {
+      const emailCheck = await checkDuplicateEmail(memberData.email, excludeId)
+      if (emailCheck.exists) {
+        errors.push(`Ya existe un socio con email ${memberData.email}: ${emailCheck.member.nombre} ${emailCheck.member.apellido}`)
+      }
+    }
+    
+    // Verificar Nombre + Apellido
+    const nameCheck = await checkDuplicateName(memberData.nombre, memberData.apellido, excludeId)
+    if (nameCheck.exists) {
+      errors.push(`Ya existe un socio llamado ${memberData.nombre} ${memberData.apellido} (DNI: ${nameCheck.member.dni})`)
+    }
+    
+    return { valid: errors.length === 0, errors }
+  }
+
+  /**
    * Obtiene todos los socios desde la vista v_socios_estado
    * Esta vista incluye el cálculo de estados (activo, vencido)
    * @param {boolean} includeInactive - Si es true, incluye socios inactivos
@@ -96,9 +241,10 @@ export function useMembers() {
       return { success: true, data }
     } catch (err) {
       console.error('Error al crear socio:', err)
-      error.value = err.message
-      toast.error('Error al crear socio:' + err.message)
-      return { success: false, error: err.message }
+      const friendlyError = translatePostgresError(err)
+      error.value = friendlyError
+      toast.error('Error al crear socio: ' + friendlyError)
+      return { success: false, error: friendlyError }
     } finally {
       loading.value = false
     }
@@ -126,9 +272,10 @@ export function useMembers() {
       return { success: true, data }
     } catch (err) {
       console.error('Error al actualizar socio:', err)
-      error.value = err.message
-      toast.error('Error al actualizar socio: ' + err.message)
-      return { success: false, error: err.message }
+      const friendlyError = translatePostgresError(err)
+      error.value = friendlyError
+      toast.error('Error al actualizar socio: ' + friendlyError)
+      return { success: false, error: friendlyError }
     } finally {
       loading.value = false
     }
@@ -262,6 +409,11 @@ export function useMembers() {
     deleteMember,
     uploadAvatar,
     deleteAvatar,
-    clearError
+    clearError,
+    // Validaciones de duplicados
+    checkDuplicateDNI,
+    checkDuplicateEmail,
+    checkDuplicateName,
+    validateNoDuplicates
   }
 }

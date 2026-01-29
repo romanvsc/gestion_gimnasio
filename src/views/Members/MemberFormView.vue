@@ -412,7 +412,7 @@ import {
 
 const router = useRouter()
 const route = useRoute()
-const { loading, error, getMemberById, createMember, updateMember, uploadAvatar, deleteAvatar } = useMembers()
+const { loading, error, getMemberById, createMember, updateMember, uploadAvatar, deleteAvatar, validateNoDuplicates } = useMembers()
 const { plans, fetchParameters } = useParameters()
 
 const isEditing = computed(() => !!route.params.id)
@@ -528,6 +528,18 @@ async function handleSubmit() {
   }
 
   try {
+    // Validar duplicados antes de crear/actualizar
+    const excludeId = isEditing.value ? route.params.id : null
+    const validation = await validateNoDuplicates(formData.value, excludeId)
+    
+    if (!validation.valid) {
+      // Mostrar cada error de duplicado
+      validation.errors.forEach(err => {
+        toast.warning(err, { duration: 5000 })
+      })
+      return
+    }
+
     let memberData = { ...formData.value }
     
     if (photoFile.value) {

@@ -7,7 +7,29 @@
       <div class="flex-1">
         <p class="text-gray-400 text-sm font-medium mb-2">{{ title }}</p>
         <p class="text-gray-800 text-3xl font-bold mb-1">{{ value }}</p>
-        <div v-if="trend" class="flex items-center gap-1">
+        
+        <!-- Comparison with previous period -->
+        <div v-if="showComparison" class="flex items-center gap-1.5 mt-1">
+          <component 
+            :is="comparisonIcon" 
+            :class="[
+              'w-4 h-4',
+              comparisonIsPositive ? 'text-emerald-600' : 'text-red-600'
+            ]"
+          />
+          <span 
+            :class="[
+              'text-sm font-semibold',
+              comparisonIsPositive ? 'text-emerald-600' : 'text-red-600'
+            ]"
+          >
+            {{ formattedComparison }}
+          </span>
+          <span class="text-gray-400 text-xs">{{ comparisonLabel }}</span>
+        </div>
+        
+        <!-- Legacy trend support -->
+        <div v-else-if="trend" class="flex items-center gap-1">
           <span 
             :class="[
               'text-sm font-semibold',
@@ -41,6 +63,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-vue-next'
 
 const props = defineProps({
   title: {
@@ -51,6 +74,16 @@ const props = defineProps({
     type: [String, Number],
     required: true
   },
+  // New comparison props
+  comparison: {
+    type: Number,
+    default: null
+  },
+  comparisonLabel: {
+    type: String,
+    default: 'vs periodo anterior'
+  },
+  // Legacy trend prop (for backwards compatibility)
   trend: {
     type: String,
     default: ''
@@ -75,6 +108,28 @@ const props = defineProps({
 
 const router = useRouter()
 
+// Comparison computed properties
+const showComparison = computed(() => {
+  return props.comparison !== null && props.comparison !== undefined
+})
+
+const comparisonIsPositive = computed(() => {
+  return props.comparison > 0
+})
+
+const comparisonIcon = computed(() => {
+  if (props.comparison > 0) return TrendingUp
+  if (props.comparison < 0) return TrendingDown
+  return Minus
+})
+
+const formattedComparison = computed(() => {
+  if (props.comparison === 0) return '0%'
+  const sign = props.comparison > 0 ? '+' : ''
+  return `${sign}${props.comparison}%`
+})
+
+// Legacy trend computed
 const trendIsPositive = computed(() => {
   return props.trend.startsWith('+')
 })
@@ -85,3 +140,4 @@ function handleClick() {
   }
 }
 </script>
+
