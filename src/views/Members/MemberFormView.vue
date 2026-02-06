@@ -114,10 +114,9 @@
                 <BaseInput
                   v-model="formData.dni"
                   type="text"
-                  label="DNI *"
+                  label="DNI"
                   placeholder="12345678"
                   size="lg"
-                  required
                 />
                 <BaseInput
                   v-model="formData.fecha_nacimiento"
@@ -593,7 +592,7 @@ function removePhoto() {
 }
 
 async function handleSubmit() {
-  if (!formData.value.nombre.trim() || !formData.value.apellido.trim() || !formData.value.dni) {
+  if (!formData.value.nombre.trim() || !formData.value.apellido.trim()) {
     toast.error('Complete los campos obligatorios')
     return
   }
