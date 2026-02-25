@@ -21,7 +21,7 @@
       {{ title }}
     </span>
 
-    <span v-if="subtitle" class="text-xs text-gray-400 mt-1 hidden md:block">
+    <span v-if="subtitle" class="text-xs text-gray-400 dark:text-gray-500 mt-1 hidden md:block">
       {{ subtitle }}
     </span>
   </BaseButton>

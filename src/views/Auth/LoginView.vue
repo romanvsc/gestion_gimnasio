@@ -54,7 +54,7 @@
     </div>
 
     <!-- Panel derecho - Formulario de login -->
-    <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white">
+    <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white dark:bg-gray-900">
       <div class="w-full max-w-md animate-slide-up">
         <!-- Logo para móvil -->
         <div class="lg:hidden flex justify-center mb-6">
@@ -83,12 +83,12 @@
         <form @submit.prevent="handleLogin" class="space-y-5">
           <!-- Campo de Email -->
           <div>
-            <label for="email-input" class="block text-sm font-medium text-gray-700 mb-1.5">
+            <label for="email-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Correo Electrónico *
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail class="h-5 w-5 text-gray-400" />
+                <Mail class="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="email-input"
@@ -100,7 +100,7 @@
                 required
                 @input="validateEmailRealTime"
                 @focus="clearFieldError('email')"
-                class="w-full pl-10 pr-4 py-3 text-gray-900 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
+                class="w-full pl-10 pr-4 py-3 text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-200"
                 :class="{ 
                   'border-red-400 focus:ring-red-500/20 focus:border-red-500 bg-red-50': emailError,
                   'border-green-400': email && !emailError && isValidEmail(email)
@@ -119,12 +119,12 @@
 
           <!-- Campo de Contraseña -->
           <div>
-            <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1.5">
+            <label for="password-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Contraseña *
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock class="h-5 w-5 text-gray-400" />
+                <Lock class="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="password-input"
@@ -137,7 +137,7 @@
                 @focus="clearFieldError('password')"
                 @keydown="checkCapsLock"
                 @keyup="checkCapsLock"
-                class="w-full pl-10 pr-12 py-3 text-gray-900 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white transition-all duration-200"
+                class="w-full pl-10 pr-12 py-3 text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-200"
                 :class="{ 
                   'border-red-400 focus:ring-red-500/20 focus:border-red-500 bg-red-50': passwordError,
                   'border-green-400': password && !passwordError && password.length >= 6
@@ -146,7 +146,7 @@
               <button 
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                 :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
               >
                 <EyeOff v-if="showPassword" class="h-5 w-5" />
@@ -172,7 +172,7 @@
                 v-model="rememberMe"
                 class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-offset-0 transition-colors"
               />
-              <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+              <span class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
                 Recordar mi correo
               </span>
             </label>
@@ -182,7 +182,7 @@
           <Transition name="shake">
             <div 
               v-if="generalError" 
-              class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center"
+              class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-sm flex items-center"
             >
               <AlertCircle class="h-5 w-5 mr-2 flex-shrink-0" />
               {{ generalError }}
@@ -211,7 +211,7 @@
 
         <!-- Footer -->
         <div class="mt-8 text-center">
-          <p class="text-sm text-gray-500">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
             ¿Problemas para ingresar?
             <a href="#" class="text-primary-600 hover:text-primary-700 font-medium hover:underline ml-1">
               Contacta soporte

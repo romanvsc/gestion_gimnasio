@@ -15,10 +15,10 @@
 
       <!-- Sección 1: Análisis Financiero -->
       <section class="mb-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div class="p-4 md:p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                 <TrendingUp class="w-5 h-5 text-emerald-600" />
               </div>
               <div>
@@ -41,7 +41,7 @@
       <!-- Sección 2: Patrones de Actividad -->
       <section class="mb-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-secondary-100 dark:bg-secondary-900/30 flex items-center justify-center">
             <Activity class="w-5 h-5 text-secondary-600" />
           </div>
           <div>
@@ -53,8 +53,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           <!-- Gráfico 1: Actividad por Día -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
               <h3 class="font-medium text-page-title">Actividad por Día</h3>
               <Loader2 v-if="loading.daily" class="w-4 h-4 animate-spin text-page-muted" />
             </div>
@@ -64,8 +64,8 @@
           </div>
 
           <!-- Gráfico 2: Horarios Pico -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
               <h3 class="font-medium text-page-title">Horarios Pico</h3>
               <Loader2 v-if="loading.hourly" class="w-4 h-4 animate-spin text-page-muted" />
             </div>
@@ -80,7 +80,7 @@
       <!-- Sección 3: Alertas de Socios -->
       <section>
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
             <AlertTriangle class="w-5 h-5 text-amber-600" />
           </div>
           <div>

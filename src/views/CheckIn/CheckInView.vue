@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
     <div class="h-screen flex flex-col lg:flex-row">
       
       <!-- Área Principal: Kiosco de Acceso -->
@@ -8,14 +8,14 @@
         <!-- Icono Decorativo + Header -->
         <div class="mb-8 text-center">
           <div class="mb-6 flex justify-center">
-            <CreditCard class="w-16 h-16 text-gray-200" />
+            <CreditCard class="w-16 h-16 text-gray-200 dark:text-gray-700" />
           </div>
           <h1 class="text-3xl md:text-4xl font-bold text-page-title mb-2">Acceso al Gimnasio</h1>
           <p class="text-page-subtitle text-lg">Escanea o ingresa tu DNI</p>
         </div>
 
         <!-- Buscador Gigante Centrado -->
-        <div class="w-full max-w-2xl mb-8">
+        <div class="w-full max-w-2xl mb-5">
           <BaseInput
             v-model="searchQuery"
             size="kiosk"
@@ -25,10 +25,32 @@
           />
         </div>
 
+        <!-- Fecha de asistencia -->
+        <div class="w-full max-w-2xl mb-8">
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+            <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Fecha de asistencia</p>
+            <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
+              <div class="flex-1">
+                <BaseInput
+                  v-model="selectedAttendanceDate"
+                  type="date"
+                  size="lg"
+                />
+              </div>
+              <BaseButton
+                label="Hoy"
+                variant="secondary"
+                size="md"
+                @click="setTodayDate"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- Loading -->
         <div v-if="loading" class="text-center">
           <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent"></div>
-          <p class="text-gray-600 mt-4 text-lg">Buscando...</p>
+          <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Buscando...</p>
         </div>
 
         <!-- Resultados: Tarjetas de Acceso -->
@@ -42,7 +64,7 @@
             <!-- ACCESO PERMITIDO -->
             <div
               v-if="canCheckIn(member)"
-              class="bg-gradient-to-r from-emerald-50 to-teal-50 border-4 border-emerald-500 rounded-3xl p-8 shadow-2xl"
+              class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/20 border-4 border-emerald-500 rounded-3xl p-8 shadow-2xl"
             >
               <div class="flex items-center gap-6">
                 <!-- Avatar Grande -->
@@ -52,13 +74,21 @@
                 
                 <!-- Info -->
                 <div class="flex-1">
-                  <p class="text-3xl font-bold text-gray-900 mb-1">
+                  <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
                     {{ member.nombre }} {{ member.apellido }}
                   </p>
-                  <p class="text-lg text-gray-600 mb-4">DNI: {{ member.dni }}</p>
-                  <div class="flex items-center gap-3 bg-white rounded-xl px-4 py-3 shadow-sm">
-                    <CheckCircle class="h-8 w-8 text-emerald-500" />
-                    <span class="text-2xl font-bold text-emerald-600">ACCESO PERMITIDO</span>
+                  <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">DNI: {{ member.dni }}</p>
+                  <div class="flex items-start gap-3 bg-white dark:bg-gray-800/60 rounded-xl px-4 py-3 shadow-sm">
+                    <CheckCircle class="h-8 w-8 text-emerald-500 mt-0.5" />
+                    <div class="flex-1">
+                      <span class="text-2xl font-bold text-emerald-600 block">ACCESO PERMITIDO</span>
+                      <span
+                        v-if="member.estado_apto_fisico !== 'vigente'"
+                        class="text-sm font-medium text-amber-600"
+                      >
+                        Aviso: apto físico vencido (no bloquea el check-in)
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -67,7 +97,7 @@
             <!-- ACCESO DENEGADO -->
             <div
               v-else
-              class="bg-gradient-to-r from-red-50 to-orange-50 border-4 border-red-500 rounded-3xl p-8 shadow-2xl"
+              class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/20 border-4 border-red-500 rounded-3xl p-8 shadow-2xl"
             >
               <div class="flex items-center gap-6">
                 <!-- Avatar Grande -->
@@ -77,24 +107,16 @@
                 
                 <!-- Info -->
                 <div class="flex-1">
-                  <p class="text-3xl font-bold text-gray-900 mb-1">
+                  <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
                     {{ member.nombre }} {{ member.apellido }}
                   </p>
-                  <p class="text-lg text-gray-600 mb-4">DNI: {{ member.dni }}</p>
-                  <div class="flex items-center gap-3 bg-white rounded-xl px-4 py-3 shadow-sm">
+                  <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">DNI: {{ member.dni }}</p>
+                  <div class="flex items-center gap-3 bg-white dark:bg-gray-800/60 rounded-xl px-4 py-3 shadow-sm">
                     <AlertCircle class="h-8 w-8 text-red-500" />
                     <div class="flex-1">
                       <span class="text-2xl font-bold text-red-600 block">ACCESO DENEGADO</span>
                       <span class="text-base text-red-500 font-medium">
-                        <span v-if="member.estado_cuota !== 'activo' && member.estado_apto_fisico !== 'vigente'">
-                          Cuota y Apto Físico Vencidos
-                        </span>
-                        <span v-else-if="member.estado_cuota !== 'activo'">
-                          Cuota Vencida
-                        </span>
-                        <span v-else>
-                          Apto Físico Vencido
-                        </span>
+                        Cuota vencida o inactiva
                       </span>
                     </div>
                   </div>
@@ -105,8 +127,8 @@
         </div>
 
         <!-- Sin resultados -->
-        <div v-else-if="searchQuery && !loading" class="text-center text-gray-500 text-xl">
-          <AlertCircle class="h-16 w-16 mx-auto mb-4 text-gray-400" />
+        <div v-else-if="searchQuery && !loading" class="text-center text-gray-500 dark:text-gray-400 text-xl">
+          <AlertCircle class="h-16 w-16 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
           <p>No se encontraron resultados</p>
         </div>
 
@@ -114,9 +136,9 @@
       </div>
 
       <!-- Aside Lateral: Live Feed de Últimos Accesos -->
-      <aside class="lg:w-80 bg-white lg:border-l border-gray-200 lg:overflow-y-auto">
-        <div class="sticky top-0 bg-white border-b border-gray-100 p-6 z-10">
-          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+      <aside class="lg:w-80 bg-white dark:bg-gray-800 lg:border-l border-gray-200 dark:border-gray-700 lg:overflow-y-auto">
+        <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-6 z-10">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
             <Activity class="h-5 w-5 text-primary-600" />
             Últimos Accesos
           </h2>
@@ -143,7 +165,7 @@
                     'h-2 w-2 rounded-full flex-shrink-0',
                     checkIn.acceso_permitido ? 'bg-emerald-500' : 'bg-red-500'
                   ]"></div>
-                  <p class="text-sm font-medium text-gray-900 truncate">
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                     {{ checkIn.member_name }}
                   </p>
                 </div>
@@ -156,52 +178,12 @@
         </div>
         
         <div v-else class="p-8 text-center">
-          <Activity class="h-12 w-12 mx-auto mb-3 text-gray-300" />
-          <p class="text-gray-400 text-sm">Sin accesos recientes</p>
+          <Activity class="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
+          <p class="text-gray-400 dark:text-gray-500 text-sm">Sin accesos recientes</p>
         </div>
       </aside>
     </div>
 
-    <!-- Modal de Confirmación Visual -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-      <div 
-        :class="[
-          'rounded-3xl p-12 shadow-2xl max-w-lg w-full text-center transform transition-all',
-          modalData.allowed ? 'bg-emerald-50 border-4 border-emerald-500' : 'bg-red-50 border-4 border-red-500'
-        ]"
-      >
-        <!-- Icono -->
-        <div :class="[
-          'mx-auto h-24 w-24 rounded-full flex items-center justify-center mb-6',
-          modalData.allowed ? 'bg-emerald-500' : 'bg-red-500'
-        ]">
-          <CheckCircle v-if="modalData.allowed" class="h-16 w-16 text-white" />
-          <AlertCircle v-else class="h-16 w-16 text-white" />
-        </div>
-        
-        <!-- Texto -->
-        <h3 :class="[
-          'text-4xl font-bold mb-4',
-          modalData.allowed ? 'text-emerald-900' : 'text-red-900'
-        ]">
-          {{ modalData.allowed ? 'ACCESO PERMITIDO' : 'ACCESO DENEGADO' }}
-        </h3>
-        
-        <p class="text-lg text-gray-700 mb-8">
-          {{ modalData.message }}
-        </p>
-        
-        <button
-          @click="closeModal"
-          :class="[
-            'w-full py-4 px-6 rounded-xl text-white font-semibold text-lg transition-colors',
-            modalData.allowed ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'
-          ]"
-        >
-          Cerrar
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -210,13 +192,14 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import Swal from 'sweetalert2'
 
 const searchQuery = ref('')
 const searchResults = ref([])
 const recentCheckIns = ref([])
 const loading = ref(false)
-const showModal = ref(false)
-const modalData = ref({ allowed: true, message: '' })
+const selectedAttendanceDate = ref(getTodayDateValue())
 
 let searchTimeout = null
 let realtimeSubscription = null
@@ -249,25 +232,20 @@ async function searchMembers() {
 }
 
 function canCheckIn(member) {
-  // REGLA ESTRICTA: Ambos deben estar en estado válido
-  // - Cuota: debe ser 'activo'
-  // - Apto Físico: debe ser 'vigente' (si está vencido no puede entrar)
+  // REGLA DE NEGOCIO: la cuota activa habilita check-in.
+  // El apto físico vencido se muestra como advertencia visual, pero no bloquea acceso.
   const cuotaActiva = member.estado_cuota === 'activo'
-  const aptoVigente = member.estado_apto_fisico === 'vigente'
   
-  // Debug: mostrar en consola para troubleshooting
-  if (!cuotaActiva || !aptoVigente) {
+  if (!cuotaActiva) {
     console.log('❌ Acceso denegado:', {
       nombre: `${member.nombre} ${member.apellido}`,
       dni: member.dni,
       estado_cuota: member.estado_cuota,
-      estado_apto_fisico: member.estado_apto_fisico,
-      cuotaActiva,
-      aptoVigente
+      estado_apto_fisico: member.estado_apto_fisico
     })
   }
   
-  return cuotaActiva && aptoVigente
+  return cuotaActiva
 }
 
 function getInitials(nombre, apellido) {
@@ -280,32 +258,40 @@ async function handleCheckIn(member) {
   const allowed = canCheckIn(member)
   
   try {
-    // Verificar si ya existe un check-in hoy para este socio
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayISO = today.toISOString()
+    const { startISO, endISO } = getDateRangeForQuery(selectedAttendanceDate.value)
     
     const { data: existingCheckIn, error: checkError } = await supabase
       .from('attendance')
       .select('id, created_at')
       .eq('member_id', member.id)
-      .gte('created_at', todayISO)
+      .gte('created_at', startISO)
+      .lt('created_at', endISO)
       .limit(1)
 
     if (checkError) throw checkError
 
-    // Si ya existe un check-in hoy, mostrar mensaje y no registrar
+    // Si ya existe un check-in en la fecha seleccionada, mostrar mensaje y no registrar
     if (existingCheckIn && existingCheckIn.length > 0) {
       const checkInTime = new Date(existingCheckIn[0].created_at).toLocaleTimeString('es-AR', {
         hour: '2-digit',
         minute: '2-digit'
       })
-      
-      modalData.value = {
-        allowed: false,
-        message: `${member.nombre} ${member.apellido} ya registró su acceso hoy a las ${checkInTime}.`
-      }
-      showModal.value = true
+      const humanDate = formatDateForHuman(selectedAttendanceDate.value)
+
+      await Swal.fire({
+        title: 'Asistencia ya registrada',
+        text: `${member.nombre} ${member.apellido} ya tiene asistencia el ${humanDate} a las ${checkInTime}.`,
+        icon: 'info',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#5F388C',
+        customClass: {
+          popup: 'rounded-xl shadow-2xl',
+          title: 'text-xl font-bold text-gray-900',
+          htmlContainer: 'text-gray-600',
+          confirmButton: 'bg-primary-600 hover:bg-primary-700 px-6 py-2.5 rounded-lg font-medium text-white shadow-sm hover:shadow-md transition-all'
+        },
+        buttonsStyling: false
+      })
       
       // Limpiar búsqueda
       searchQuery.value = ''
@@ -314,38 +300,123 @@ async function handleCheckIn(member) {
     }
 
     // Registrar asistencia
+    const createdAtISO = buildCheckInDateTime(selectedAttendanceDate.value)
+
     const { error } = await supabase
       .from('attendance')
       .insert([{
         member_id: member.id,
-        acceso_permitido: allowed
+        acceso_permitido: allowed,
+        created_at: createdAtISO
       }])
 
     if (error) throw error
 
-    // Mostrar modal
-    let message = `Check-in registrado para ${member.nombre} ${member.apellido}.`
-    if (!allowed) {
-      const warnings = []
-      if (member.estado_cuota !== 'activo') warnings.push('cuota vencida')
-      if (member.estado_apto_fisico !== 'vigente') warnings.push('apto físico vencido')
-      message += ` Advertencia: ${warnings.join(' y ')}.`
-    }
+    const humanDate = formatDateForHuman(selectedAttendanceDate.value)
 
-    modalData.value = { allowed, message }
-    showModal.value = true
+    if (!allowed) {
+      await Swal.fire({
+        title: 'Acceso denegado',
+        text: `${member.nombre} ${member.apellido} quedó registrado con acceso denegado por cuota vencida/inactiva (${humanDate}).`,
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#5F388C',
+        customClass: {
+          popup: 'rounded-xl shadow-2xl',
+          title: 'text-xl font-bold text-gray-900',
+          htmlContainer: 'text-gray-600',
+          confirmButton: 'bg-primary-600 hover:bg-primary-700 px-6 py-2.5 rounded-lg font-medium text-white shadow-sm hover:shadow-md transition-all'
+        },
+        buttonsStyling: false
+      })
+    } else {
+      const aptoWarning = member.estado_apto_fisico !== 'vigente'
+        ? ' Aviso: apto físico vencido.'
+        : ''
+
+      await Swal.fire({
+        title: 'Asistencia registrada',
+        text: `${member.nombre} ${member.apellido} registrado correctamente para el ${humanDate}.${aptoWarning}`,
+        icon: 'success',
+        confirmButtonText: 'Perfecto',
+        confirmButtonColor: '#5F388C',
+        customClass: {
+          popup: 'rounded-xl shadow-2xl',
+          title: 'text-xl font-bold text-gray-900',
+          htmlContainer: 'text-gray-600',
+          confirmButton: 'bg-primary-600 hover:bg-primary-700 px-6 py-2.5 rounded-lg font-medium text-white shadow-sm hover:shadow-md transition-all'
+        },
+        buttonsStyling: false
+      })
+    }
 
     // Limpiar búsqueda (Realtime se encarga de actualizar el feed)
     searchQuery.value = ''
     searchResults.value = []
   } catch (error) {
     console.error('Error en check-in:', error)
-    alert('Error al registrar check-in')
+    await Swal.fire({
+      title: 'Error al registrar asistencia',
+      text: 'Ocurrió un problema al guardar el check-in. Intentá nuevamente.',
+      icon: 'error',
+      confirmButtonText: 'Entendido',
+      confirmButtonColor: '#5F388C',
+      customClass: {
+        popup: 'rounded-xl shadow-2xl',
+        title: 'text-xl font-bold text-gray-900',
+        htmlContainer: 'text-gray-600',
+        confirmButton: 'bg-primary-600 hover:bg-primary-700 px-6 py-2.5 rounded-lg font-medium text-white shadow-sm hover:shadow-md transition-all'
+      },
+      buttonsStyling: false
+    })
   }
 }
 
-function closeModal() {
-  showModal.value = false
+function getTodayDateValue() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function setTodayDate() {
+  selectedAttendanceDate.value = getTodayDateValue()
+}
+
+function getDateRangeForQuery(dateValue) {
+  const [year, month, day] = dateValue.split('-').map(Number)
+  const start = new Date(year, month - 1, day, 0, 0, 0)
+  const end = new Date(year, month - 1, day + 1, 0, 0, 0)
+
+  return {
+    startISO: start.toISOString(),
+    endISO: end.toISOString()
+  }
+}
+
+function buildCheckInDateTime(dateValue) {
+  const now = new Date()
+  const [year, month, day] = dateValue.split('-').map(Number)
+  const attendanceDateTime = new Date(
+    year,
+    month - 1,
+    day,
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds()
+  )
+
+  return attendanceDateTime.toISOString()
+}
+
+function formatDateForHuman(dateValue) {
+  const [year, month, day] = dateValue.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
 }
 
 async function loadRecentCheckIns() {

@@ -1,10 +1,10 @@
 <template>
   <div id="app" class="min-h-screen">
     <!-- Mostrar loading mientras se inicializa la sesión -->
-    <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <div class="text-center">
         <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
-        <p class="text-gray-600">Cargando...</p>
+        <p class="text-gray-600 dark:text-gray-400">Cargando...</p>
       </div>
     </div>
     <!-- Una vez inicializado, mostrar el contenido -->
@@ -43,10 +43,13 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { Toaster } from 'vue-sonner'
 import { useUserStore } from './stores/userStore'
 import { useSettings } from './composables/useSettings'
+import { useTheme } from './composables/useTheme'
 import { supabase } from './lib/supabase'
 
 const userStore = useUserStore()
 const { fetchSettings } = useSettings()
+// Inicializar tema (lee localStorage y aplica clase dark en <html>)
+const { isDark } = useTheme()
 const componentKey = ref(0)
 let debounceTimer = null
 

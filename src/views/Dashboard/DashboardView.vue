@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50 min-h-screen">
+  <div class="bg-page-bg min-h-screen transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -66,7 +66,7 @@
       <div v-if="loading" class="space-y-8">
         <!-- Skeleton para Tarjetas de Métricas -->
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div v-for="i in 4" :key="i" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             <div class="flex items-start justify-between">
               <div class="flex-1 space-y-3">
                 <BaseSkeleton width="60%" height="0.875rem" />
@@ -78,7 +78,7 @@
         </div>
         
         <!-- Skeleton para Tabla de Check-ins -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <BaseSkeleton width="180px" height="1.5rem" class="mb-6" />
           <div class="space-y-4">
             <div v-for="i in 4" :key="i" class="flex items-center gap-4 py-3">
@@ -131,17 +131,17 @@
         </div>
 
         <!-- Tarjeta de Alerta: Socios Vencidos -->
-        <div v-if="stats.expiredMembers > 0" class="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 mb-8">
+        <div v-if="stats.expiredMembers > 0" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg p-6 mb-8">
           <div class="flex items-start justify-between">
             <div class="flex items-start gap-4">
               <div class="p-3 bg-red-100 rounded-lg">
                 <AlertCircle class="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-red-900 mb-1">
+                <h3 class="text-lg font-semibold text-red-900 dark:text-red-300 mb-1">
                   {{ stats.expiredMembers }} Socios con Cuota Vencida
                 </h3>
-                <p class="text-sm text-red-700">
+                <p class="text-sm text-red-700 dark:text-red-400">
                   Hay socios con pagos pendientes que requieren atención
                 </p>
               </div>
@@ -157,9 +157,9 @@
         </div>
 
         <!-- Últimos Check-Ins -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Últimos Check-Ins</h2>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Últimos Check-Ins</h2>
             <BaseButton
               variant="ghost"
               @click="showLastAccessModal = true"
@@ -177,18 +177,18 @@
           <div v-else class="overflow-x-auto">
             <table class="w-full">
               <thead>
-                <tr class="border-b border-gray-100">
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Socio</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">DNI</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Hora</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Estado</th>
+                <tr class="border-b border-gray-100 dark:border-gray-700">
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Socio</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">DNI</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Hora</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 <tr 
                   v-for="checkin in recentCheckIns" 
                   :key="checkin.id"
-                  class="border-b border-gray-50 hover:bg-primary-50 transition-colors"
+                  class="border-b border-gray-50 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
                 >
                   <td class="py-4 px-4 text-sm text-gray-800 font-medium">
                     <BaseButton
@@ -200,8 +200,8 @@
                       {{ checkin.name }}
                     </BaseButton>
                   </td>
-                  <td class="py-4 px-4 text-sm text-gray-500">{{ checkin.dni }}</td>
-                  <td class="py-4 px-4 text-sm text-gray-500">{{ checkin.time }}</td>
+                  <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-400">{{ checkin.dni }}</td>
+                  <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-400">{{ checkin.time }}</td>
                   <td class="py-4 px-4">
                     <StatusBadge
                       :status="checkin.status"
@@ -212,15 +212,15 @@
               </tbody>
             </table>
             
-            <div v-if="recentCheckIns.length === 0" class="text-center py-8 text-gray-400">
+            <div v-if="recentCheckIns.length === 0" class="text-center py-8 text-gray-400 dark:text-gray-500">
               No hay check-ins recientes
             </div>
           </div>
         </div>
 
         <!-- Gráfico de Asistencia Semanal -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-8">
-          <h2 class="text-xl font-bold text-gray-800 mb-6">Asistencia Semanal</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mt-8">
+          <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6">Asistencia Semanal</h2>
           <AssistanceChart />
         </div>
 

@@ -1,38 +1,38 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
       <!-- Success Screen -->
       <div v-if="showSuccess" class="p-6">
         <div class="text-center mb-6">
-          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-            <CheckCircle class="h-10 w-10 text-green-600" />
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
+            <CheckCircle class="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
             ¡Usuario creado exitosamente!
           </h3>
-          <p class="text-sm text-gray-600 mb-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Guarda esta contraseña, solo se mostrará una vez:
           </p>
         </div>
 
-        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700">Usuario:</span>
-            <span class="text-sm font-semibold text-gray-900">{{ form.usuario }}</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Usuario:</span>
+            <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ form.usuario }}</span>
           </div>
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700">Email:</span>
-            <span class="text-sm text-gray-900">{{ form.email }}</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Email:</span>
+            <span class="text-sm text-gray-900 dark:text-gray-100">{{ form.email }}</span>
           </div>
-          <div class="border-t border-gray-200 mt-3 pt-3">
+          <div class="border-t border-gray-200 dark:border-gray-600 mt-3 pt-3">
             <div class="flex items-center justify-between">
-              <span class="text-sm font-medium text-gray-700">Contraseña:</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña:</span>
               <BaseButton @click="copyPassword" color="secondary" size="sm">
                 <Copy class="w-4 h-4 mr-1" />
                 Copiar
               </BaseButton>
             </div>
-            <div class="mt-2 p-3 bg-white border border-gray-200 rounded font-mono text-sm break-all">
+            <div class="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded font-mono text-sm break-all dark:text-gray-200">
               {{ generatedPassword }}
             </div>
           </div>
@@ -47,10 +47,10 @@
       <div v-else class="p-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-semibold text-gray-900">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {{ isEditing ? 'Editar Usuario' : 'Nuevo Usuario' }}
           </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+          <button @click="closeModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
             <X class="w-5 h-5" />
           </button>
         </div>
@@ -59,7 +59,7 @@
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Usuario -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Nombre de Usuario *
             </label>
             <BaseInput
@@ -74,7 +74,7 @@
 
           <!-- Email (solo en crear) -->
           <div v-if="!isEditing">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email *
             </label>
             <BaseInput
@@ -88,7 +88,7 @@
 
           <!-- Contraseña (solo en crear) -->
           <div v-if="!isEditing">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Contraseña *
             </label>
             <div class="relative">
@@ -103,7 +103,7 @@
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 <component :is="showPassword ? EyeOff : Eye" class="w-5 h-5" />
               </button>
@@ -122,12 +122,12 @@
 
           <!-- Rol -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Rol *
             </label>
             <select
               v-model="form.rol"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200"
               :disabled="loading"
               required
             >
@@ -138,10 +138,10 @@
           </div>
 
           <!-- Email info (en editar) -->
-          <div v-if="isEditing" class="bg-primary-50 border border-primary-200 rounded-lg p-3">
+          <div v-if="isEditing" class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-3">
             <div class="flex items-start">
-              <AlertCircle class="w-5 h-5 text-primary-600 mr-2 flex-shrink-0 mt-0.5" />
-              <div class="text-sm text-primary-800">
+              <AlertCircle class="w-5 h-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0 mt-0.5" />
+              <div class="text-sm text-primary-800 dark:text-primary-300">
                 <p class="font-medium mb-1">Email: {{ staff?.email }}</p>
                 <p class="text-xs">El email no se puede modificar una vez creado</p>
               </div>
@@ -149,8 +149,8 @@
           </div>
 
           <!-- Error general -->
-          <div v-if="errors.general" class="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p class="text-sm text-red-800">{{ errors.general }}</p>
+          <div v-if="errors.general" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+            <p class="text-sm text-red-800 dark:text-red-400">{{ errors.general }}</p>
           </div>
 
           <!-- Buttons -->

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore'
 
 // Importar layouts
@@ -112,7 +113,7 @@ router.beforeEach(async (to, from, next) => {
   }
   // Verificar Roles (RBAC)
   else if (to.meta.role && userStore.userRole !== to.meta.role) {
-    alert('No tienes permisos para acceder a esta sección.')
+    toast.error('No tienes permisos para acceder a esta sección.')
     next({ name: 'Dashboard' })
   }
   // En cualquier otro caso, permitir la navegación

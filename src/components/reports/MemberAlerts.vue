@@ -4,13 +4,13 @@
     <div class="grid md:grid-cols-2 gap-6">
       
       <!-- Tarjeta A: Socios Vencidos -->
-      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-red-500">
         <div class="flex items-start justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-1">Cuotas Vencidas</h3>
-            <p class="text-sm text-gray-600">Socios con pagos pendientes</p>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">Cuotas Vencidas</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Socios con pagos pendientes</p>
           </div>
-          <div class="p-3 bg-red-50 rounded-lg">
+          <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
             <AlertCircle class="w-6 h-6 text-red-600" />
           </div>
         </div>
@@ -20,7 +20,7 @@
           <p class="text-5xl font-bold text-red-600">
             {{ loading.overdue ? '...' : overdueMembers.length }}
           </p>
-          <p class="text-sm text-gray-500 mt-1">Socios activos con deuda</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Socios activos con deuda</p>
         </div>
 
         <!-- Botón Ver Listado -->
@@ -36,23 +36,23 @@
       </div>
 
       <!-- Tarjeta B: Socios Inactivos -->
-      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-gray-400">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-gray-400 dark:border-gray-500">
         <div class="flex items-start justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-1">Socios Inactivos</h3>
-            <p class="text-sm text-gray-600">Usuarios dados de baja</p>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">Socios Inactivos</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Usuarios dados de baja</p>
           </div>
-          <div class="p-3 bg-gray-50 rounded-lg">
-            <UserX class="w-6 h-6 text-gray-600" />
+          <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <UserX class="w-6 h-6 text-gray-600 dark:text-gray-400" />
           </div>
         </div>
         
         <!-- KPI -->
         <div class="mb-4">
-          <p class="text-5xl font-bold text-gray-600">
+          <p class="text-5xl font-bold text-gray-600 dark:text-gray-400">
             {{ loading.inactive ? '...' : inactiveMembers.length }}
           </p>
-          <p class="text-sm text-gray-500 mt-1">Total de bajas registradas</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total de bajas registradas</p>
         </div>
 
         <!-- Botón Ver Listado -->

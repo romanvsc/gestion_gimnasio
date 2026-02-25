@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50 min-h-screen">
+  <div class="bg-page-bg min-h-screen transition-colors duration-200">
     <div class="max-w-6xl mx-auto px-4 py-6 md:py-8">
       
       <!-- Header con botón volver -->
@@ -31,12 +31,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
           
           <!-- Columna Izquierda: Formulario (3/5) -->
-          <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-5 md:p-6 space-y-6">
-            <h2 class="text-lg font-semibold text-gray-900">Datos del Pago</h2>
+          <div class="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 md:p-6 space-y-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Datos del Pago</h2>
             
             <!-- Buscar Socio -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Buscar Socio *
               </label>
               <BaseInput
@@ -47,25 +47,25 @@
               />
               
               <!-- Resultados de búsqueda -->
-              <div v-if="memberSearchResults.length > 0" class="mt-2 border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
+              <div v-if="memberSearchResults.length > 0" class="mt-2 border border-gray-200 dark:border-gray-600 rounded-lg max-h-48 overflow-y-auto">
                 <button
                   v-for="member in memberSearchResults"
                   :key="member.id"
                   type="button"
-                  class="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors border-b border-gray-100 last:border-b-0 touch-manipulation"
+                  class="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0 touch-manipulation"
                   @click="selectMember(member)"
                 >
-                  <p class="font-medium text-gray-900">{{ member.nombre }} {{ member.apellido }}</p>
-                  <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">{{ member.nombre }} {{ member.apellido }}</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">DNI: {{ member.dni }}</p>
                 </button>
               </div>
 
               <!-- Socio seleccionado -->
-              <div v-if="selectedMember" class="mt-3 bg-primary-50 border border-primary-200 rounded-lg p-4">
+              <div v-if="selectedMember" class="mt-3 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 rounded-lg p-4">
                 <div class="flex justify-between items-start gap-3">
                   <div class="flex-1">
-                    <p class="font-semibold text-primary-900">{{ selectedMember.nombre }} {{ selectedMember.apellido }}</p>
-                    <p class="text-sm text-primary-700">DNI: {{ selectedMember.dni }}</p>
+                    <p class="font-semibold text-primary-900 dark:text-primary-200">{{ selectedMember.nombre }} {{ selectedMember.apellido }}</p>
+                    <p class="text-sm text-primary-700 dark:text-primary-400">DNI: {{ selectedMember.dni }}</p>
                     <span v-if="selectedMember.es_socio_club" class="inline-flex items-center gap-1 mt-2 text-xs font-medium text-yellow-800 bg-yellow-100 px-2 py-1 rounded-full border border-yellow-300">
                       🏆 Socio Club
                     </span>
@@ -84,7 +84,7 @@
 
             <!-- Seleccionar Plan -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-3">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Plan *
               </label>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -95,13 +95,13 @@
                   :class="[
                     'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
                     formData.plan_id === plan.id
-                      ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 shadow-sm'
-                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
+                      ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 shadow-sm dark:bg-primary-900/20 dark:ring-primary-700'
+                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:active:bg-gray-700'
                   ]"
                   @click="selectPlan(plan)"
                 >
-                  <p class="font-semibold text-gray-900 mb-1">{{ plan.nombre }}</p>
-                  <p class="text-sm text-gray-500 mb-2">{{ plan.dias_duracion }} días</p>
+                  <p class="font-semibold text-gray-900 dark:text-gray-100 mb-1">{{ plan.nombre }}</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ plan.dias_duracion }} días</p>
                   <div class="flex items-baseline gap-2">
                     <p class="text-xl md:text-2xl font-bold text-primary-600">
                       ${{ selectedMember?.es_socio_club ? (plan.precio_socio || plan.precio) : plan.precio }}
@@ -116,7 +116,7 @@
 
             <!-- Método de Pago -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-3">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Método de Pago *
               </label>
               <div class="flex flex-wrap gap-2">
@@ -127,8 +127,8 @@
                   :class="[
                     'px-5 py-3 rounded-lg border-2 font-medium transition-all touch-manipulation',
                     formData.metodo_pago === method.nombre
-                      ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm'
-                      : 'border-gray-200 text-gray-700 hover:border-gray-300 active:bg-gray-50'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm dark:bg-primary-900/20 dark:text-primary-300'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300 active:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-500'
                   ]"
                   @click="formData.metodo_pago = method.nombre"
                 >
@@ -139,7 +139,7 @@
 
             <!-- Fecha de Inicio -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Fecha de Inicio *
               </label>
               <BaseInput
@@ -153,7 +153,7 @@
             <!-- Error general -->
             <div 
               v-if="error" 
-              class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+              class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm"
             >
               {{ error }}
             </div>

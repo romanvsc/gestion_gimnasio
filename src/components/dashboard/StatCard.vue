@@ -1,12 +1,12 @@
 <template>
   <div 
     @click="handleClick"
-    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-100"
+    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-100 dark:hover:border-primary-800"
   >
     <div class="flex items-start justify-between">
       <div class="flex-1">
-        <p class="text-gray-400 text-sm font-medium mb-2">{{ title }}</p>
-        <p class="text-gray-800 text-3xl font-bold mb-1">{{ value }}</p>
+        <p class="text-gray-400 dark:text-gray-500 text-sm font-medium mb-2">{{ title }}</p>
+        <p class="text-gray-800 dark:text-gray-100 text-3xl font-bold mb-1">{{ value }}</p>
         
         <!-- Comparison with previous period -->
         <div v-if="showComparison" class="flex items-center gap-1.5 mt-1">

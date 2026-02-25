@@ -3,7 +3,7 @@
     <label 
       v-if="label" 
       :for="inputId" 
-      class="block text-sm font-medium text-gray-700 mb-1"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
     >
       {{ label }}
       <span v-if="required" class="text-red-500">*</span>
@@ -26,14 +26,14 @@
     
     <p 
       v-if="error" 
-      class="mt-1 text-sm text-red-600"
+      class="mt-1 text-sm text-red-600 dark:text-red-400"
     >
       {{ error }}
     </p>
     
     <p 
       v-if="hint && !error" 
-      class="mt-1 text-sm text-gray-500"
+      class="mt-1 text-sm text-gray-500 dark:text-gray-400"
     >
       {{ hint }}
     </p>
@@ -108,7 +108,7 @@ const inputClasses = computed(() => {
     kiosk: 'px-6 py-6 text-2xl rounded-2xl shadow-lg'
   }
   
-  const baseClasses = `block w-full border placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${sizeClasses[props.size]}`
+  const baseClasses = `block w-full border placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-colors ${sizeClasses[props.size]}`
   
   // Kiosk mode tiene estilos especiales de focus
   const focusClasses = props.size === 'kiosk' 
@@ -116,14 +116,14 @@ const inputClasses = computed(() => {
     : ''
   
   if (props.error) {
-    return `${baseClasses} ${focusClasses} border-red-300 focus:border-red-500 focus:ring-red-200`
+    return `${baseClasses} ${focusClasses} border-red-300 focus:border-red-500 focus:ring-red-200 dark:border-red-500 dark:focus:ring-red-800 dark:bg-gray-700 dark:text-gray-100`
   }
   
   if (props.disabled) {
-    return `${baseClasses} ${focusClasses} border-gray-200 bg-gray-50 cursor-not-allowed`
+    return `${baseClasses} ${focusClasses} border-gray-200 bg-gray-50 cursor-not-allowed dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500`
   }
   
-  return `${baseClasses} ${focusClasses} border-gray-300 focus:border-primary-500 focus:ring-primary-200`
+  return `${baseClasses} ${focusClasses} border-gray-300 focus:border-primary-500 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-primary-800`
 })
 
 function handleInput(event) {

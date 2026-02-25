@@ -10,17 +10,17 @@
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="handleClose" />
         
         <!-- Modal Content -->
-        <div class="relative bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
+        <div class="relative bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
           <!-- Header -->
-          <div class="flex items-center justify-between p-4 border-b border-gray-100">
+          <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
             <h3 class="text-lg font-semibold text-page-title">
               {{ isEditing ? 'Editar Plan' : 'Nuevo Plan' }}
             </h3>
             <button 
               @click="handleClose"
-              class="p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-manipulation"
             >
-              <X class="w-5 h-5 text-gray-500" />
+              <X class="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
 
@@ -55,7 +55,7 @@
               required
             >
               <template #prefix>
-                <span class="text-gray-500">$</span>
+                <span class="text-gray-500 dark:text-gray-400">$</span>
               </template>
             </BaseInput>
 
@@ -68,12 +68,12 @@
               size="lg"
             >
               <template #prefix>
-                <span class="text-gray-500">$</span>
+                <span class="text-gray-500 dark:text-gray-400">$</span>
               </template>
             </BaseInput>
 
             <!-- Estado Activo -->
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
               <div>
                 <p class="font-medium text-page-title">Plan activo</p>
                 <p class="text-sm text-page-subtitle">Los planes inactivos no aparecen al registrar pagos</p>
@@ -82,7 +82,7 @@
                 type="button"
                 @click="form.activo = !form.activo"
                 class="relative w-14 h-8 rounded-full transition-colors duration-200 touch-manipulation"
-                :class="form.activo ? 'bg-emerald-500' : 'bg-gray-300'"
+                :class="form.activo ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'"
               >
                 <span 
                   class="absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-200"
@@ -93,7 +93,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="p-4 border-t border-gray-100 flex gap-3">
+          <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex gap-3">
             <BaseButton 
               variant="ghost" 
               class="flex-1"

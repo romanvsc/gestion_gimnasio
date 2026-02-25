@@ -1,21 +1,21 @@
 <template>
   <div class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 class="text-xl font-bold text-gray-800">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">
           Historial de {{ memberName }}
         </h3>
         <button
           @click="$emit('close')"
-          class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
-          <X class="w-5 h-5 text-gray-500" />
+          <X class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         </button>
       </div>
 
       <!-- Tabs -->
-      <div class="border-b border-gray-200">
+      <div class="border-b border-gray-200 dark:border-gray-700">
         <nav class="flex -mb-px">
           <button
             @click="activeTab = 'payments'"
@@ -23,7 +23,7 @@
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors',
               activeTab === 'payments'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
             ]"
           >
             <Receipt class="w-4 h-4" />
@@ -35,7 +35,7 @@
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors',
               activeTab === 'attendance'
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
             ]"
           >
             <CalendarClock class="w-4 h-4" />
@@ -48,12 +48,12 @@
       <div class="p-6 overflow-y-auto max-h-[calc(80vh-160px)]">
         <!-- Loading -->
         <div v-if="loading" class="text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary-600"></div>
-          <p class="mt-4 text-gray-500">Cargando datos...</p>
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-600 border-t-primary-600"></div>
+          <p class="mt-4 text-gray-500 dark:text-gray-400">Cargando datos...</p>
         </div>
 
         <!-- Error -->
-        <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
           {{ error }}
         </div>
 
@@ -63,29 +63,29 @@
             <div
               v-for="payment in payments"
               :key="payment.id"
-              class="bg-gray-50 rounded-lg p-4 border border-gray-200"
+              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
             >
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-2">
                     <Receipt class="w-5 h-5 text-primary-600" />
-                    <h4 class="font-semibold text-gray-900">{{ payment.plans?.nombre || 'Plan no disponible' }}</h4>
+                    <h4 class="font-semibold text-gray-900 dark:text-gray-100">{{ payment.plans?.nombre || 'Plan no disponible' }}</h4>
                   </div>
                   <div class="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <span class="text-gray-500">Fecha Inicio:</span>
-                      <span class="ml-2 text-gray-900">{{ formatDate(payment.fecha_inicio) }}</span>
+                      <span class="text-gray-500 dark:text-gray-400">Fecha Inicio:</span>
+                      <span class="ml-2 text-gray-900 dark:text-gray-100">{{ formatDate(payment.fecha_inicio) }}</span>
                     </div>
                     <div>
-                      <span class="text-gray-500">Fecha Fin:</span>
-                      <span class="ml-2 text-gray-900">{{ formatDate(payment.fecha_fin) }}</span>
+                      <span class="text-gray-500 dark:text-gray-400">Fecha Fin:</span>
+                      <span class="ml-2 text-gray-900 dark:text-gray-100">{{ formatDate(payment.fecha_fin) }}</span>
                     </div>
                     <div>
-                      <span class="text-gray-500">Método:</span>
-                      <span class="ml-2 text-gray-900">{{ payment.metodo_pago || '-' }}</span>
+                      <span class="text-gray-500 dark:text-gray-400">Método:</span>
+                      <span class="ml-2 text-gray-900 dark:text-gray-100">{{ payment.metodo_pago || '-' }}</span>
                     </div>
                     <div>
-                      <span class="text-gray-500">Monto:</span>
+                      <span class="text-gray-500 dark:text-gray-400">Monto:</span>
                       <span class="ml-2 font-semibold text-primary-600">{{ formatCurrencyFull(payment.monto) }}</span>
                     </div>
                   </div>
@@ -94,8 +94,8 @@
             </div>
           </div>
           <div v-else class="text-center py-12">
-            <Receipt class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p class="text-gray-500">No hay pagos registrados</p>
+            <Receipt class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p class="text-gray-500 dark:text-gray-400">No hay pagos registrados</p>
           </div>
         </div>
 
@@ -105,12 +105,12 @@
             <div
               v-for="att in attendances"
               :key="att.id"
-              class="bg-gray-50 rounded-lg p-3 border border-gray-200 flex items-center justify-between"
+              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between"
             >
               <div class="flex items-center gap-3">
                 <CalendarClock class="w-5 h-5 text-primary-600" />
                 <div>
-                  <p class="text-sm font-medium text-gray-900">{{ formatDateTime(att.created_at) }}</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ formatDateTime(att.created_at) }}</p>
                 </div>
               </div>
               <StatusBadge
@@ -120,8 +120,8 @@
             </div>
           </div>
           <div v-else class="text-center py-12">
-            <CalendarClock class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p class="text-gray-500">No hay asistencias registradas</p>
+            <CalendarClock class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p class="text-gray-500 dark:text-gray-400">No hay asistencias registradas</p>
           </div>
         </div>
       </div>

@@ -30,16 +30,16 @@
           type="date"
           v-model="customStartStr"
           :max="todayStr"
-          class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
+          class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
           @change="onCustomRangeChange"
         />
-        <span class="text-gray-400">-</span>
+        <span class="text-gray-400 dark:text-gray-500">-</span>
         <input
           type="date"
           v-model="customEndStr"
           :min="customStartStr"
           :max="todayStr"
-          class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
+          class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
           @change="onCustomRangeChange"
         />
         <BaseButton

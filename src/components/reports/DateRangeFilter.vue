@@ -1,10 +1,10 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <!-- Label y descripción -->
       <div>
-        <h3 class="text-sm font-semibold text-gray-700 mb-1">Período de Análisis</h3>
-        <p class="text-xs text-gray-500">Selecciona el rango temporal para los reportes</p>
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Período de Análisis</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Selecciona el rango temporal para los reportes</p>
       </div>
 
       <!-- Botones de rango -->
@@ -17,7 +17,7 @@
             'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             selectedRange === range.value
               ? 'bg-primary-600 text-white shadow-md'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
           ]"
         >
           {{ range.label }}
@@ -26,8 +26,8 @@
     </div>
 
     <!-- Información del rango seleccionado -->
-    <div v-if="dateInfo" class="mt-3 pt-3 border-t border-gray-200">
-      <div class="flex items-center gap-2 text-xs text-gray-600">
+    <div v-if="dateInfo" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+      <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
         <Calendar class="w-4 h-4" />
         <span>
           <strong>Desde:</strong> {{ dateInfo.startDate }} 

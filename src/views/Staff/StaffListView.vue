@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -16,23 +16,23 @@
     <!-- Loading -->
     <div v-if="loading && staffList.length === 0" class="text-center py-12">
       <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      <p class="mt-4 text-gray-600">Cargando usuarios...</p>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando usuarios...</p>
     </div>
 
     <!-- Desktop Table -->
-    <div v-else class="hidden md:block bg-white rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <div v-else class="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700/50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Usuario</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rol</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="staff in staffList" :key="staff.id" class="hover:bg-gray-50">
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tr v-for="staff in staffList" :key="staff.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
                 <div 
@@ -42,12 +42,12 @@
                   {{ getInitials(staff.usuario) }}
                 </div>
                 <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ staff.usuario }}</div>
+                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ staff.usuario }}</div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ staff.email }}</div>
+              <div class="text-sm text-gray-900 dark:text-gray-100">{{ staff.email }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <StatusBadge :type="staff.rol === 'admin' ? 'success' : 'info'">
@@ -82,8 +82,8 @@
 
       <!-- Empty State -->
       <div v-if="staffList.length === 0" class="text-center py-12">
-        <Users class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <p class="text-gray-600">No hay usuarios registrados</p>
+        <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <p class="text-gray-600 dark:text-gray-400">No hay usuarios registrados</p>
       </div>
     </div>
 
@@ -92,7 +92,7 @@
       <div 
         v-for="staff in staffList" 
         :key="staff.id"
-        class="bg-white rounded-lg shadow p-4"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
       >
         <div class="flex items-start justify-between mb-3">
           <div class="flex items-center">
@@ -103,8 +103,8 @@
               {{ getInitials(staff.usuario) }}
             </div>
             <div class="ml-3">
-              <div class="text-sm font-medium text-gray-900">{{ staff.usuario }}</div>
-              <div class="text-xs text-gray-500">{{ staff.email }}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ staff.usuario }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ staff.email }}</div>
             </div>
           </div>
         </div>
@@ -144,8 +144,8 @@
 
       <!-- Empty State Mobile -->
       <div v-if="staffList.length === 0" class="text-center py-12">
-        <Users class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <p class="text-gray-600">No hay usuarios registrados</p>
+        <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <p class="text-gray-600 dark:text-gray-400">No hay usuarios registrados</p>
       </div>
     </div>
 

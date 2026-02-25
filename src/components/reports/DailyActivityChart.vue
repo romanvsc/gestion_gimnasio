@@ -1,16 +1,16 @@
 <template>
   <div class="relative h-full">
     <!-- Loading State -->
-    <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
+    <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-75">
       <div class="text-center">
         <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent"></div>
-        <p class="mt-2 text-sm text-gray-600">Cargando datos...</p>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Cargando datos...</p>
       </div>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="!chartData.labels || chartData.labels.length === 0" class="flex items-center justify-center h-full">
-      <div class="text-center text-gray-500">
+      <div class="text-center text-gray-500 dark:text-gray-400">
         <p class="text-lg font-medium">No hay datos disponibles</p>
         <p class="text-sm">Aún no hay registros de asistencia</p>
       </div>

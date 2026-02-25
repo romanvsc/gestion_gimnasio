@@ -1,14 +1,14 @@
 <template>
   <div class="bg-page-bg min-h-screen pb-24 md:pb-8">
     <!-- Header -->
-    <div class="bg-white border-b border-gray-100 sticky top-0 z-10">
+    <div class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-10">
       <div class="max-w-4xl mx-auto px-4 py-4">
         <div class="flex items-center gap-3">
           <button 
             @click="router.push({ name: 'Dashboard' })"
-            class="p-2 -ml-2 rounded-xl hover:bg-gray-100 transition-colors touch-manipulation"
+            class="p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-manipulation"
           >
-            <ArrowLeft class="w-5 h-5 text-gray-600" />
+            <ArrowLeft class="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
           <div>
             <h1 class="text-xl font-bold text-page-title">Configuración</h1>
@@ -30,10 +30,10 @@
     <div v-else class="max-w-4xl mx-auto px-4 py-6 space-y-6">
       
       <!-- SECCIÓN 1: Identidad Visual -->
-      <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
-            <ImageIcon class="w-5 h-5 text-primary-600" />
+      <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+            <ImageIcon class="w-5 h-5 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Identidad Visual</h2>
@@ -94,10 +94,10 @@
       </section>
 
       <!-- SECCIÓN 2: Información del Gimnasio -->
-      <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-secondary-100 flex items-center justify-center">
-            <Building2 class="w-5 h-5 text-secondary-600" />
+      <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-secondary-100 dark:bg-secondary-900/30 flex items-center justify-center">
+            <Building2 class="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Información del Gimnasio</h2>
@@ -140,10 +140,10 @@
       </section>
 
       <!-- SECCIÓN 3: Horarios -->
-      <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-            <Clock class="w-5 h-5 text-amber-600" />
+      <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+            <Clock class="w-5 h-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Horarios de Apertura</h2>
@@ -156,18 +156,18 @@
             v-model="formData.horarios_apertura"
             rows="4"
             placeholder="Lunes a Viernes: 6:00 - 22:00&#10;Sábados: 8:00 - 20:00&#10;Domingos: 9:00 - 14:00"
-            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none text-base"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none text-base"
             maxlength="500"
           ></textarea>
         </div>
       </section>
 
       <!-- SECCIÓN 4: Planes -->
-      <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+      <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <CreditCard class="w-5 h-5 text-emerald-600" />
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+              <CreditCard class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
               <h2 class="font-semibold text-page-title">Planes y Precios</h2>
@@ -184,7 +184,7 @@
           </BaseButton>
         </div>
         
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-gray-100 dark:divide-gray-700">
           <!-- Empty State -->
           <div v-if="!plans.length" class="p-8 text-center">
             <CreditCard class="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -196,7 +196,7 @@
           <div 
             v-for="plan in plans" 
             :key="plan.id"
-            class="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
             <div class="flex items-center gap-3">
               <div 
@@ -241,10 +241,10 @@
       </section>
 
       <!-- SECCIÓN 5: Métodos de Pago -->
-      <section class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
-            <Wallet class="w-5 h-5 text-primary-600" />
+      <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+            <Wallet class="w-5 h-5 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
             <h2 class="font-semibold text-page-title">Métodos de Pago</h2>
@@ -260,8 +260,8 @@
               @click="togglePaymentMethod(method)"
               class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all touch-manipulation"
               :class="method.activo 
-                ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500' 
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+                ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/30 dark:text-primary-300' 
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'"
             >
               <span class="flex items-center gap-2">
                 <Check v-if="method.activo" class="w-4 h-4" />

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-gray-50">
+  <div class="flex h-screen overflow-hidden bg-page-bg transition-colors duration-200">
     <!-- Sidebar para desktop -->
     <Sidebar />
 

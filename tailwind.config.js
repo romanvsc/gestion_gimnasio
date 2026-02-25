@@ -52,11 +52,14 @@ export default {
         },
         // ============================================
         // Design System: Colores semánticos para páginas
+        // Usan CSS variables para soportar dark mode automático
         page: {
-          bg: '#f8fafc',        // gray-50: Fondo de todas las páginas
-          title: '#0f172a',      // gray-900: Títulos principales
-          subtitle: '#64748b',   // gray-500: Subtítulos y descripciones
-          muted: '#94a3b8',      // gray-400: Texto muy secundario
+          bg: 'var(--color-page-bg)',
+          title: 'var(--color-page-title)',
+          subtitle: 'var(--color-page-subtitle)',
+          muted: 'var(--color-page-muted)',
+          card: 'var(--color-page-card)',
+          border: 'var(--color-page-border)',
         },
       },
     },

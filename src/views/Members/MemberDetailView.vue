@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-page-bg transition-colors duration-200">
     <div class="max-w-5xl mx-auto px-4 py-8">
       <!-- Header con Botón Volver -->
       <div class="mb-8">
@@ -26,7 +26,7 @@
       </div>
 
       <!-- Error -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
         {{ error }}
       </div>
 
@@ -116,30 +116,30 @@
           />
 
           <!-- Tarjeta: Salud (IMC) -->
-          <div class="rounded-lg shadow-sm border-2 bg-primary-50 border-primary-200 p-6">
+          <div class="rounded-lg shadow-sm border-2 bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-700 p-6">
             <div class="flex items-center gap-3 mb-3">
-              <div class="p-2 rounded-lg bg-primary-100">
+              <div class="p-2 rounded-lg bg-primary-100 dark:bg-primary-800/40">
                 <Activity class="w-6 h-6 text-primary-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900">Salud</h3>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Salud</h3>
             </div>
             
             <div v-if="memberData.peso && memberData.altura" class="space-y-2">
               <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-600 flex items-center gap-1">
+                <span class="text-gray-600 dark:text-gray-400 flex items-center gap-1">
                   <Weight class="w-4 h-4" /> Peso:
                 </span>
-                <span class="font-semibold text-gray-900">{{ memberData.peso }} kg</span>
+                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ memberData.peso }} kg</span>
               </div>
               <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-600 flex items-center gap-1">
+                <span class="text-gray-600 dark:text-gray-400 flex items-center gap-1">
                   <Ruler class="w-4 h-4" /> Altura:
                 </span>
-                <span class="font-semibold text-gray-900">{{ memberData.altura }} m</span>
+                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ memberData.altura }} m</span>
               </div>
-              <div class="pt-2 border-t border-primary-200">
+              <div class="pt-2 border-t border-primary-200 dark:border-primary-700">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-600">IMC:</span>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">IMC:</span>
                   <div class="flex items-center gap-2">
                     <span class="font-bold text-primary-700 text-lg">{{ calculatedIMC }}</span>
                     <span :class="['inline-flex h-3 w-3 rounded-full', imcColor]"></span>
@@ -151,42 +151,42 @@
               </div>
             </div>
             
-            <div v-else class="text-sm text-gray-500">
+            <div v-else class="text-sm text-gray-500 dark:text-gray-400">
               Sin datos de salud registrados
             </div>
           </div>
         </div>
 
         <!-- Datos Personales -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
             <User class="w-5 h-5" />
             Datos Personales
           </h2>
           <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt class="text-sm font-medium text-gray-500">Email</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ memberData.email || '-' }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ memberData.email || '-' }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500">Teléfono</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ memberData.telefono || '-' }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ memberData.telefono || '-' }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500">Fecha de Nacimiento</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ formatDateLong(memberData.fecha_nacimiento) }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de Nacimiento</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDateLong(memberData.fecha_nacimiento) }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500">Fecha de Alta</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ formatDateLong(memberData.fecha_alta) }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de Alta</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDateLong(memberData.fecha_alta) }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500">Plan Asignado</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ planName || 'Sin plan fijo' }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Plan Asignado</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ planName || 'Sin plan fijo' }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500">Tipo de Membresía</dt>
-              <dd class="mt-1 text-sm text-gray-900 flex items-center gap-2">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tipo de Membresía</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 {{ memberData.es_socio_club ? 'Socio del Club' : 'Socio Regular' }}
                 <span v-if="memberData.es_socio_club" class="text-yellow-500">⭐</span>
               </dd>

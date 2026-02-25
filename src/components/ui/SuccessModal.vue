@@ -10,7 +10,7 @@
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" />
         
         <!-- Modal Card -->
-        <div class="relative bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform">
+        <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform">
           <!-- Fondo decorativo superior con degradado -->
           <div 
             class="absolute top-0 left-0 right-0 h-36"
@@ -39,17 +39,17 @@
             </div>
             
             <!-- Título -->
-            <h3 class="text-2xl font-bold text-center text-gray-900 mb-2">
+            <h3 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-2">
               {{ title }}
             </h3>
             
             <!-- Mensaje -->
-            <p class="text-center text-gray-500 mb-6 text-base leading-relaxed px-2">
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-6 text-base leading-relaxed px-2">
               {{ message }}
             </p>
             
             <!-- Detalles (slot para contenido adicional) -->
-            <div v-if="$slots.default" class="bg-gray-50 rounded-2xl p-4 mb-6">
+            <div v-if="$slots.default" class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 mb-6">
               <slot />
             </div>
             
