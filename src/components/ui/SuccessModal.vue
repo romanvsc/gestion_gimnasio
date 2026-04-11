@@ -10,7 +10,7 @@
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" />
         
         <!-- Modal Card -->
-        <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform">
+        <div class="relative bg-white dark:bg-[#151f32] rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform dark:ring-1 dark:ring-white/10">
           <!-- Fondo decorativo superior con degradado -->
           <div 
             class="absolute top-0 left-0 right-0 h-36"
@@ -49,7 +49,7 @@
             </p>
             
             <!-- Detalles (slot para contenido adicional) -->
-            <div v-if="$slots.default" class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 mb-6">
+            <div v-if="$slots.default" class="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 mb-6">
               <slot />
             </div>
             

@@ -59,6 +59,7 @@ export default {
           subtitle: 'var(--color-page-subtitle)',
           muted: 'var(--color-page-muted)',
           card: 'var(--color-page-card)',
+          'card-hover': 'var(--color-page-card-hover)',
           border: 'var(--color-page-border)',
         },
       },

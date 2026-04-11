@@ -2,71 +2,26 @@
   <div class="bg-page-bg min-h-screen transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 py-8">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Dashboard</h1>
-        <p class="text-page-subtitle mb-6">
-          Bienvenido de nuevo, {{ settings.nombre_gimnasio }}. Esto es lo que está pasando hoy.
-          <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
+      <div class="mb-10">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-page-title leading-tight mb-3">
+          Bienvenido de nuevo, <span class="text-primary-500">{{ settings.nombre_gimnasio }}</span>
+        </h1>
+        <p class="text-page-subtitle text-base md:text-lg">
+          Tu centro de alto rendimiento está operando al máximo nivel hoy.
+          <span v-if="userStore.isAdmin" class="ml-2 inline-flex items-center px-2.5 py-0.5 bg-yellow-400/10 text-yellow-400 text-xs font-bold rounded-md border border-yellow-400/20 uppercase tracking-wider">
             Admin
           </span>
-          <span v-else-if="userStore.isStaff" class="ml-2 px-2 py-1 bg-secondary-100 text-secondary-800 text-xs font-semibold rounded">
+          <span v-else-if="userStore.isStaff" class="ml-2 inline-flex items-center px-2.5 py-0.5 bg-secondary-400/10 text-secondary-400 text-xs font-bold rounded-md border border-secondary-400/20 uppercase tracking-wider">
             Staff
           </span>
         </p>
-
-        <!-- Action Cards - Optimizado para Mobile/Tablet -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <DashboardActionCard
-            title="Nuevo Socio"
-            subtitle="Registrar nueva alta"
-            :icon="UserPlus"
-            icon-bg-class="bg-primary-50"
-            icon-text-class="text-primary-600"
-            hover-border-class="hover:border-primary-100"
-            title-hover-class="group-hover:text-primary-700"
-            @click="router.push({ name: 'NewMember' })"
-          />
-
-          <DashboardActionCard
-            title="Registrar Pago"
-            subtitle="Ingresar cuota"
-            :icon="BadgeDollarSign"
-            icon-bg-class="bg-emerald-50"
-            icon-text-class="text-emerald-600"
-            hover-border-class="hover:border-emerald-100"
-            title-hover-class="group-hover:text-emerald-700"
-            @click="router.push({ name: 'NewPayment' })"
-          />
-
-          <DashboardActionCard
-            title="Check-In"
-            subtitle="Control de acceso"
-            :icon="CheckCircle"
-            icon-bg-class="bg-primary-50"
-            icon-text-class="text-primary-600"
-            hover-border-class="hover:border-primary-100"
-            title-hover-class="group-hover:text-primary-700"
-            @click="router.push({ name: 'CheckIn' })"
-          />
-
-          <DashboardActionCard
-            title="Últimos Accesos"
-            subtitle="Historial reciente"
-            :icon="ListChecks"
-            icon-bg-class="bg-secondary-50"
-            icon-text-class="text-secondary-600"
-            hover-border-class="hover:border-secondary-100"
-            title-hover-class="group-hover:text-secondary-700"
-            @click="showLastAccessModal = true"
-          />
-        </div>
       </div>
 
       <!-- Loading Skeleton -->
       <div v-if="loading" class="space-y-8">
         <!-- Skeleton para Tarjetas de Métricas -->
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+          <div v-for="i in 4" :key="i" class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
             <div class="flex items-start justify-between">
               <div class="flex-1 space-y-3">
                 <BaseSkeleton width="60%" height="0.875rem" />
@@ -78,7 +33,7 @@
         </div>
         
         <!-- Skeleton para Tabla de Check-ins -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <BaseSkeleton width="180px" height="1.5rem" class="mb-6" />
           <div class="space-y-4">
             <div v-for="i in 4" :key="i" class="flex items-center gap-4 py-3">
@@ -93,13 +48,14 @@
 
       <div v-else>
         <!-- Tarjetas de Métricas -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <StatCard
-            title="Ingresos del Mes"
+            title="Recaudación"
             :value="'$' + formatCurrency(stats.monthlyRevenue)"
             :icon="Wallet"
             icon-bg-color="bg-primary-50"
             icon-color="text-primary-600"
+            badge="Mensual"
           />
           
           <StatCard
@@ -118,52 +74,110 @@
             route="/checkin"
             icon-bg-color="bg-primary-50"
             icon-color="text-primary-600"
+            badge="Live"
+            badge-variant="live"
           />
           
           <StatCard
-            title="Socios Vencidos"
+            title="Cuotas Vencidas"
             :value="stats.expiredMembers"
             :icon="AlertCircle"
             route="/miembros"
             icon-bg-color="bg-red-50"
             icon-color="text-red-600"
+            :badge="stats.expiredMembers > 0 ? 'Urgent' : ''"
+            badge-variant="urgent"
           />
         </div>
 
+        <!-- Acciones Rápidas + Gráfico -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Acciones Rápidas -->
+          <div>
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Acciones Rápidas</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
+              <DashboardActionCard
+                title="Nuevo Socio"
+                subtitle="Registrar nueva alta"
+                :icon="UserPlus"
+                icon-bg-class="bg-primary-50"
+                icon-text-class="text-primary-600"
+                hover-border-class="hover:border-primary-100"
+                title-hover-class="group-hover:text-primary-700"
+                @click="router.push({ name: 'NewMember' })"
+              />
+              <DashboardActionCard
+                title="Registrar Pago"
+                subtitle="Ingresar cuota"
+                :icon="BadgeDollarSign"
+                icon-bg-class="bg-emerald-50"
+                icon-text-class="text-emerald-600"
+                hover-border-class="hover:border-emerald-100"
+                title-hover-class="group-hover:text-emerald-700"
+                @click="router.push({ name: 'NewPayment' })"
+              />
+              <DashboardActionCard
+                title="Check-In"
+                subtitle="Control de acceso"
+                :icon="CheckCircle"
+                icon-bg-class="bg-primary-50"
+                icon-text-class="text-primary-600"
+                hover-border-class="hover:border-primary-100"
+                title-hover-class="group-hover:text-primary-700"
+                @click="router.push({ name: 'CheckIn' })"
+              />
+              <DashboardActionCard
+                title="Últimos Accesos"
+                subtitle="Historial reciente"
+                :icon="ListChecks"
+                icon-bg-class="bg-secondary-50"
+                icon-text-class="text-secondary-600"
+                hover-border-class="hover:border-secondary-100"
+                title-hover-class="group-hover:text-secondary-700"
+                @click="showLastAccessModal = true"
+              />
+            </div>
+          </div>
+
+          <!-- Gráfico de Asistencia -->
+          <div class="bg-page-card rounded-xl border border-page-border p-5 md:p-6">
+            <AssistanceChart />
+          </div>
+        </div>
+
         <!-- Tarjeta de Alerta: Socios Vencidos -->
-        <div v-if="stats.expiredMembers > 0" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg p-6 mb-8">
-          <div class="flex items-start justify-between">
-            <div class="flex items-start gap-4">
-              <div class="p-3 bg-red-100 rounded-lg">
-                <AlertCircle class="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-red-900 dark:text-red-300 mb-1">
-                  {{ stats.expiredMembers }} Socios con Cuota Vencida
-                </h3>
-                <p class="text-sm text-red-700 dark:text-red-400">
-                  Hay socios con pagos pendientes que requieren atención
-                </p>
-              </div>
+        <div v-if="stats.expiredMembers > 0" class="relative overflow-hidden bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 dark:from-primary-900 dark:via-primary-800 dark:to-primary-700 rounded-2xl p-6 md:p-8 mb-8">
+          <!-- Subtle pattern overlay -->
+          <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 40%);"></div>
+          <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-xl md:text-2xl font-extrabold text-white mb-1.5 tracking-tight">
+                {{ stats.expiredMembers }} Socios con Cuota Vencida
+              </h3>
+              <p class="text-sm md:text-base text-primary-100/80">
+                Se requiere acción inmediata para regularizar el acceso a las instalaciones.
+              </p>
             </div>
             <BaseButton
-              variant="danger"
+              variant="secondary"
+              size="lg"
               @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
-              class="flex items-center gap-2"
+              class="flex-shrink-0 !bg-white/10 !text-white !border-white/20 hover:!bg-white/20 !font-bold uppercase tracking-wider"
             >
-              Ver Listado
+              Gestionar Morosos
             </BaseButton>
           </div>
         </div>
 
         <!-- Últimos Check-Ins -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Últimos Check-Ins</h2>
+        <div class="bg-page-card rounded-xl border border-page-border overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-5 border-b border-page-border">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Últimos Accesos</h2>
             <BaseButton
               variant="ghost"
               @click="showLastAccessModal = true"
               size="sm"
+              class="!text-xs !uppercase !tracking-wider !font-bold"
             >
               Ver todos
             </BaseButton>
@@ -177,32 +191,32 @@
           <div v-else class="overflow-x-auto">
             <table class="w-full">
               <thead>
-                <tr class="border-b border-gray-100 dark:border-gray-700">
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Socio</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">DNI</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Hora</th>
-                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600 dark:text-gray-400">Estado</th>
+                <tr class="border-b border-page-border">
+                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Socio</th>
+                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">DNI</th>
+                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Hora</th>
+                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 <tr 
                   v-for="checkin in recentCheckIns" 
                   :key="checkin.id"
-                  class="border-b border-gray-50 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                  class="border-b border-page-border last:border-0 hover:bg-white/[0.02] transition-colors"
                 >
-                  <td class="py-4 px-4 text-sm text-gray-800 font-medium">
+                  <td class="py-4 px-6 text-sm font-semibold text-page-title">
                     <BaseButton
                       variant="ghost"
                       size="sm"
-                      class="w-full justify-start px-0 py-0 hover:bg-transparent focus:ring-0"
+                      class="w-full justify-start px-0 py-0 hover:bg-transparent focus:ring-0 !font-semibold"
                       @click="goToMember(checkin.memberId)"
                     >
                       {{ checkin.name }}
                     </BaseButton>
                   </td>
-                  <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-400">{{ checkin.dni }}</td>
-                  <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-400">{{ checkin.time }}</td>
-                  <td class="py-4 px-4">
+                  <td class="py-4 px-6 text-sm text-gray-500 dark:text-gray-400 font-mono">{{ checkin.dni }}</td>
+                  <td class="py-4 px-6 text-sm text-gray-500 dark:text-gray-400">{{ checkin.time }}</td>
+                  <td class="py-4 px-6">
                     <StatusBadge
                       :status="checkin.status"
                       :label="checkin.statusLabel"
@@ -216,12 +230,6 @@
               No hay check-ins recientes
             </div>
           </div>
-        </div>
-
-        <!-- Gráfico de Asistencia Semanal -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mt-8">
-          <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6">Asistencia Semanal</h2>
-          <AssistanceChart />
         </div>
 
       </div>

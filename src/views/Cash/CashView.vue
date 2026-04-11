@@ -42,27 +42,27 @@
       <!-- Grid de Resumen (4 tarjetas) -->
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <!-- Saldo Inicial del Período -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <p class="text-page-subtitle text-sm font-medium mb-2">Saldo Inicial del Período</p>
-              <p class="text-gray-800 dark:text-gray-100 text-3xl font-bold mb-1">
+              <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrency(balanceAnterior) }}
               </p>
               <span class="text-sm text-gray-500 dark:text-gray-400">Al inicio del rango</span>
             </div>
-            <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-700">
+            <div class="p-3 rounded-lg bg-gray-50 dark:bg-white/5">
               <Calendar class="w-6 h-6 text-gray-600 dark:text-gray-400" />
             </div>
           </div>
         </div>
 
         <!-- Ingresos -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <p class="text-page-subtitle text-sm font-medium mb-2">Ingresos</p>
-              <p class="text-gray-800 dark:text-gray-100 text-3xl font-bold mb-1">
+              <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrency(ingresosDia) }}
               </p>
               <span class="text-sm font-semibold text-emerald-600">
@@ -76,11 +76,11 @@
         </div>
 
         <!-- Egresos -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <p class="text-page-subtitle text-sm font-medium mb-2">Egresos</p>
-              <p class="text-gray-800 dark:text-gray-100 text-3xl font-bold mb-1">
+              <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrency(egresosDia) }}
               </p>
               <span class="text-sm font-semibold text-red-600">
@@ -94,11 +94,11 @@
         </div>
 
         <!-- Saldo Final -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <p class="text-page-subtitle text-sm font-medium mb-2">Saldo Final</p>
-              <p class="text-gray-800 dark:text-gray-100 text-3xl font-bold mb-1">
+              <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrency(saldoFinal) }}
               </p>
               <span class="text-sm text-primary-600 font-semibold">En caja ahora</span>
@@ -135,9 +135,9 @@
       </div>
 
       <!-- Tabla de Movimientos -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+      <div class="bg-page-card rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-page-border">
+          <h2 class="text-lg font-semibold text-page-title">
             Movimientos del Período ({{ transactions.length }})
           </h2>
         </div>
@@ -154,7 +154,7 @@
 
         <div v-else class="overflow-x-auto">
           <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-700/50">
+            <thead class="bg-gray-50 dark:bg-white/5">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Hora
@@ -173,10 +173,10 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              <tr v-for="transaction in transactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+            <tbody class="bg-page-card divide-y divide-gray-200 dark:divide-gray-700/50">
+              <tr v-for="transaction in transactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-white/5">
                 <!-- Hora -->
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-page-title">
                   {{ formatTime(transaction.created_at) }}
                 </td>
 
@@ -184,7 +184,7 @@
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
                     <div>
-                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ transaction.categoria }}</p>
+                      <p class="text-sm font-medium text-page-title">{{ transaction.categoria }}</p>
                       <p v-if="transaction.descripcion" class="text-sm text-gray-500 dark:text-gray-400">
                         {{ transaction.descripcion }}
                       </p>
@@ -247,7 +247,7 @@
 
     <!-- Modal de Éxito -->
     <div v-if="showSuccessModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl max-w-md mx-4">
+      <div class="bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 p-8 rounded-lg shadow-xl max-w-md mx-4">
         <div class="text-center">
           <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
             <CheckCircle class="h-6 w-6 text-emerald-600" />

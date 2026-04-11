@@ -54,7 +54,7 @@
     </div>
 
     <!-- Panel derecho - Formulario de login -->
-    <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white dark:bg-gray-900">
+    <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white dark:bg-[#0b1120]">
       <div class="w-full max-w-md animate-slide-up">
         <!-- Logo para móvil -->
         <div class="lg:hidden flex justify-center mb-6">

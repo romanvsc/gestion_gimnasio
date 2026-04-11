@@ -5,8 +5,8 @@ const STORAGE_KEY = 'gym-theme'
 /** 
  * Valores posibles: 'light', 'dark', 'system'
  */
-const themePreference = ref('light')
-const isDark = ref(false)
+const themePreference = ref('dark')
+const isDark = ref(true)
 
 let initialized = false
 
@@ -24,10 +24,18 @@ export function useTheme() {
   function init() {
     // Leer preferencia guardada
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved && ['light', 'dark', 'system'].includes(saved)) {
+    
+    // Migración v2: si venía de la versión anterior con 'light' como default,
+    // forzar dark como nuevo default (una sola vez)
+    const migrationKey = 'gym-theme-v2-migrated'
+    if (!localStorage.getItem(migrationKey)) {
+      localStorage.setItem(migrationKey, '1')
+      themePreference.value = 'dark'
+      localStorage.setItem(STORAGE_KEY, 'dark')
+    } else if (saved && ['light', 'dark', 'system'].includes(saved)) {
       themePreference.value = saved
     } else {
-      themePreference.value = 'light'
+      themePreference.value = 'dark'
     }
 
     applyTheme()
@@ -59,7 +67,7 @@ export function useTheme() {
     // Actualizar meta theme-color para la barra del navegador/PWA
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', isDark.value ? '#0f172a' : '#5F388C')
+      metaThemeColor.setAttribute('content', isDark.value ? '#0b1120' : '#5F388C')
     }
   }
 

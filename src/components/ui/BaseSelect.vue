@@ -136,17 +136,17 @@ const selectClasses = computed(() => {
     lg: 'px-4 py-3 text-lg rounded-lg pr-10'
   }
 
-  const base = `block w-full border appearance-none bg-white dark:bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors cursor-pointer ${sizeMap[props.size]}`
+  const base = `block w-full border appearance-none bg-white dark:bg-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors cursor-pointer ${sizeMap[props.size]}`
 
   if (props.error) {
     return `${base} border-red-300 dark:border-red-500 focus:border-red-500 focus:ring-red-200 dark:focus:ring-red-800 text-gray-900 dark:text-gray-100`
   }
 
   if (props.disabled) {
-    return `${base} border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-not-allowed text-gray-400 dark:text-gray-500`
+    return `${base} border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 cursor-not-allowed text-gray-400 dark:text-gray-500`
   }
 
-  return `${base} border-gray-300 dark:border-gray-600 focus:border-primary-500 focus:ring-primary-200 dark:focus:ring-primary-800 text-gray-900 dark:text-gray-100`
+  return `${base} border-gray-300 dark:border-gray-700 focus:border-primary-500 focus:ring-primary-200 dark:focus:ring-primary-800 text-gray-900 dark:text-gray-100`
 })
 
 function handleChange(event) {

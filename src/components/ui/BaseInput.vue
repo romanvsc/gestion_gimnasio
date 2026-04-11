@@ -116,14 +116,14 @@ const inputClasses = computed(() => {
     : ''
   
   if (props.error) {
-    return `${baseClasses} ${focusClasses} border-red-300 focus:border-red-500 focus:ring-red-200 dark:border-red-500 dark:focus:ring-red-800 dark:bg-gray-700 dark:text-gray-100`
+    return `${baseClasses} ${focusClasses} border-red-300 focus:border-red-500 focus:ring-red-200 dark:border-red-500 dark:focus:ring-red-800 dark:bg-gray-800 dark:text-gray-100`
   }
   
   if (props.disabled) {
-    return `${baseClasses} ${focusClasses} border-gray-200 bg-gray-50 cursor-not-allowed dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500`
+    return `${baseClasses} ${focusClasses} border-gray-200 bg-gray-50 cursor-not-allowed dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500`
   }
   
-  return `${baseClasses} ${focusClasses} border-gray-300 focus:border-primary-500 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:focus:ring-primary-800`
+  return `${baseClasses} ${focusClasses} border-gray-300 focus:border-primary-500 focus:ring-primary-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:ring-primary-800`
 })
 
 function handleInput(event) {

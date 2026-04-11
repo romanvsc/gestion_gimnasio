@@ -9,7 +9,7 @@
       <div :class="['p-2 rounded-lg', iconBgClass]">
         <component :is="icon" :class="['w-6 h-6', iconClass]" />
       </div>
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ title }}</h3>
+      <h3 class="text-lg font-semibold text-page-title">{{ title }}</h3>
     </div>
     <p :class="['text-sm font-medium', textClass]">
       {{ statusText }}

@@ -84,10 +84,10 @@ const buttonClasses = computed(() => {
   // Variante
   const variantClasses = {
     primary: 'bg-primary-600 text-white shadow-sm hover:bg-primary-700 focus:ring-primary-500 disabled:bg-primary-300 dark:bg-primary-500 dark:hover:bg-primary-600 dark:disabled:bg-primary-800',
-    secondary: 'bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50 focus:ring-gray-500 disabled:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 dark:disabled:bg-gray-800',
+    secondary: 'bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50 focus:ring-gray-500 disabled:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-white/10 dark:disabled:bg-gray-800',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300 dark:bg-red-500 dark:hover:bg-red-600',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500 disabled:text-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:disabled:text-gray-600',
-    card: 'bg-white text-gray-900 border border-gray-100 shadow-sm hover:shadow-md focus:ring-primary-500 disabled:bg-gray-50 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:hover:bg-gray-700'
+    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500 disabled:text-gray-400 dark:text-gray-300 dark:hover:bg-white/10 dark:disabled:text-gray-600',
+    card: 'bg-page-card text-gray-900 border border-gray-100 shadow-sm hover:shadow-md hover:bg-page-card-hover focus:ring-primary-500 disabled:bg-gray-50 dark:text-gray-100 dark:border-gray-700/50'
   }
   
   // Disabled

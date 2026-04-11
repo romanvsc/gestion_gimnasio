@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0b1120] dark:to-[#0f1729] transition-colors duration-200">
     <div class="h-screen flex flex-col lg:flex-row">
       
       <!-- Área Principal: Kiosco de Acceso -->
@@ -27,7 +27,7 @@
 
         <!-- Fecha de asistencia -->
         <div class="w-full max-w-2xl mb-8">
-          <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+          <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-page-card p-4 shadow-sm">
             <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Fecha de asistencia</p>
             <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
               <div class="flex-1">
@@ -74,11 +74,11 @@
                 
                 <!-- Info -->
                 <div class="flex-1">
-                  <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+                  <p class="text-3xl font-bold text-page-title mb-1">
                     {{ member.nombre }} {{ member.apellido }}
                   </p>
                   <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">DNI: {{ member.dni }}</p>
-                  <div class="flex items-start gap-3 bg-white dark:bg-gray-800/60 rounded-xl px-4 py-3 shadow-sm">
+                  <div class="flex items-start gap-3 bg-white dark:bg-white/5 rounded-xl px-4 py-3 shadow-sm">
                     <CheckCircle class="h-8 w-8 text-emerald-500 mt-0.5" />
                     <div class="flex-1">
                       <span class="text-2xl font-bold text-emerald-600 block">ACCESO PERMITIDO</span>
@@ -107,11 +107,11 @@
                 
                 <!-- Info -->
                 <div class="flex-1">
-                  <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+                  <p class="text-3xl font-bold text-page-title mb-1">
                     {{ member.nombre }} {{ member.apellido }}
                   </p>
                   <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">DNI: {{ member.dni }}</p>
-                  <div class="flex items-center gap-3 bg-white dark:bg-gray-800/60 rounded-xl px-4 py-3 shadow-sm">
+                  <div class="flex items-center gap-3 bg-white dark:bg-white/5 rounded-xl px-4 py-3 shadow-sm">
                     <AlertCircle class="h-8 w-8 text-red-500" />
                     <div class="flex-1">
                       <span class="text-2xl font-bold text-red-600 block">ACCESO DENEGADO</span>
@@ -136,24 +136,24 @@
       </div>
 
       <!-- Aside Lateral: Live Feed de Últimos Accesos -->
-      <aside class="lg:w-80 bg-white dark:bg-gray-800 lg:border-l border-gray-200 dark:border-gray-700 lg:overflow-y-auto">
-        <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-6 z-10">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+      <aside class="lg:w-80 bg-page-card lg:border-l border-gray-200 dark:border-gray-700 lg:overflow-y-auto">
+        <div class="sticky top-0 bg-page-card border-b border-page-border p-6 z-10">
+          <h2 class="text-lg font-semibold text-page-title flex items-center gap-2">
             <Activity class="h-5 w-5 text-primary-600" />
             Últimos Accesos
           </h2>
           <p class="text-xs text-gray-500 mt-1">Live Feed</p>
         </div>
         
-        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50">
+        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50 dark:divide-gray-700/50">
           <div
             v-for="checkIn in recentCheckIns"
             :key="checkIn.id"
-            class="p-4 hover:bg-gray-50 transition-colors"
+            class="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
           >
             <div class="flex items-center gap-3">
               <!-- Avatar circular -->
-              <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-600 flex-shrink-0">
+              <div class="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-400 flex-shrink-0">
                 {{ getInitials(checkIn.member_name.split(' ')[0], checkIn.member_name.split(' ')[1]) }}
               </div>
               
@@ -165,7 +165,7 @@
                     'h-2 w-2 rounded-full flex-shrink-0',
                     checkIn.acceso_permitido ? 'bg-emerald-500' : 'bg-red-500'
                   ]"></div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                  <p class="text-sm font-medium text-page-title truncate">
                     {{ checkIn.member_name }}
                   </p>
                 </div>

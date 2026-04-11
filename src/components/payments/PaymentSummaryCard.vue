@@ -11,7 +11,7 @@
       @click="isExpanded = !isExpanded"
     >
       <div class="flex items-center gap-3">
-        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Resumen de Pago</h3>
+        <h3 class="text-base font-semibold text-page-title">Resumen de Pago</h3>
         <!-- Mini resumen cuando está colapsado -->
         <div v-if="!isExpanded" class="flex items-center gap-2">
           <span class="text-xl font-bold text-primary-600">{{ monto ? `$${monto}` : '$0' }}</span>
@@ -33,7 +33,7 @@
     </button>
 
     <!-- Header normal (desktop) -->
-    <h3 v-else class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+    <h3 v-else class="text-lg font-semibold text-page-title mb-4">
       Resumen de Pago
     </h3>
     
@@ -55,7 +55,7 @@
       >
         <!-- Monto a Pagar -->
         <div :class="[
-          'text-center bg-white dark:bg-gray-800/60 rounded-lg shadow-sm',
+          'text-center bg-white dark:bg-white/5 rounded-lg shadow-sm',
           compact ? 'py-4' : 'py-6'
         ]">
           <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">Monto a Pagar</p>
@@ -73,28 +73,28 @@
         </div>
 
         <!-- Plan Seleccionado -->
-        <div class="bg-white dark:bg-gray-800/60 rounded-lg p-3 shadow-sm">
+        <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm">
           <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1.5">Plan Seleccionado</p>
-          <p class="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100">
+          <p class="text-sm md:text-base font-medium text-page-title">
             {{ planName || 'Ningún plan seleccionado' }}
           </p>
         </div>
 
         <!-- Fechas -->
-        <div class="bg-white dark:bg-gray-800/60 rounded-lg p-3 shadow-sm space-y-2">
+        <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm space-y-2">
           <div>
             <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Fecha de Inicio</p>
-            <p class="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100">
+            <p class="text-sm md:text-base font-medium text-page-title">
               {{ fechaInicio || '—' }}
             </p>
           </div>
-          <div class="border-t border-gray-100 dark:border-gray-700 pt-2">
+          <div class="border-t border-gray-100 dark:border-gray-700/50 pt-2">
             <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Fecha de Fin</p>
-            <p class="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100">
+            <p class="text-sm md:text-base font-medium text-page-title">
               {{ fechaFin || '—' }}
             </p>
           </div>
-          <div v-if="duracion" class="border-t border-gray-100 dark:border-gray-700 pt-2">
+          <div v-if="duracion" class="border-t border-gray-100 dark:border-gray-700/50 pt-2">
             <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Duración</p>
             <p class="text-sm md:text-base font-medium text-primary-600">
               {{ duracion }} días
@@ -103,9 +103,9 @@
         </div>
 
         <!-- Método de Pago -->
-        <div class="bg-white dark:bg-gray-800/60 rounded-lg p-3 shadow-sm">
+        <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm">
           <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1.5">Método de Pago</p>
-          <p class="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100">
+          <p class="text-sm md:text-base font-medium text-page-title">
             {{ metodoPago || '—' }}
           </p>
         </div>

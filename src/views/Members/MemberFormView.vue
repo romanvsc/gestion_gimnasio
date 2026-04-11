@@ -17,7 +17,7 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="loading && isEditing" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
+      <div v-if="loading && isEditing" class="bg-page-card rounded-xl shadow-sm border border-page-border p-8 text-center">
         <div class="animate-pulse">
           <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
           <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
@@ -29,8 +29,8 @@
       <form v-else @submit.prevent="handleSubmit" class="space-y-6">
         
         <!-- SECCIÓN 1: Datos Personales & Foto -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+          <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <User class="w-5 h-5 text-primary-500" />
             Datos Personales & Foto
           </h2>
@@ -59,7 +59,7 @@
                       <X class="w-4 h-4" />
                     </button>
                   </div>
-                  <div v-else class="w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600">
+                  <div v-else class="w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700">
                     <UserCircle class="w-16 h-16 text-gray-300 dark:text-gray-600" />
                   </div>
                 </div>
@@ -157,8 +157,8 @@
         </div>
 
         <!-- SECCIÓN 2: Salud (Datos Físicos) -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+          <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <Heart class="w-5 h-5 text-red-500" />
             Salud & Datos Físicos
           </h2>
@@ -195,7 +195,7 @@
               </label>
               <div class="relative">
                 <div 
-                  class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-lg flex items-center justify-between"
+                  class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold text-lg flex items-center justify-between"
                 >
                   <span>{{ imcDisplay }}</span>
                   <span v-if="imc" :class="['inline-flex h-3 w-3 rounded-full', imcColor]"></span>
@@ -212,7 +212,7 @@
           </div>
 
           <!-- Apto Físico -->
-          <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+          <div class="mt-6 pt-6 border-t border-page-border">
             <BaseInput
               v-model="formData.apto_fisico"
               type="date"
@@ -224,8 +224,8 @@
         </div>
 
         <!-- SECCIÓN 3: Membresía y Estado -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+          <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <CreditCard class="w-5 h-5 text-primary-500" />
             Membresía y Estado
           </h2>
@@ -239,7 +239,7 @@
                 'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all touch-manipulation',
                 formData.es_socio_club 
                   ? 'bg-yellow-50 border-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-700' 
-                  : 'bg-gray-50 border-gray-200 hover:border-gray-300 dark:bg-gray-700/50 dark:border-gray-600 dark:hover:border-gray-500'
+                  : 'bg-gray-50 border-gray-200 hover:border-gray-300 dark:bg-white/5 dark:border-gray-700 dark:hover:border-gray-600'
               ]"
             >
               <div class="flex items-center gap-3">
@@ -253,7 +253,7 @@
                   ]" />
                 </div>
                 <div class="text-left">
-                  <p class="font-semibold text-gray-900 dark:text-gray-100">¿Es Socio del Club?</p>
+                  <p class="font-semibold text-page-title">¿Es Socio del Club?</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">Aplica tarifa preferencial en los planes</p>
                 </div>
               </div>
@@ -282,10 +282,10 @@
                     'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
                     formData.plan_id === null
                       ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 dark:bg-primary-900/20'
-                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:active:bg-gray-700'
+                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-500 dark:active:bg-gray-700'
                   ]"
                 >
-                  <p class="font-semibold text-gray-900 dark:text-gray-100">Sin plan fijo</p>
+                  <p class="font-semibold text-page-title">Sin plan fijo</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">Elegir al pagar</p>
                 </button>
                 
@@ -299,10 +299,10 @@
                     'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
                     formData.plan_id === plan.id
                       ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 dark:bg-primary-900/20'
-                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:active:bg-gray-700'
+                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-500 dark:active:bg-gray-700'
                   ]"
                 >
-                  <p class="font-semibold text-gray-900 dark:text-gray-100">{{ plan.nombre }}</p>
+                  <p class="font-semibold text-page-title">{{ plan.nombre }}</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">{{ plan.dias_duracion }} días</p>
                   <p class="text-lg font-bold text-primary-600 mt-1">
                     ${{ formatPrice(formData.es_socio_club && plan.precio_socio ? plan.precio_socio : plan.precio) }}
@@ -322,7 +322,7 @@
                 'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all touch-manipulation',
                 formData.activo 
                   ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700' 
-                  : 'bg-gray-50 border-gray-200 hover:border-gray-300 dark:bg-gray-700/50 dark:border-gray-600 dark:hover:border-gray-500'
+                  : 'bg-gray-50 border-gray-200 hover:border-gray-300 dark:bg-white/5 dark:border-gray-700 dark:hover:border-gray-600'
               ]"
             >
               <div class="flex items-center gap-3">
@@ -334,7 +334,7 @@
                   <UserX v-else class="w-6 h-6 text-gray-400 dark:text-gray-500" />
                 </div>
                 <div class="text-left">
-                  <p class="font-semibold text-gray-900 dark:text-gray-100">Socio Activo</p>
+                  <p class="font-semibold text-page-title">Socio Activo</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">Los socios inactivos no pueden hacer check-in</p>
                 </div>
               </div>

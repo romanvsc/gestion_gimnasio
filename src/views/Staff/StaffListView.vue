@@ -20,9 +20,9 @@
     </div>
 
     <!-- Desktop Table -->
-    <div v-else class="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div v-else class="hidden md:block bg-page-card rounded-lg shadow overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-700/50">
+        <thead class="bg-gray-50 dark:bg-white/5">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Usuario</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
@@ -31,8 +31,8 @@
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-          <tr v-for="staff in staffList" :key="staff.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+        <tbody class="bg-page-card divide-y divide-gray-200 dark:divide-gray-700/50">
+          <tr v-for="staff in staffList" :key="staff.id" class="hover:bg-gray-50 dark:hover:bg-white/5">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
                 <div 
@@ -42,12 +42,12 @@
                   {{ getInitials(staff.usuario) }}
                 </div>
                 <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ staff.usuario }}</div>
+                  <div class="text-sm font-medium text-page-title">{{ staff.usuario }}</div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900 dark:text-gray-100">{{ staff.email }}</div>
+              <div class="text-sm text-page-title">{{ staff.email }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <StatusBadge :type="staff.rol === 'admin' ? 'success' : 'info'">
@@ -92,7 +92,7 @@
       <div 
         v-for="staff in staffList" 
         :key="staff.id"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+        class="bg-page-card rounded-lg shadow p-4"
       >
         <div class="flex items-start justify-between mb-3">
           <div class="flex items-center">
@@ -103,7 +103,7 @@
               {{ getInitials(staff.usuario) }}
             </div>
             <div class="ml-3">
-              <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ staff.usuario }}</div>
+              <div class="text-sm font-medium text-page-title">{{ staff.usuario }}</div>
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ staff.email }}</div>
             </div>
           </div>

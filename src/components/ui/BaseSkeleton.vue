@@ -1,6 +1,6 @@
 <template>
   <div
-    class="animate-pulse bg-gray-200 dark:bg-gray-700"
+    class="animate-pulse bg-gray-200 dark:bg-gray-700/50"
     :class="[roundedClass, customClass]"
     :style="{ width: computedWidth, height: computedHeight }"
   >

@@ -2,17 +2,17 @@
   <div>
     <!-- Estadísticas rápidas -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
-        <span class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ totalWeek }}</span>
+      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-gray-700/50">
+        <span class="text-3xl font-bold text-page-title">{{ totalWeek }}</span>
         <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">Total Semanal</span>
       </div>
       
-      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
-        <span class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ averageDaily }}</span>
+      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-gray-700/50">
+        <span class="text-3xl font-bold text-page-title">{{ averageDaily }}</span>
         <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">Promedio Diario</span>
       </div>
 
-      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
+      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-gray-700/50">
         <span class="text-3xl font-bold text-primary-600">{{ bestDay.day }}</span>
         <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">Mejor Día ({{ bestDay.count }})</span>
       </div>

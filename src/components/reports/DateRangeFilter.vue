@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+  <div class="bg-page-card rounded-lg shadow-md p-4">
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <!-- Label y descripción -->
       <div>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Información del rango seleccionado -->
-    <div v-if="dateInfo" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+    <div v-if="dateInfo" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
         <Calendar class="w-4 h-4" />
         <span>

@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+  <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+      <h2 class="text-xl font-semibold text-page-title flex items-center gap-2">
         <History class="w-5 h-5" />
         Historial de Pagos
       </h2>
@@ -29,7 +29,7 @@
     <!-- Tabla de Pagos -->
     <div v-else class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-700/50">
+        <thead class="bg-gray-50 dark:bg-white/5">
           <tr>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Fecha Pago
@@ -48,19 +48,19 @@
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <tbody class="bg-page-card divide-y divide-gray-200 dark:divide-gray-700/50">
           <tr 
             v-for="payment in payments" 
             :key="payment.id"
             :class="[
-              'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors',
+              'hover:bg-gray-50 dark:hover:bg-white/5 transition-colors',
               isPaymentExpired(payment.fecha_fin) && 'opacity-60'
             ]"
           >
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-page-title">
               {{ formatDateLong(payment.created_at) }}
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-page-title">
               {{ payment.plans?.nombre || 'Plan' }}
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
@@ -71,7 +71,7 @@
                 ${{ formatCurrency(payment.monto) }}
               </span>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-page-title">
               {{ payment.metodo_pago }}
             </td>
           </tr>
@@ -83,7 +83,7 @@
         <span class="text-sm text-gray-600 dark:text-gray-400">
           Total de pagos: <span class="font-semibold">{{ payments.length }}</span>
         </span>
-        <span class="text-lg font-bold text-gray-900 dark:text-gray-100">
+        <span class="text-lg font-bold text-page-title">
           Total recaudado: <span class="text-emerald-600">${{ formatCurrency(totalAmount) }}</span>
         </span>
       </div>

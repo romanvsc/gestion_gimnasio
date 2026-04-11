@@ -10,15 +10,15 @@
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="handleClose" />
         
         <!-- Modal Content -->
-        <div class="relative bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
+        <div class="relative bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
           <!-- Header -->
-          <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 border-b border-page-border">
             <h3 class="text-lg font-semibold text-page-title">
               {{ isEditing ? 'Editar Plan' : 'Nuevo Plan' }}
             </h3>
             <button 
               @click="handleClose"
-              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-manipulation"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-colors touch-manipulation"
             >
               <X class="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
@@ -73,7 +73,7 @@
             </BaseInput>
 
             <!-- Estado Activo -->
-            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
               <div>
                 <p class="font-medium text-page-title">Plan activo</p>
                 <p class="text-sm text-page-subtitle">Los planes inactivos no aparecen al registrar pagos</p>
@@ -93,7 +93,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+          <div class="p-4 border-t border-page-border flex gap-3">
             <BaseButton 
               variant="ghost" 
               class="flex-1"

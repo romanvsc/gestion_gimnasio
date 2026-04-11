@@ -13,19 +13,21 @@
     --color-page-subtitle: #64748b;
     --color-page-muted: #94a3b8;
     --color-page-card: #ffffff;
+    --color-page-card-hover: #f8fafc;
     --color-page-border: #f1f5f9;
   }
 
   /* ============================
-     CSS Variables - Dark Mode 
+     CSS Variables - Dark Mode (DEFAULT)
      ============================ */
   .dark {
-    --color-page-bg: #0f172a;
+    --color-page-bg: #0b1120;
     --color-page-title: #f1f5f9;
     --color-page-subtitle: #94a3b8;
     --color-page-muted: #64748b;
-    --color-page-card: #1e293b;
-    --color-page-border: #334155;
+    --color-page-card: #151f32;
+    --color-page-card-hover: #1a2740;
+    --color-page-border: #1e293b;
   }
 
   body {
@@ -38,7 +40,7 @@
     height: 8px;
   }
   .dark ::-webkit-scrollbar-track {
-    background: #1e293b;
+    background: #0b1120;
   }
   .dark ::-webkit-scrollbar-thumb {
     background: #475569;

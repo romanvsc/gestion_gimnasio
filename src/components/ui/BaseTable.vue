@@ -11,7 +11,7 @@
     </div>
 
     <!-- Contenedor de tabla con scroll -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div class="bg-page-card rounded-xl shadow-sm border border-page-border overflow-hidden">
       
       <!-- Loading state -->
       <div v-if="loading" class="p-8 text-center">
@@ -35,7 +35,7 @@
       <!-- Tabla -->
       <div v-else class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+          <thead class="bg-gray-50 dark:bg-white/5 border-b border-page-border">
             <tr>
               <th 
                 v-for="col in columns" 
@@ -66,7 +66,7 @@
             <tr 
               v-for="(row, index) in sortedData" 
               :key="row.id || index"
-              class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
               :class="[rowClass?.(row, index), clickable ? 'cursor-pointer' : '']"
               @click="clickable && $emit('row-click', row)"
             >
@@ -92,7 +92,7 @@
       <!-- Footer -->
       <div 
         v-if="$slots.footer && data && data.length > 0" 
-        class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+        class="px-6 py-4 border-t border-page-border bg-gray-50 dark:bg-white/5"
       >
         <slot name="footer" :total="data.length" />
       </div>

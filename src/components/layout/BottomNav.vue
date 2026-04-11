@@ -1,5 +1,5 @@
 <template>
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 safe-area-bottom transition-colors duration-200">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-[#0d1526] border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom transition-colors duration-200">
     <div class="flex justify-around items-center h-20 px-1">
       <!-- Items de navegación principales -->
       <router-link
@@ -9,7 +9,7 @@
         :class="[
           isActive(item.to)
             ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/30'
-            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700',
+            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/5',
           'flex flex-col items-center justify-center flex-1 h-full py-2 px-1 rounded-xl transition-all duration-200 min-w-0 touch-manipulation'
         ]"
       >
@@ -34,8 +34,8 @@
         @click="showMoreMenu = !showMoreMenu"
         :class="[
           showMoreMenu || isMoreActive
-            ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/30'
-            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700',
+            ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/20'
+            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/5',
           'flex flex-col items-center justify-center flex-1 h-full py-2 px-1 rounded-xl transition-all duration-200 min-w-0 touch-manipulation'
         ]"
       >
@@ -63,7 +63,7 @@
     >
       <div 
         v-if="showMoreMenu" 
-        class="absolute bottom-full left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg rounded-t-2xl overflow-hidden"
+        class="absolute bottom-full left-0 right-0 bg-white dark:bg-[#0d1526] border-t border-gray-200 dark:border-gray-800 shadow-lg rounded-t-2xl overflow-hidden"
       >
         <div class="p-4 space-y-1">
           <!-- Items del menú "Más" -->
@@ -74,8 +74,8 @@
             @click="showMoreMenu = false"
             :class="[
               isActive(item.to)
-                ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700',
+                ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
+                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5',
               'flex items-center gap-4 px-4 py-3 rounded-xl transition-colors touch-manipulation'
             ]"
           >
@@ -84,7 +84,7 @@
           </router-link>
 
           <!-- Separador -->
-          <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+          <div class="border-t border-gray-200 dark:border-gray-800 my-2"></div>
 
           <!-- Cerrar Sesión -->
           <button

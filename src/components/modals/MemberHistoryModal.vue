@@ -1,14 +1,14 @@
 <template>
   <div class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+    <div class="bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+        <h3 class="text-xl font-bold text-page-title">
           Historial de {{ memberName }}
         </h3>
         <button
           @click="$emit('close')"
-          class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          class="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
         >
           <X class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         </button>
@@ -48,7 +48,7 @@
       <div class="p-6 overflow-y-auto max-h-[calc(80vh-160px)]">
         <!-- Loading -->
         <div v-if="loading" class="text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-600 border-t-primary-600"></div>
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-700 border-t-primary-600"></div>
           <p class="mt-4 text-gray-500 dark:text-gray-400">Cargando datos...</p>
         </div>
 
@@ -63,26 +63,26 @@
             <div
               v-for="payment in payments"
               :key="payment.id"
-              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+              class="bg-gray-50 dark:bg-white/5 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
             >
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-2">
                     <Receipt class="w-5 h-5 text-primary-600" />
-                    <h4 class="font-semibold text-gray-900 dark:text-gray-100">{{ payment.plans?.nombre || 'Plan no disponible' }}</h4>
+                    <h4 class="font-semibold text-page-title">{{ payment.plans?.nombre || 'Plan no disponible' }}</h4>
                   </div>
                   <div class="grid grid-cols-2 gap-2 text-sm">
                     <div>
                       <span class="text-gray-500 dark:text-gray-400">Fecha Inicio:</span>
-                      <span class="ml-2 text-gray-900 dark:text-gray-100">{{ formatDate(payment.fecha_inicio) }}</span>
+                      <span class="ml-2 text-page-title">{{ formatDate(payment.fecha_inicio) }}</span>
                     </div>
                     <div>
                       <span class="text-gray-500 dark:text-gray-400">Fecha Fin:</span>
-                      <span class="ml-2 text-gray-900 dark:text-gray-100">{{ formatDate(payment.fecha_fin) }}</span>
+                      <span class="ml-2 text-page-title">{{ formatDate(payment.fecha_fin) }}</span>
                     </div>
                     <div>
                       <span class="text-gray-500 dark:text-gray-400">Método:</span>
-                      <span class="ml-2 text-gray-900 dark:text-gray-100">{{ payment.metodo_pago || '-' }}</span>
+                      <span class="ml-2 text-page-title">{{ payment.metodo_pago || '-' }}</span>
                     </div>
                     <div>
                       <span class="text-gray-500 dark:text-gray-400">Monto:</span>
@@ -105,12 +105,12 @@
             <div
               v-for="att in attendances"
               :key="att.id"
-              class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600 flex items-center justify-between"
+              class="bg-gray-50 dark:bg-white/5 rounded-lg p-3 border border-gray-200 dark:border-gray-700 flex items-center justify-between"
             >
               <div class="flex items-center gap-3">
                 <CalendarClock class="w-5 h-5 text-primary-600" />
                 <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ formatDateTime(att.created_at) }}</p>
+                  <p class="text-sm font-medium text-page-title">{{ formatDateTime(att.created_at) }}</p>
                 </div>
               </div>
               <StatusBadge

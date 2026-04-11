@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Registrar Movimiento</h2>
+    <div class="bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-lg shadow-xl max-w-md w-full p-6">
+      <h2 class="text-2xl font-bold text-page-title mb-6">Registrar Movimiento</h2>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <!-- Tipo -->
@@ -17,7 +17,7 @@
                 'p-4 rounded-lg border-2 font-semibold transition-all',
                 formData.tipo === 'INGRESO'
                   ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:border-gray-500'
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'
               ]"
             >
               <ArrowDownCircle class="w-6 h-6 mx-auto mb-2" />
@@ -30,7 +30,7 @@
                 'p-4 rounded-lg border-2 font-semibold transition-all',
                 formData.tipo === 'EGRESO'
                   ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:border-gray-500'
+                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'
               ]"
             >
               <ArrowUpCircle class="w-6 h-6 mx-auto mb-2" />
@@ -49,7 +49,7 @@
             v-model="formData.categoria"
             required
             :disabled="!formData.tipo"
-            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-200 dark:disabled:bg-gray-800"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-200 dark:disabled:bg-gray-800"
           >
             <option value="">{{ formData.tipo ? 'Seleccionar...' : 'Primero selecciona un tipo' }}</option>
             <option v-for="concept in filteredConcepts" :key="concept.id" :value="concept.nombre">
@@ -79,7 +79,7 @@
             v-model="formData.descripcion"
             rows="3"
             placeholder="Detalle opcional del movimiento..."
-            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-gray-700 dark:text-gray-200"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-gray-800 dark:text-gray-200"
           ></textarea>
         </div>
 

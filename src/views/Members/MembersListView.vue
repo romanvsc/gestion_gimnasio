@@ -19,7 +19,7 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+      <div v-if="loading" class="bg-page-card rounded-xl shadow-sm p-8 text-center">
         <p class="text-gray-600 dark:text-gray-400">Cargando socios...</p>
       </div>
 
@@ -30,7 +30,7 @@
 
       <template v-else>
         <!-- Filtros -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 mb-6">
+        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-4 mb-6">
           <div class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1">
               <BaseInput
@@ -48,7 +48,7 @@
                 type="checkbox" 
                 v-model="showInactive"
                 @change="handleToggleInactive"
-                class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700"
+                class="w-5 h-5 rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-primary-500 dark:bg-gray-800"
               />
               Mostrar inactivos
             </label>
@@ -56,7 +56,7 @@
         </div>
 
         <!-- Empty state (cuando no hay socios) -->
-        <div v-if="filteredMembers.length === 0" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div v-if="filteredMembers.length === 0" class="text-center py-12 bg-page-card rounded-xl shadow-sm border border-page-border">
           <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <p class="text-lg font-medium text-gray-600 dark:text-gray-400">No se encontraron socios</p>
           <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Prueba ajustando los filtros o agrega un nuevo socio</p>
@@ -67,7 +67,7 @@
           <div
             v-for="member in filteredMembers"
             :key="member.id"
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 touch-manipulation active:bg-gray-50 dark:active:bg-gray-700 transition-colors"
+            class="bg-page-card rounded-xl shadow-sm border border-page-border p-4 touch-manipulation active:bg-page-card-hover transition-colors"
             @click="goToMemberDetail(member.id)"
           >
             <div class="flex items-start gap-4">
@@ -86,7 +86,7 @@
               
               <!-- Info -->
               <div class="flex-1 min-w-0">
-                <h3 class="font-semibold text-gray-900 dark:text-gray-100 truncate flex items-center gap-1.5">
+                <h3 class="font-semibold text-page-title truncate flex items-center gap-1.5">
                   {{ member.nombre }} {{ member.apellido }}
                   <img 
                     v-if="member.es_socio_club" 
@@ -119,9 +119,9 @@
         </div>
 
         <!-- Vista Desktop: Tabla -->
-        <div v-if="filteredMembers.length > 0" class="hidden md:block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div v-if="filteredMembers.length > 0" class="hidden md:block bg-page-card rounded-xl shadow-sm border border-page-border overflow-hidden">
           <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+            <thead class="bg-gray-50 dark:bg-white/5 border-b border-page-border">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Socio</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">DNI</th>
@@ -132,11 +132,11 @@
                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
               <tr 
                 v-for="member in filteredMembers" 
                 :key="member.id"
-                class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                 :class="{ 'opacity-60': !member.activo }"
               >
                 <td class="px-6 py-4">
@@ -153,7 +153,7 @@
                       </span>
                     </div>
                     <div>
-                      <p class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
+                      <p class="font-medium text-page-title flex items-center gap-1.5">
                         {{ member.nombre }} {{ member.apellido }}
                         <img 
                           v-if="member.es_socio_club" 

@@ -121,7 +121,7 @@
               <div class="p-2 rounded-lg bg-primary-100 dark:bg-primary-800/40">
                 <Activity class="w-6 h-6 text-primary-600" />
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Salud</h3>
+              <h3 class="text-lg font-semibold text-page-title">Salud</h3>
             </div>
             
             <div v-if="memberData.peso && memberData.altura" class="space-y-2">
@@ -129,13 +129,13 @@
                 <span class="text-gray-600 dark:text-gray-400 flex items-center gap-1">
                   <Weight class="w-4 h-4" /> Peso:
                 </span>
-                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ memberData.peso }} kg</span>
+                <span class="font-semibold text-page-title">{{ memberData.peso }} kg</span>
               </div>
               <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-600 dark:text-gray-400 flex items-center gap-1">
                   <Ruler class="w-4 h-4" /> Altura:
                 </span>
-                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ memberData.altura }} m</span>
+                <span class="font-semibold text-page-title">{{ memberData.altura }} m</span>
               </div>
               <div class="pt-2 border-t border-primary-200 dark:border-primary-700">
                 <div class="flex items-center justify-between">
@@ -158,35 +158,35 @@
         </div>
 
         <!-- Datos Personales -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+          <h2 class="text-xl font-semibold text-page-title mb-4 flex items-center gap-2">
             <User class="w-5 h-5" />
             Datos Personales
           </h2>
           <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ memberData.email || '-' }}</dd>
+              <dd class="mt-1 text-sm text-page-title">{{ memberData.email || '-' }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Teléfono</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ memberData.telefono || '-' }}</dd>
+              <dd class="mt-1 text-sm text-page-title">{{ memberData.telefono || '-' }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de Nacimiento</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDateLong(memberData.fecha_nacimiento) }}</dd>
+              <dd class="mt-1 text-sm text-page-title">{{ formatDateLong(memberData.fecha_nacimiento) }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de Alta</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ formatDateLong(memberData.fecha_alta) }}</dd>
+              <dd class="mt-1 text-sm text-page-title">{{ formatDateLong(memberData.fecha_alta) }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Plan Asignado</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ planName || 'Sin plan fijo' }}</dd>
+              <dd class="mt-1 text-sm text-page-title">{{ planName || 'Sin plan fijo' }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tipo de Membresía</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <dd class="mt-1 text-sm text-page-title flex items-center gap-2">
                 {{ memberData.es_socio_club ? 'Socio del Club' : 'Socio Regular' }}
                 <span v-if="memberData.es_socio_club" class="text-yellow-500">⭐</span>
               </dd>

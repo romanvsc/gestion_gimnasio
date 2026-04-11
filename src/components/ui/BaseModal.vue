@@ -16,7 +16,7 @@
         <Transition name="modal-panel" appear>
           <div 
             v-if="modelValue"
-            class="relative w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden"
+            class="relative w-full bg-white dark:bg-[#151f32] rounded-2xl shadow-2xl overflow-hidden dark:ring-1 dark:ring-white/10"
             :class="sizeClasses"
             role="dialog"
             aria-modal="true"
@@ -25,7 +25,7 @@
             <!-- Header -->
             <div 
               v-if="title || $slots.header || showClose"
-              class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700"
+              class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700/50"
               :class="headerClass"
             >
               <div v-if="$slots.header" class="flex-1">
@@ -38,7 +38,7 @@
               <button 
                 v-if="showClose"
                 @click="handleClose"
-                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-manipulation"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors touch-manipulation"
                 aria-label="Cerrar"
               >
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -59,7 +59,7 @@
             <!-- Footer -->
             <div 
               v-if="$slots.footer"
-              class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+              class="px-6 py-4 border-t border-gray-100 dark:border-gray-700/50 bg-gray-50 dark:bg-white/5"
             >
               <slot name="footer" />
             </div>
