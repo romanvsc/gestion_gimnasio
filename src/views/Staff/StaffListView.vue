@@ -161,13 +161,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { Users, UserPlus, Edit, XCircle, CheckCircle } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import StaffFormModal from '@/components/staff/StaffFormModal.vue'
 import { useStaff } from '@/composables/useStaff'
+import { useAppResume } from '@/composables/useAppResume'
 import { confirmAlert } from '@/lib/alerts'
 
 const { staffList, loading, loadStaff, toggleStatus } = useStaff()
@@ -178,6 +179,10 @@ const selectedStaff = ref(null)
 onMounted(() => {
   loadStaff()
 })
+
+useAppResume(async () => {
+  await loadStaff()
+}, { minIntervalMs: 1500 })
 
 const openCreateModal = () => {
   selectedStaff.value = null

@@ -243,6 +243,7 @@ import { ArrowLeft } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
 import { useParameters } from '@/composables/useParameters'
+import { useAppResume } from '@/composables/useAppResume'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import PaymentSummaryCard from '@/components/payments/PaymentSummaryCard.vue'
@@ -458,4 +459,8 @@ watch(
 onMounted(async () => {
   await fetchParameters()
 })
+
+useAppResume(async () => {
+  await fetchParameters()
+}, { minIntervalMs: 1500 })
 </script>

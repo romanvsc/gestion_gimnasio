@@ -6,8 +6,38 @@ export function useParameters() {
   const concepts = ref([])
   const plans = ref([])
   const paymentMethods = ref([])
+  const memberPageSizes = ref([])
   const loading = ref(false)
   const error = ref(null)
+
+  /**
+   * Carga tamaños de pagina para listado de socios desde DB.
+   * Si la tabla no existe todavia, no rompe la carga general de parametros.
+   */
+  async function fetchMemberPageSizes() {
+    try {
+      const data = await runQuery(() =>
+        supabase
+          .from('member_page_sizes')
+          .select('id, value, label, sort_order, activo')
+          .eq('activo', true)
+          .order('sort_order', { ascending: true })
+          .order('value', { ascending: true }),
+        0
+      )
+
+      memberPageSizes.value = (data || []).map(item => ({
+        ...item,
+        value: Number(item.value)
+      }))
+
+      return { success: true, data: memberPageSizes.value }
+    } catch (err) {
+      console.warn('No se pudieron cargar tamanos de pagina de socios:', err.message)
+      memberPageSizes.value = []
+      return { success: false, error: err.message }
+    }
+  }
 
   /**
    * Carga conceptos, planes y métodos de pago activos desde Supabase
@@ -50,6 +80,9 @@ export function useParameters() {
       concepts.value = conceptsData || []
       plans.value = plansData || []
       paymentMethods.value = paymentMethodsData || []
+
+      // No bloquear la carga principal si la tabla opcional aun no existe
+      await fetchMemberPageSizes()
 
       return { success: true }
     } catch (err) {
@@ -239,6 +272,7 @@ export function useParameters() {
     concepts,
     plans,
     paymentMethods,
+    memberPageSizes,
     loading,
     error,
     // Computed
@@ -246,6 +280,7 @@ export function useParameters() {
     expenseConcepts,
     // Métodos
     fetchParameters,
+    fetchMemberPageSizes,
     fetchAllPlans,
     fetchAllPaymentMethods,
     createPlan,

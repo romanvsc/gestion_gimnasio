@@ -249,6 +249,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
 import { useSettings } from '@/composables/useSettings'
+import { useAppResume } from '@/composables/useAppResume'
 import { errorAlert } from '@/lib/alerts'
 import { formatCurrency } from '@/utils/formatters'
 import { useAttendance } from '@/composables/useAttendance'
@@ -313,11 +314,15 @@ function goToMember(memberId) {
   }
 }
 
-onMounted(async () => {
+async function refreshDashboardData() {
   await Promise.all([
     loadStats(),
     loadRecentCheckIns()
   ])
+}
+
+onMounted(async () => {
+  await refreshDashboardData()
 
   unsubscribeRealtime = subscribeToAttendanceInserts({
     channelName: 'dashboard-attendance',
@@ -325,6 +330,10 @@ onMounted(async () => {
     limit: 5
   })
 })
+
+useAppResume(async () => {
+  await refreshDashboardData()
+}, { minIntervalMs: 1500, showToast: true })
 
 onUnmounted(() => {
   if (statsRefreshTimer) clearTimeout(statsRefreshTimer)

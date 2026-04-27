@@ -190,6 +190,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useAppResume } from '@/composables/useAppResume'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -452,8 +453,17 @@ function formatTime(dateString) {
   })
 }
 
+function removeAttendanceSubscription() {
+  if (realtimeSubscription) {
+    supabase.removeChannel(realtimeSubscription)
+    realtimeSubscription = null
+  }
+}
+
 // Suscripción a Supabase Realtime para actualizar el feed en vivo
 function subscribeToAttendance() {
+  removeAttendanceSubscription()
+
   realtimeSubscription = supabase
     .channel('public:attendance')
     .on(
@@ -467,14 +477,21 @@ function subscribeToAttendance() {
     .subscribe()
 }
 
-onMounted(() => {
-  loadRecentCheckIns()
+async function refreshCheckInView() {
+  await loadRecentCheckIns()
   subscribeToAttendance()
+}
+
+onMounted(() => {
+  refreshCheckInView()
 })
 
+useAppResume(async () => {
+  await refreshCheckInView()
+}, { minIntervalMs: 1500, showToast: true })
+
 onUnmounted(() => {
-  if (realtimeSubscription) {
-    supabase.removeChannel(realtimeSubscription)
-  }
+  removeAttendanceSubscription()
+  if (searchTimeout) clearTimeout(searchTimeout)
 })
 </script>

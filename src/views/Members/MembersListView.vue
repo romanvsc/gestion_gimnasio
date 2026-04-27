@@ -43,6 +43,18 @@
                 </template>
               </BaseInput>
             </div>
+            <div class="w-full sm:w-56">
+              <BaseSelect
+                v-model="pageSize"
+                :options="pageSizeOptions"
+                value-key="value"
+                label-key="label"
+                placeholder="Filas por pagina"
+                size="lg"
+                :disabled="pageSizeOptions.length === 0"
+                @change="handlePageSizeChange"
+              />
+            </div>
             <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer touch-manipulation">
               <input 
                 type="checkbox" 
@@ -65,7 +77,7 @@
         <!-- Vista Mobile: Cards -->
         <div v-else class="md:hidden space-y-3">
           <div
-            v-for="member in filteredMembers"
+            v-for="member in paginatedMembers"
             :key="member.id"
             class="bg-page-card rounded-xl shadow-sm border border-page-border p-4 touch-manipulation active:bg-page-card-hover transition-colors"
             @click="goToMemberDetail(member.id)"
@@ -119,7 +131,7 @@
         </div>
 
         <!-- Vista Desktop: Tabla -->
-        <div v-if="filteredMembers.length > 0" class="hidden md:block bg-page-card rounded-xl shadow-sm border border-page-border overflow-hidden">
+        <div v-if="totalFilteredMembers > 0" class="hidden md:block bg-page-card rounded-xl shadow-sm border border-page-border overflow-hidden">
           <table class="w-full">
             <thead class="bg-gray-50 dark:bg-white/5 border-b border-page-border">
               <tr>
@@ -134,7 +146,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
               <tr 
-                v-for="member in filteredMembers" 
+                v-for="member in paginatedMembers" 
                 :key="member.id"
                 class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                 :class="{ 'opacity-60': !member.activo }"
@@ -207,10 +219,38 @@
           </table>
         </div>
 
-        <!-- Contador -->
-        <p v-if="filteredMembers.length > 0" class="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center md:text-left">
-          {{ filteredMembers.length }} socio(s) encontrado(s)
-        </p>
+        <!-- Paginacion + Contador -->
+        <div v-if="totalFilteredMembers > 0" class="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p class="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
+            Mostrando {{ visibleFrom }}-{{ visibleTo }} de {{ totalFilteredMembers }} socio(s)
+          </p>
+
+          <div class="flex items-center justify-center gap-2">
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              :disabled="currentPage === 1"
+              @click="goToPreviousPage"
+            >
+              <ChevronLeft class="w-4 h-4 mr-1" />
+              Anterior
+            </BaseButton>
+
+            <span class="text-sm font-medium text-gray-600 dark:text-gray-300 min-w-28 text-center">
+              Pagina {{ currentPage }} de {{ totalPages }}
+            </span>
+
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              :disabled="currentPage >= totalPages"
+              @click="goToNextPage"
+            >
+              Siguiente
+              <ChevronRight class="w-4 h-4 ml-1" />
+            </BaseButton>
+          </div>
+        </div>
       </template>
     </div>
 
@@ -225,23 +265,36 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMembers } from '@/composables/useMembers'
-import { Search, UserPlus, ChevronRight, Users, Eye, Receipt } from 'lucide-vue-next'
+import { useParameters } from '@/composables/useParameters'
+import { useAppResume } from '@/composables/useAppResume'
+import { Search, UserPlus, ChevronLeft, ChevronRight, Users, Eye, Receipt } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import MemberHistoryModal from '@/components/modals/MemberHistoryModal.vue'
 
 const router = useRouter()
 const { members, loading, error, getMembers } = useMembers()
+const { memberPageSizes, fetchMemberPageSizes } = useParameters()
 
 const searchQuery = ref('')
 const showInactive = ref(false)
+const pageSize = ref(10)
+const currentPage = ref(1)
 const showHistoryModal = ref(false)
 const selectedMemberId = ref('')
 const selectedMemberName = ref('')
+
+const pageSizeOptions = computed(() => {
+  return memberPageSizes.value.map(option => ({
+    value: Number(option.value),
+    label: option.label
+  }))
+})
 
 function getInitials(nombre, apellido) {
   const firstInitial = nombre ? nombre.charAt(0).toUpperCase() : ''
@@ -250,6 +303,30 @@ function getInitials(nombre, apellido) {
 }
 
 async function handleToggleInactive() {
+  currentPage.value = 1
+  await reloadMembers()
+}
+
+function handlePageSizeChange(value) {
+  const numericValue = Number(value)
+  if (!numericValue) return
+  pageSize.value = numericValue
+  currentPage.value = 1
+}
+
+function goToPreviousPage() {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1
+  }
+}
+
+function goToNextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value += 1
+  }
+}
+
+async function reloadMembers() {
   await getMembers(showInactive.value)
 }
 
@@ -262,6 +339,31 @@ const filteredMembers = computed(() => {
     const dni = member.dni?.toString() || ''
     return fullName.includes(query) || dni.includes(query)
   })
+})
+
+const totalFilteredMembers = computed(() => filteredMembers.value.length)
+
+const totalPages = computed(() => {
+  const size = Number(pageSize.value) || 10
+  return Math.max(1, Math.ceil(totalFilteredMembers.value / size))
+})
+
+const paginatedMembers = computed(() => {
+  const size = Number(pageSize.value) || 10
+  const startIndex = (currentPage.value - 1) * size
+  return filteredMembers.value.slice(startIndex, startIndex + size)
+})
+
+const visibleFrom = computed(() => {
+  if (totalFilteredMembers.value === 0) return 0
+  const size = Number(pageSize.value) || 10
+  return (currentPage.value - 1) * size + 1
+})
+
+const visibleTo = computed(() => {
+  if (totalFilteredMembers.value === 0) return 0
+  const size = Number(pageSize.value) || 10
+  return Math.min(currentPage.value * size, totalFilteredMembers.value)
 })
 
 function goToNewMember() {
@@ -278,7 +380,37 @@ function openHistoryModal(member, tab = 'payments') {
   showHistoryModal.value = true
 }
 
-onMounted(async () => {
-  await getMembers(showInactive.value)
+watch(searchQuery, () => {
+  currentPage.value = 1
 })
+
+watch(totalPages, (nextTotalPages) => {
+  if (currentPage.value > nextTotalPages) {
+    currentPage.value = nextTotalPages
+  }
+})
+
+watch(memberPageSizes, (options) => {
+  if (!options.length) return
+
+  const hasCurrentValue = options.some(option => Number(option.value) === Number(pageSize.value))
+
+  if (!hasCurrentValue) {
+    pageSize.value = Number(options[0].value)
+  }
+}, { immediate: true })
+
+onMounted(async () => {
+  await Promise.all([
+    reloadMembers(),
+    fetchMemberPageSizes()
+  ])
+})
+
+useAppResume(async () => {
+  await Promise.all([
+    reloadMembers(),
+    fetchMemberPageSizes()
+  ])
+}, { minIntervalMs: 1500 })
 </script>

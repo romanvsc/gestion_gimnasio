@@ -264,9 +264,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { useCashRegister } from '@/composables/useCashRegister'
+import { useAppResume } from '@/composables/useAppResume'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import TransactionModal from './TransactionModal.vue'
@@ -336,10 +337,14 @@ const formatTime = (timestamp) => {
 }
 
 // Métodos
-const handleFilterClick = () => {
+const reloadCurrentRange = async () => {
   const start = new Date(startDate.value + 'T12:00:00')
   const end = new Date(endDate.value + 'T12:00:00')
-  loadRangeData(start, end)
+  await loadRangeData(start, end)
+}
+
+const handleFilterClick = () => {
+  reloadCurrentRange()
 }
 
 const openModal = () => {
@@ -392,8 +397,10 @@ const handleExportExcel = async () => {
 
 // Inicialización
 onMounted(() => {
-  const start = new Date(startDate.value + 'T12:00:00')
-  const end = new Date(endDate.value + 'T12:00:00')
-  loadRangeData(start, end)
+  reloadCurrentRange()
 })
+
+useAppResume(async () => {
+  await reloadCurrentRange()
+}, { minIntervalMs: 1500 })
 </script>

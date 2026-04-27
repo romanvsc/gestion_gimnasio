@@ -20,12 +20,13 @@ export async function runQuery(queryFn, retries = 3, delay = 500) {
     
     // 2. DESPERTAR SESIÓN: Forzar verificación de token antes de cualquier query
     // Esto "despierta" la conexión interna de Auth que puede estar dormida
-    const { error: authError } = await supabase.auth.getSession()
-    if (authError) {
-      console.warn('⚠️ Error de sesión, intentando refrescar...', authError)
-      // Intentar refrescar el token
-      const { error: refreshError } = await supabase.auth.refreshSession()
-      if (refreshError) throw refreshError
+    const { data: sessionData, error: authError } = await supabase.auth.getSession()
+    if (authError || !sessionData?.session) {
+      console.warn('⚠️ Sesión no disponible, intentando refrescar token...')
+      const { data: refreshedData, error: refreshError } = await supabase.auth.refreshSession()
+      if (refreshError || !refreshedData?.session) {
+        throw refreshError || new Error('Sesion expirada o invalida')
+      }
     }
     
     // 3. EJECUTAR QUERY
@@ -64,10 +65,12 @@ export async function runCountQuery(queryFn, retries = 3, delay = 500) {
     }
     
     // DESPERTAR SESIÓN antes de la query
-    const { error: authError } = await supabase.auth.getSession()
-    if (authError) {
-      const { error: refreshError } = await supabase.auth.refreshSession()
-      if (refreshError) throw refreshError
+    const { data: sessionData, error: authError } = await supabase.auth.getSession()
+    if (authError || !sessionData?.session) {
+      const { data: refreshedData, error: refreshError } = await supabase.auth.refreshSession()
+      if (refreshError || !refreshedData?.session) {
+        throw refreshError || new Error('Sesion expirada o invalida')
+      }
     }
     
     const result = await queryFn()

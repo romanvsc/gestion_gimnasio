@@ -315,6 +315,7 @@ import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useSettings } from '@/composables/useSettings'
 import { useParameters } from '@/composables/useParameters'
+import { useAppResume } from '@/composables/useAppResume'
 import { confirmAlert } from '@/lib/alerts'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -373,17 +374,7 @@ const successModalConfig = reactive({
   buttonText: 'Entendido'
 })
 
-// ==================
-// LIFECYCLE
-// ==================
-onMounted(async () => {
-  await Promise.all([
-    fetchSettings(),
-    fetchAllPlans(),
-    fetchAllPaymentMethods()
-  ])
-  
-  // Copiar datos al formulario
+function syncFormDataFromSettings() {
   Object.assign(formData, {
     nombre_gimnasio: settings.nombre_gimnasio || '',
     email_contacto: settings.email_contacto || '',
@@ -392,7 +383,28 @@ onMounted(async () => {
     horarios_apertura: settings.horarios_apertura || '',
     logo_url: settings.logo_url || null
   })
+}
+
+async function loadSettingsData() {
+  await Promise.all([
+    fetchSettings(),
+    fetchAllPlans(),
+    fetchAllPaymentMethods()
+  ])
+
+  syncFormDataFromSettings()
+}
+
+// ==================
+// LIFECYCLE
+// ==================
+onMounted(async () => {
+  await loadSettingsData()
 })
+
+useAppResume(async () => {
+  await loadSettingsData()
+}, { minIntervalMs: 1500 })
 
 // ==================
 // LOGO HANDLERS

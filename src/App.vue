@@ -10,7 +10,7 @@
     <!-- Una vez inicializado, mostrar el contenido -->
     <router-view v-else v-slot="{ Component }">
       <Transition name="page" mode="out-in">
-        <component :is="Component" :key="componentKey" />
+        <component :is="Component" />
       </Transition>
     </router-view>
     
@@ -39,56 +39,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { Toaster } from 'vue-sonner'
 import { useUserStore } from './stores/userStore'
 import { useSettings } from './composables/useSettings'
 import { useTheme } from './composables/useTheme'
-import { supabase } from './lib/supabase'
 
 const userStore = useUserStore()
 const { fetchSettings } = useSettings()
 // Inicializar tema (lee localStorage y aplica clase dark en <html>)
 const { isDark } = useTheme()
-const componentKey = ref(0)
-let debounceTimer = null
 
-/**
- * Maneja el retorno del usuario a la pestaña
- * PRIMERO refresca el token, LUEGO recarga la vista
- * DEBOUNCE: Solo ejecuta 1 vez cada 1000ms para evitar race conditions
- */
-const handleVisibilityChange = async () => {
-  if (document.visibilityState === 'visible') {
-    // DEBOUNCE: Cancelar timer anterior si existe
-    if (debounceTimer) {
-      clearTimeout(debounceTimer)
+// Recarga la página cuando el usuario vuelve a la app después de estar en segundo plano.
+// Se ignora si la página recién cargó (primeros 5 segundos) para evitar loops.
+const APP_START_TIME = Date.now()
+const RELOAD_MIN_HIDDEN_MS = 3_000 // recargar si estuvo oculta al menos 3 segundos (cambio de app real)
+
+let hiddenAt = 0
+
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'hidden') {
+    hiddenAt = Date.now()
+  } else if (document.visibilityState === 'visible') {
+    const hiddenDuration = hiddenAt > 0 ? Date.now() - hiddenAt : 0
+    const appAge = Date.now() - APP_START_TIME
+    if (appAge > 5000 && hiddenDuration >= RELOAD_MIN_HIDDEN_MS) {
+      window.location.reload()
     }
-    
-    // Ejecutar después de 1000ms de silencio
-    debounceTimer = setTimeout(async () => {
-      console.log('🔄 Despertando app...')
-      
-      try {
-        // 1. FORZAR REFRESCO DE TOKEN EXPLÍCITO
-        // Esto "despierta" la conexión interna de Auth que estaba dormida
-        const { data, error } = await supabase.auth.refreshSession()
-        
-        if (error || !data.session) {
-          console.warn('⚠️ Token expirado o inválido. Redirigiendo al login...')
-          await userStore.logout()
-          return
-        }
-        
-        console.log('✅ Token refrescado. Recargando vista...')
-        // 2. SOLO si el token revivió, recargamos la vista
-        componentKey.value += 1
-      } catch (err) {
-        console.error('Error refrescando sesión:', err)
-        // En caso de error grave, mandamos al login
-        await userStore.logout()
-      }
-    }, 1000) // Debounce de 1000ms
   }
 }
 
@@ -99,7 +76,7 @@ onMounted(async () => {
   // Cargar configuración global del gimnasio
   await fetchSettings()
   
-  // Agregar listener para detectar cuando el usuario vuelve a la pestaña
+  // Detectar cuando la app pasa a segundo plano / vuelve a foreground
   document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 

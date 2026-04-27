@@ -211,6 +211,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
+import { useAppResume } from '@/composables/useAppResume'
 import { formatDateLong } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
@@ -373,18 +374,23 @@ function goToNewPayment() {
   router.push({ name: 'NewPayment' })
 }
 
-// Lifecycle
-onMounted(async () => {
-  // Cargar parámetros (planes)
+async function loadMemberDetailData() {
   await fetchParameters()
-  
-  // Cargar datos del socio
+
   const result = await getMemberById(route.params.id)
   if (result.success) {
     memberData.value = result.data
   }
 
-  // Cargar historial de pagos
   await loadPayments()
+}
+
+// Lifecycle
+onMounted(async () => {
+  await loadMemberDetailData()
 })
+
+useAppResume(async () => {
+  await loadMemberDetailData()
+}, { minIntervalMs: 1500 })
 </script>

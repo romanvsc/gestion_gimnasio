@@ -8,11 +8,53 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 /**
+ * Función fetch con reintentos para manejar cortes temporales de red
+ * al volver a la PWA (ej: salir de standby, cambiar de WiFi a 4G).
+ */
+const fetchWithRetry = async (url, options = {}) => {
+  const maxRetries = 4;
+  const baseDelay = 1000;
+  let attempt = 0;
+
+  while (attempt < maxRetries) {
+    try {
+      // Timeout agresivo para detectar rápidamente red colgada
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeoutId);
+      
+      // Solo reintentar en errores 5xx del servidor
+      if (!response.ok && response.status >= 500) {
+        throw new Error(`Server Error: ${response.status}`);
+      }
+      return response;
+    } catch (error) {
+      attempt++;
+      // Errores típicos de red desconectada al volver a la app
+      const isNetworkError = 
+        error.name === 'TypeError' || 
+        error.message === 'Failed to fetch' || 
+        error.name === 'AbortError' || 
+        error.message?.includes('Server Error') ||
+        error.message?.includes('NetworkError');
+
+      if (attempt >= maxRetries || !isNetworkError) {
+        throw error;
+      }
+      
+      console.warn(`[Supabase Fetch] Fallo temporal de red. Intento ${attempt}/${maxRetries}. Reintentando en ${baseDelay * attempt}ms...`, error.message);
+      await new Promise(resolve => setTimeout(resolve, baseDelay * attempt));
+    }
+  }
+}
+
+/**
  * Cliente Supabase configurado para conexiones móviles lentas
- * - Timeout de 15 segundos para queries
+ * - Fetch con reintentos automáticos
  * - Auto-refresh de tokens
  * - Persistencia de sesión
- * - Detección agresiva de fallos
  */
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -21,9 +63,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
   },
   global: {
-    // Timeout de 15 segundos para evitar queries colgadas
-    fetch: (url, options = {}) => {
-      return fetch(url, { ...options, signal: AbortSignal.timeout(15000) })
-    }
+    fetch: fetchWithRetry
   }
 })

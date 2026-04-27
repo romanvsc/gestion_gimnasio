@@ -99,6 +99,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useReports } from '@/composables/useReports'
+import { useAppResume } from '@/composables/useAppResume'
 import DateRangeFilter from '@/components/reports/DateRangeFilter.vue'
 import FinanceChart from '@/components/reports/FinanceChart.vue'
 import DailyActivityChart from '@/components/reports/DailyActivityChart.vue'
@@ -138,4 +139,13 @@ async function loadReports(startDate, endDate) {
     fetchHourlyActivity(startDate, endDate)
   ])
 }
+
+async function refreshCurrentRangeReports() {
+  if (!currentDateRange.value.startDate || !currentDateRange.value.endDate) return
+  await loadReports(currentDateRange.value.startDate, currentDateRange.value.endDate)
+}
+
+useAppResume(async () => {
+  await refreshCurrentRangeReports()
+}, { minIntervalMs: 1500 })
 </script>

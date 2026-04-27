@@ -10,6 +10,14 @@ export const useUserStore = defineStore('user', () => {
   const loading = ref(false)
   const error = ref(null)
   const userRole = ref(null) // 'admin', 'staff', o null
+  let authSubscription = null
+
+  // Timestamp reactivo para señalizar que la app volvió al frente
+  const lastResumeAt = ref(0)
+
+  function triggerResume() {
+    lastResumeAt.value = Date.now()
+  }
 
   // Computed
   const isAuthenticated = computed(() => !!session.value)
@@ -82,31 +90,35 @@ export const useUserStore = defineStore('user', () => {
         userRole.value = null
       }
 
-      // Escuchar cambios en la autenticación (incluyendo refresh de token)
-      supabase.auth.onAuthStateChange(async (event, newSession) => {
-        console.log('Auth state changed:', event)
+      // Escuchar cambios de auth una sola vez para evitar listeners duplicados.
+      if (!authSubscription) {
+        const { data } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+          console.log('Auth state changed:', event)
 
-        session.value = newSession
-        user.value = newSession?.user || null
+          session.value = newSession
+          user.value = newSession?.user || null
 
-        if (newSession?.user) {
-          await checkUserRole(newSession.user.id)
-        } else {
-          userRole.value = null
-        }
+          if (newSession?.user) {
+            await checkUserRole(newSession.user.id)
+          } else {
+            userRole.value = null
+          }
 
-        // Si el token se refrescó, actualizar la sesión
-        if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refrescado automáticamente')
-        }
+          // Si el token se refrescó, actualizar la sesión
+          if (event === 'TOKEN_REFRESHED') {
+            console.log('Token refrescado automáticamente')
+          }
 
-        // Si la sesión expiró, limpiar todo
-        if (event === 'SIGNED_OUT') {
-          session.value = null
-          user.value = null
-          userRole.value = null
-        }
-      })
+          // Si la sesión expiró, limpiar todo
+          if (event === 'SIGNED_OUT') {
+            session.value = null
+            user.value = null
+            userRole.value = null
+          }
+        })
+
+        authSubscription = data?.subscription || null
+      }
     } catch (err) {
       console.error('Error al inicializar sesión:', err)
       error.value = err.message
@@ -217,6 +229,7 @@ export const useUserStore = defineStore('user', () => {
     loading,
     error,
     userRole,
+    lastResumeAt,
     // Computed
     isAuthenticated,
     userEmail,
@@ -228,6 +241,7 @@ export const useUserStore = defineStore('user', () => {
     logout,
     register,
     clearError,
-    checkUserRole
+    checkUserRole,
+    triggerResume
   }
 })
