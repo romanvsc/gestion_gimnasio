@@ -136,10 +136,22 @@
 
       <!-- Tabla de Movimientos -->
       <div class="bg-page-card rounded-xl shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-page-border">
+        <div class="px-6 py-4 border-b border-page-border flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h2 class="text-lg font-semibold text-page-title">
             Movimientos del Período ({{ transactions.length }})
           </h2>
+          <div class="w-full md:w-56">
+            <BaseSelect
+              v-model="pageSize"
+              :options="pageSizeOptions"
+              value-key="value"
+              label-key="label"
+              placeholder="Filas por pagina"
+              size="md"
+              :disabled="pageSizeOptions.length === 0"
+              @change="handlePageSizeChange"
+            />
+          </div>
         </div>
 
         <div v-if="loading" class="p-12 text-center">
@@ -174,7 +186,7 @@
               </tr>
             </thead>
             <tbody class="bg-page-card divide-y divide-gray-200 dark:divide-gray-700/50">
-              <tr v-for="transaction in transactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-white/5">
+              <tr v-for="transaction in paginatedTransactions" :key="transaction.id" class="hover:bg-gray-50 dark:hover:bg-white/5">
                 <!-- Hora -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-page-title">
                   {{ formatTime(transaction.created_at) }}
@@ -235,6 +247,38 @@
             </tbody>
           </table>
         </div>
+
+        <div v-if="transactions.length > 0" class="px-6 py-4 border-t border-page-border flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p class="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
+            Mostrando {{ visibleFrom }}-{{ visibleTo }} de {{ totalTransactions }} movimiento(s)
+          </p>
+
+          <div class="flex items-center justify-center gap-2">
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              :disabled="currentPage === 1"
+              @click="goToPreviousPage"
+            >
+              <ChevronLeft class="w-4 h-4 mr-1" />
+              Anterior
+            </BaseButton>
+
+            <span class="text-sm font-medium text-gray-600 dark:text-gray-300 min-w-28 text-center">
+              Pagina {{ currentPage }} de {{ totalPages }}
+            </span>
+
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              :disabled="currentPage >= totalPages"
+              @click="goToNextPage"
+            >
+              Siguiente
+              <ChevronRight class="w-4 h-4 ml-1" />
+            </BaseButton>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -264,17 +308,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { useCashRegister } from '@/composables/useCashRegister'
+import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
 import TransactionModal from './TransactionModal.vue'
 import {
   Calendar,
   ArrowDownCircle,
   ArrowUpCircle,
+  ChevronLeft,
+  ChevronRight,
   Wallet,
   Plus,
   FileSpreadsheet,
@@ -294,6 +342,7 @@ const {
   addManualTransaction,
   exportToExcel
 } = useCashRegister()
+const { memberPageSizes, fetchMemberPageSizes } = useParameters()
 
 // Estado local - Inicializar con primer día del mes hasta hoy
 const initializeDefaultDates = () => {
@@ -312,6 +361,38 @@ const endDate = ref(defaultDates.end)
 const showModal = ref(false)
 const showSuccessModal = ref(false)
 const exportingExcel = ref(false)
+const pageSize = ref(10)
+const currentPage = ref(1)
+
+const pageSizeOptions = computed(() => {
+  return memberPageSizes.value.map(option => ({
+    value: Number(option.value),
+    label: option.label
+  }))
+})
+
+const resolvedPageSize = computed(() => Number(pageSize.value) || 10)
+
+const totalTransactions = computed(() => transactions.value.length)
+
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(totalTransactions.value / resolvedPageSize.value))
+})
+
+const paginatedTransactions = computed(() => {
+  const startIndex = (currentPage.value - 1) * resolvedPageSize.value
+  return transactions.value.slice(startIndex, startIndex + resolvedPageSize.value)
+})
+
+const visibleFrom = computed(() => {
+  if (totalTransactions.value === 0) return 0
+  return (currentPage.value - 1) * resolvedPageSize.value + 1
+})
+
+const visibleTo = computed(() => {
+  if (totalTransactions.value === 0) return 0
+  return Math.min(currentPage.value * resolvedPageSize.value, totalTransactions.value)
+})
 
 // Watcher: Si startDate > endDate, actualizar endDate automáticamente
 watch(startDate, (newStart) => {
@@ -319,6 +400,22 @@ watch(startDate, (newStart) => {
     endDate.value = newStart
   }
 })
+
+watch(totalPages, (nextTotalPages) => {
+  if (currentPage.value > nextTotalPages) {
+    currentPage.value = nextTotalPages
+  }
+})
+
+watch(memberPageSizes, (options) => {
+  if (!options.length) return
+
+  const hasCurrentValue = options.some(option => Number(option.value) === Number(pageSize.value))
+
+  if (!hasCurrentValue) {
+    pageSize.value = Number(options[0].value)
+  }
+}, { immediate: true })
 
 // Formateo
 const formatCurrency = (amount) => {
@@ -343,8 +440,28 @@ const reloadCurrentRange = async () => {
   await loadRangeData(start, end)
 }
 
-const handleFilterClick = () => {
-  reloadCurrentRange()
+const handleFilterClick = async () => {
+  currentPage.value = 1
+  await reloadCurrentRange()
+}
+
+const handlePageSizeChange = (value) => {
+  const numericValue = Number(value)
+  if (!numericValue) return
+  pageSize.value = numericValue
+  currentPage.value = 1
+}
+
+const goToPreviousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value -= 1
+  }
+}
+
+const goToNextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value += 1
+  }
 }
 
 const openModal = () => {
@@ -362,7 +479,7 @@ const handleSubmit = async (formData) => {
     closeModal()
     showSuccessModal.value = true
     // Recargar con el rango actual
-    handleFilterClick()
+    await handleFilterClick()
   } else {
     toast.error(`Error al registrar el movimiento: ${result.error}`, { duration: 5000 })
   }
@@ -396,11 +513,17 @@ const handleExportExcel = async () => {
 }
 
 // Inicialización
-onMounted(() => {
-  reloadCurrentRange()
+onMounted(async () => {
+  await Promise.all([
+    reloadCurrentRange(),
+    fetchMemberPageSizes()
+  ])
 })
 
 useAppResume(async () => {
-  await reloadCurrentRange()
+  await Promise.all([
+    reloadCurrentRange(),
+    fetchMemberPageSizes()
+  ])
 }, { minIntervalMs: 1500 })
 </script>
