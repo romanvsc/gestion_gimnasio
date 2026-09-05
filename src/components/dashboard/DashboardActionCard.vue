@@ -1,32 +1,32 @@
 <template>
   <BaseButton
-    variant="card"
+    :variant="featured ? 'primary' : 'card'"
     type="button"
     :aria-label="ariaLabel || title"
-    class="group w-full flex items-center gap-3 md:gap-4 text-left p-3.5 md:p-4 rounded-xl transition-all duration-200"
-    :class="hoverBorderClass"
+    class="group min-h-14 w-full flex items-center gap-3 text-left !rounded-lg !p-3 transition-all duration-200 md:gap-3.5"
+    :class="featured ? '!border-primary-600 !shadow-sm' : hoverBorderClass"
     @click="$emit('click')"
   >
     <div
-      class="p-2.5 md:p-3 rounded-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
-      :class="[darkIconBg, darkIconText]"
+      class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105"
+      :class="featured ? 'bg-white/15 text-white' : [darkIconBg, darkIconText]"
     >
-      <component :is="icon" aria-hidden="true" class="w-5 h-5 md:w-6 md:h-6" />
+      <component :is="icon" aria-hidden="true" class="h-5 w-5" />
     </div>
 
     <div class="flex-1 min-w-0">
       <span
-        class="font-semibold text-sm md:text-base transition-colors block"
-        :class="titleHoverClass"
+        class="block text-sm font-semibold transition-colors"
+        :class="featured ? 'text-white' : titleHoverClass"
       >
         {{ title }}
       </span>
-      <span v-if="subtitle" class="text-xs text-page-subtitle mt-0.5 block">
+      <span v-if="subtitle" class="mt-0.5 block text-xs" :class="featured ? 'text-primary-100' : 'text-page-subtitle'">
         {{ subtitle }}
       </span>
     </div>
 
-    <ChevronRight aria-hidden="true" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+    <ChevronRight aria-hidden="true" class="h-4 w-4 flex-shrink-0 transition-colors" :class="featured ? 'text-white/70 group-hover:text-white' : 'text-page-muted group-hover:text-page-subtitle'" />
   </BaseButton>
 </template>
 
@@ -67,21 +67,27 @@ const props = defineProps({
   ariaLabel: {
     type: String,
     default: ''
+  },
+  featured: {
+    type: Boolean,
+    default: false
   }
 })
 
 const iconBgDarkMap = {
   'bg-primary-50': 'bg-primary-50 dark:bg-primary-900/20',
   'bg-secondary-50': 'bg-secondary-50 dark:bg-secondary-900/20',
-  'bg-emerald-50': 'bg-emerald-50 dark:bg-emerald-900/20',
-  'bg-red-50': 'bg-red-50 dark:bg-red-900/20',
+  'bg-success-50': 'bg-success-50 dark:bg-success-900/20',
+  'bg-danger-50': 'bg-danger-50 dark:bg-danger-900/20',
+  'bg-info-50': 'bg-info-50 dark:bg-info-900/20',
 }
 
 const iconTextDarkMap = {
   'text-primary-600': 'text-primary-600 dark:text-primary-400',
   'text-secondary-600': 'text-secondary-600 dark:text-secondary-400',
-  'text-emerald-600': 'text-emerald-600 dark:text-emerald-400',
-  'text-red-600': 'text-red-600 dark:text-red-400',
+  'text-success-600': 'text-success-600 dark:text-success-400',
+  'text-danger-600': 'text-danger-600 dark:text-danger-400',
+  'text-info-600': 'text-info-600 dark:text-info-400',
 }
 
 const darkIconBg = computed(() => iconBgDarkMap[props.iconBgClass] || props.iconBgClass)

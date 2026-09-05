@@ -1,25 +1,23 @@
 <template>
   <div>
-    <!-- Estadísticas rápidas -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-gray-700/50">
-        <span class="text-3xl font-bold text-page-title">{{ totalWeek }}</span>
-        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">Total Semanal</span>
+    <div class="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h2 class="text-base font-bold text-page-title">Asistencia semanal</h2>
+        <p class="mt-1 text-xs text-page-subtitle">
+          {{ totalWeek }} {{ totalWeek === 1 ? 'acceso' : 'accesos' }} · promedio {{ averageDaily }}/día · mejor día: {{ bestDay.fullDay.toLowerCase() }}
+        </p>
       </div>
-      
-      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-gray-700/50">
-        <span class="text-3xl font-bold text-page-title">{{ averageDaily }}</span>
-        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">Promedio Diario</span>
-      </div>
-
-      <div class="flex flex-col justify-center items-center p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-gray-700/50">
-        <span class="text-3xl font-bold text-primary-600">{{ bestDay.day }}</span>
-        <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">Mejor Día ({{ bestDay.count }})</span>
-      </div>
+      <span class="text-[10px] font-bold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-400">
+        Últimos 7 días
+      </span>
     </div>
 
     <!-- Gráfico de barras con Chart.js -->
-    <div class="h-64">
+    <div
+      class="h-64 md:h-72"
+      role="img"
+      :aria-label="`Asistencia semanal: ${totalWeek} ${totalWeek === 1 ? 'acceso' : 'accesos'}. Mejor día: ${bestDay.fullDay}, con ${bestDay.count} ${bestDay.count === 1 ? 'acceso' : 'accesos'}.`"
+    >
       <Bar :data="chartData" :options="chartOptions" />
     </div>
   </div>
@@ -39,6 +37,7 @@ import {
 } from 'chart.js'
 import { BRAND, COLOR_SCALES, colorToRgba } from '@/config/brand'
 import { useReports } from '@/composables/useReports'
+import { useTheme } from '@/composables/useTheme'
 import { reportClientError } from '@/lib/observability'
 
 // Registrar componentes de Chart.js
@@ -61,6 +60,7 @@ const weekData = ref([
   { day: 'Dom', fullDay: 'Domingo', count: 0 }
 ])
 const { fetchAttendanceByRange } = useReports()
+const { isDark } = useTheme()
 
 const totalWeek = computed(() => {
   return weekData.value.reduce((sum, d) => sum + d.count, 0)
@@ -104,7 +104,7 @@ const chartData = computed(() => ({
   ]
 }))
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -145,7 +145,7 @@ const chartOptions = {
           size: 12,
           weight: '500'
         },
-        color: COLOR_SCALES.neutral[500]
+        color: isDark.value ? COLOR_SCALES.neutral[400] : COLOR_SCALES.neutral[500]
       },
       border: {
         display: false
@@ -153,14 +153,14 @@ const chartOptions = {
     },
     y: {
       grid: {
-        color: colorToRgba(COLOR_SCALES.neutral[200], 0.5),
+        color: colorToRgba(isDark.value ? COLOR_SCALES.secondary[700] : COLOR_SCALES.neutral[200], 0.55),
         drawBorder: false
       },
       ticks: {
         font: {
           size: 11
         },
-        color: COLOR_SCALES.neutral[400],
+        color: isDark.value ? COLOR_SCALES.neutral[400] : COLOR_SCALES.neutral[500],
         stepSize: 1,
         callback: (value) => {
           if (Number.isInteger(value)) {
@@ -183,7 +183,7 @@ const chartOptions = {
     duration: 800,
     easing: 'easeOutQuart'
   }
-}
+}))
 
 async function loadWeekData() {
   try {

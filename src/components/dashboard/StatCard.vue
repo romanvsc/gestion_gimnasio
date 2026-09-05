@@ -5,17 +5,17 @@
     :aria-label="route ? `${title}: abrir detalle` : undefined"
     @click="route && handleClick()"
     :class="[
-      'rounded-xl border p-5 md:p-6 transition-all duration-200 hover:shadow-md',
+      'rounded-xl border p-4 transition-all duration-200 hover:shadow-sm md:p-5',
       route ? 'w-full cursor-pointer text-left' : '',
       badgeVariant === 'urgent'
-        ? 'bg-red-50 border-red-200 hover:border-red-300 dark:bg-red-950/40 dark:border-red-500/30 dark:hover:border-red-500/50'
-        : 'bg-page-card border-page-border hover:bg-page-card-hover'
+        ? 'border-danger-200 bg-danger-50 hover:border-danger-300 dark:border-danger-800 dark:bg-danger-950/40 dark:hover:border-danger-700'
+        : 'border-page-border bg-page-card hover:bg-page-card-hover'
     ]"
   >
-    <div class="flex items-start justify-between mb-4">
+    <div class="mb-4 flex items-start justify-between">
       <div 
         :class="[
-          'p-3 rounded-xl',
+          'flex h-10 w-10 items-center justify-center rounded-lg',
           darkIconBgColor
         ]"
       >
@@ -23,15 +23,15 @@
           :is="icon" 
           aria-hidden="true"
           :class="[
-            'w-6 h-6',
+            'h-5 w-5',
             darkIconColor
           ]"
         />
       </div>
-      <span 
+      <span
         v-if="badge"
         :class="[
-          'text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md',
+          'rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-widest',
           badgeClasses
         ]"
       >
@@ -40,46 +40,46 @@
     </div>
 
     <p
-      class="text-xs font-semibold uppercase tracking-wider mb-1.5"
-      :class="badgeVariant === 'urgent' ? 'text-red-700 dark:text-red-300' : 'text-gray-500 dark:text-gray-400'"
+      class="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
+      :class="badgeVariant === 'urgent' ? 'text-danger-700 dark:text-danger-300' : 'text-page-subtitle'"
     >{{ title }}</p>
     <p
-      class="text-3xl md:text-4xl font-extrabold tracking-tight"
-      :class="badgeVariant === 'urgent' ? 'text-red-950 dark:text-red-50' : 'text-page-title'"
+      class="text-3xl font-extrabold tracking-tight"
+      :class="badgeVariant === 'urgent' ? 'text-danger-950 dark:text-danger-50' : 'text-page-title'"
     >{{ value }}</p>
     
     <!-- Comparison with previous period -->
-    <div v-if="showComparison" class="flex items-center gap-1.5 mt-2">
+    <div v-if="showComparison" class="mt-2 flex items-center gap-1.5">
       <component 
         :is="comparisonIcon" 
         aria-hidden="true"
         :class="[
           'w-4 h-4',
-          comparisonIsPositive ? 'text-emerald-500' : 'text-red-500'
+          comparisonIsPositive ? 'text-success-600' : 'text-danger-600'
         ]"
       />
       <span 
         :class="[
           'text-sm font-bold',
-          comparisonIsPositive ? 'text-emerald-500' : 'text-red-500'
+          comparisonIsPositive ? 'text-success-600' : 'text-danger-600'
         ]"
       >
         {{ formattedComparison }}
       </span>
-      <span class="text-gray-500 text-xs">{{ comparisonLabel }}</span>
+      <span class="text-xs text-page-muted">{{ comparisonLabel }}</span>
     </div>
     
     <!-- Legacy trend support -->
-    <div v-else-if="trend" class="flex items-center gap-1 mt-2">
+    <div v-else-if="trend" class="mt-2 flex items-center gap-1">
       <span 
         :class="[
           'text-sm font-bold',
-          trendIsPositive ? 'text-emerald-500' : 'text-red-500'
+          trendIsPositive ? 'text-success-600' : 'text-danger-600'
         ]"
       >
         {{ trend }}
       </span>
-      <span class="text-gray-500 text-xs">vs mes anterior</span>
+      <span class="text-xs text-page-muted">vs mes anterior</span>
     </div>
   </component>
 </template>
@@ -144,19 +144,19 @@ const router = useRouter()
 const iconBgDarkMap = {
   'bg-primary-50': 'bg-primary-50 dark:bg-primary-900/20',
   'bg-secondary-50': 'bg-secondary-50 dark:bg-secondary-900/20',
-  'bg-emerald-50': 'bg-emerald-50 dark:bg-emerald-900/20',
-  'bg-red-50': 'bg-red-50 dark:bg-red-900/20',
-  'bg-blue-50': 'bg-blue-50 dark:bg-blue-900/20',
-  'bg-amber-50': 'bg-amber-50 dark:bg-amber-900/20',
+  'bg-success-50': 'bg-success-50 dark:bg-success-900/20',
+  'bg-danger-50': 'bg-danger-50 dark:bg-danger-900/20',
+  'bg-info-50': 'bg-info-50 dark:bg-info-900/20',
+  'bg-warning-50': 'bg-warning-50 dark:bg-warning-900/20',
 }
 
 const iconColorDarkMap = {
   'text-primary-600': 'text-primary-600 dark:text-primary-400',
   'text-secondary-600': 'text-secondary-600 dark:text-secondary-400',
-  'text-emerald-600': 'text-emerald-600 dark:text-emerald-400',
-  'text-red-600': 'text-red-600 dark:text-red-400',
-  'text-blue-600': 'text-blue-600 dark:text-blue-400',
-  'text-amber-600': 'text-amber-600 dark:text-amber-400',
+  'text-success-600': 'text-success-600 dark:text-success-400',
+  'text-danger-600': 'text-danger-600 dark:text-danger-400',
+  'text-info-600': 'text-info-600 dark:text-info-400',
+  'text-warning-600': 'text-warning-600 dark:text-warning-400',
 }
 
 const darkIconBgColor = computed(() => iconBgDarkMap[props.iconBgColor] || props.iconBgColor)
@@ -165,9 +165,9 @@ const darkIconColor = computed(() => iconColorDarkMap[props.iconColor] || props.
 // Badge variant classes
 const badgeClasses = computed(() => {
   const map = {
-    default: 'bg-primary-100 text-primary-800 border border-primary-200 dark:bg-primary-400/10 dark:text-primary-300 dark:border-primary-400/20',
-    live: 'bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-300 dark:border-emerald-400/20',
-    urgent: 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-400/15 dark:text-red-300 dark:border-red-400/20',
+    default: 'border border-primary-200 bg-primary-100 text-primary-800 dark:border-primary-700 dark:bg-primary-900/40 dark:text-primary-300',
+    live: 'border border-success-200 bg-success-100 text-success-800 dark:border-success-700 dark:bg-success-900/40 dark:text-success-300',
+    urgent: 'border border-danger-200 bg-danger-100 text-danger-800 dark:border-danger-700 dark:bg-danger-900/40 dark:text-danger-300',
   }
   return map[props.badgeVariant] || map.default
 })

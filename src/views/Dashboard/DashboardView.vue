@@ -1,27 +1,34 @@
 <template>
   <div class="bg-page-bg min-h-screen transition-colors duration-200">
-    <div class="max-w-[1440px] mx-auto px-4 py-6 md:px-6 md:py-8 xl:px-8">
-      <!-- Header -->
-      <div class="mb-10">
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-page-title leading-tight mb-3">
-          Bienvenido de nuevo, <span class="text-primary-500">{{ settings.nombre_gimnasio }}</span>
-        </h1>
-        <p class="text-page-subtitle text-base md:text-lg">
-          Tu centro de alto rendimiento está operando al máximo nivel hoy.
-          <span v-if="userStore.isAdmin" class="ml-2 inline-flex items-center px-2.5 py-0.5 bg-yellow-400/10 text-yellow-400 text-xs font-bold rounded-md border border-yellow-400/20 uppercase tracking-wider">
-            Administrador
-          </span>
-          <span v-else-if="userStore.isStaff" class="ml-2 inline-flex items-center px-2.5 py-0.5 bg-secondary-400/10 text-secondary-400 text-xs font-bold rounded-md border border-secondary-400/20 uppercase tracking-wider">
-            Personal
-          </span>
-        </p>
-      </div>
+    <div class="mx-auto max-w-[1440px] px-4 py-4 md:px-6 md:py-6 xl:px-8">
+      <TopBar title="Dashboard" :subtitle="dashboardDate">
+        <template #actions>
+          <div class="hidden items-center gap-3 lg:flex">
+            <div class="flex h-10 items-center gap-2 rounded-lg border border-page-border bg-page-card px-3 text-sm text-page-muted">
+              <Search class="h-4 w-4" aria-hidden="true" />
+              <span>Buscar socio...</span>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-lg border border-page-border bg-page-card text-page-subtitle" title="Notificaciones">
+              <Bell class="h-4 w-4" aria-hidden="true" />
+            </span>
+          </div>
+          <div class="flex min-w-0 items-center gap-2.5">
+            <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white">
+              {{ userInitial }}
+            </div>
+            <div class="hidden min-w-0 sm:block">
+              <p class="max-w-40 truncate text-sm font-semibold text-page-title">{{ userStore.userEmail }}</p>
+              <p class="text-xs text-page-subtitle">{{ roleLabel }}</p>
+            </div>
+          </div>
+        </template>
+      </TopBar>
 
       <!-- Loading Skeleton -->
-      <div v-if="loading" class="space-y-8">
+      <div v-if="loading" class="space-y-6">
         <!-- Skeleton para Tarjetas de Métricas -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          <div v-for="i in 4" :key="i" class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div v-for="i in 4" :key="i" class="rounded-xl border border-page-border bg-page-card p-4">
             <div class="flex items-start justify-between">
               <div class="flex-1 space-y-3">
                 <BaseSkeleton width="60%" height="0.875rem" />
@@ -33,7 +40,7 @@
         </div>
         
         <!-- Skeleton para Tabla de Check-ins -->
-        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+        <div class="rounded-xl border border-page-border bg-page-card p-5">
           <BaseSkeleton width="180px" height="1.5rem" class="mb-6" />
           <div class="space-y-4">
             <div v-for="i in 4" :key="i" class="flex items-center gap-4 py-3">
@@ -48,7 +55,7 @@
 
       <div v-else>
         <!-- Tarjetas de Métricas -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Recaudación"
             :value="formatCurrencyFull(stats.monthlyRevenue)"
@@ -63,8 +70,8 @@
             :value="stats.activeMembers"
             :icon="Users"
             route="/miembros"
-            icon-bg-color="bg-secondary-50"
-            icon-color="text-secondary-600"
+            icon-bg-color="bg-info-50"
+            icon-color="text-info-600"
           />
           
           <StatCard
@@ -72,8 +79,8 @@
             :value="stats.todayAttendance"
             :icon="Activity"
             route="/checkin"
-            icon-bg-color="bg-primary-50"
-            icon-color="text-primary-600"
+            icon-bg-color="bg-success-50"
+            icon-color="text-success-600"
             badge="En vivo"
             badge-variant="live"
           />
@@ -83,26 +90,26 @@
             :value="stats.expiredMembers"
             :icon="AlertCircle"
             route="/miembros"
-            icon-bg-color="bg-red-50"
-            icon-color="text-red-600"
+            icon-bg-color="bg-danger-50"
+            icon-color="text-danger-600"
             :badge="stats.expiredMembers > 0 ? 'Revisar' : ''"
             badge-variant="urgent"
           />
         </div>
 
-        <!-- Acciones Rápidas + Gráfico -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+        <!-- Acciones Rápidas -->
+        <section class="mb-6">
           <!-- Acciones Rápidas -->
-          <div>
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Acciones Rápidas</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2.5">
+          <h2 class="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-page-muted">Acciones rápidas</h2>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <DashboardActionCard
                 title="Nuevo Socio"
                 subtitle="Registrar nueva alta"
                 :icon="UserPlus"
+                featured
                 icon-bg-class="bg-primary-50"
                 icon-text-class="text-primary-600"
-                hover-border-class="hover:border-primary-100"
+                hover-border-class="hover:border-primary-300"
                 title-hover-class="group-hover:text-primary-700"
                 @click="router.push({ name: 'NewMember' })"
               />
@@ -110,77 +117,71 @@
                 title="Registrar Pago"
                 subtitle="Ingresar cuota"
                 :icon="BadgeDollarSign"
-                icon-bg-class="bg-emerald-50"
-                icon-text-class="text-emerald-600"
-                hover-border-class="hover:border-emerald-100"
-                title-hover-class="group-hover:text-emerald-700"
+                icon-bg-class="bg-success-50"
+                icon-text-class="text-success-600"
+                hover-border-class="hover:border-success-300"
+                title-hover-class="group-hover:text-success-700"
                 @click="router.push({ name: 'NewPayment' })"
               />
               <DashboardActionCard
                 title="Check-In"
                 subtitle="Control de acceso"
                 :icon="CheckCircle"
-                icon-bg-class="bg-primary-50"
-                icon-text-class="text-primary-600"
-                hover-border-class="hover:border-primary-100"
-                title-hover-class="group-hover:text-primary-700"
+                icon-bg-class="bg-info-50"
+                icon-text-class="text-info-600"
+                hover-border-class="hover:border-info-300"
+                title-hover-class="group-hover:text-info-700"
                 @click="router.push({ name: 'CheckIn' })"
               />
-              <DashboardActionCard
-                title="Últimos Accesos"
-                subtitle="Historial reciente"
-                :icon="ListChecks"
-                icon-bg-class="bg-secondary-50"
-                icon-text-class="text-secondary-600"
-                hover-border-class="hover:border-secondary-100"
-                title-hover-class="group-hover:text-secondary-700"
-                @click="showLastAccessModal = true"
-              />
-            </div>
           </div>
+        </section>
 
-          <!-- Gráfico de Asistencia -->
-          <div class="bg-page-card rounded-xl border border-page-border p-5 md:p-6">
-            <AssistanceChart />
-          </div>
-        </div>
+        <!-- Gráfico de Asistencia -->
+        <section class="mb-6 rounded-xl border border-page-border bg-page-card p-4 md:p-5">
+          <AssistanceChart />
+        </section>
 
         <!-- Tarjeta de Alerta: Socios Vencidos -->
-        <div v-if="stats.expiredMembers > 0" class="relative overflow-hidden bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 dark:from-primary-900 dark:via-primary-800 dark:to-primary-700 rounded-2xl p-6 md:p-8 mb-8">
-          <!-- Subtle pattern overlay -->
-          <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 40%);"></div>
-          <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div v-if="stats.expiredMembers > 0" class="mb-6 flex flex-col gap-4 rounded-xl border border-danger-200 bg-danger-50 p-4 dark:border-danger-800 dark:bg-danger-950/35 md:flex-row md:items-center md:justify-between md:p-5">
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-300">
+              <AlertCircle class="h-5 w-5" aria-hidden="true" />
+            </div>
             <div>
-              <h3 class="text-xl md:text-2xl font-extrabold text-white mb-1.5 tracking-tight">
-                {{ stats.expiredMembers }} Socios con Cuota Vencida
+              <h3 class="text-base font-bold tracking-tight text-danger-900 dark:text-danger-100">
+                {{ stats.expiredMembers }} socios con cuota vencida
               </h3>
-              <p v-if="statsUpdatedAt" class="mb-1 text-xs text-primary-100/70">
+              <p v-if="statsUpdatedAt" class="mt-1 text-xs text-danger-700/80 dark:text-danger-300/80">
                 Actualizado: {{ formatDateTime(statsUpdatedAt) }}
               </p>
-              <p class="text-sm md:text-base text-primary-100/80">
-                Se requiere acción inmediata para regularizar el acceso a las instalaciones.
+              <p class="mt-1 text-sm text-danger-800/80 dark:text-danger-200/80">
+                Revisá los socios que necesitan regularizar su cuota.
               </p>
             </div>
-            <BaseButton
-              variant="secondary"
-              size="lg"
-              @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
-              class="flex-shrink-0 !bg-white/10 !text-white !border-white/20 hover:!bg-white/20 !font-bold uppercase tracking-wider"
-            >
-              Gestionar Morosos
-            </BaseButton>
           </div>
+
+          <BaseButton
+            variant="danger"
+            size="sm"
+            @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
+            class="flex-shrink-0 !font-semibold"
+          >
+            Gestionar vencidos
+          </BaseButton>
         </div>
 
         <!-- Últimos Check-Ins -->
-        <div class="bg-page-card rounded-xl border border-page-border overflow-hidden">
-          <div class="flex items-center justify-between px-6 py-5 border-b border-page-border">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Últimos Accesos</h2>
+        <section class="overflow-hidden rounded-xl border border-page-border bg-page-card">
+          <div class="flex items-center justify-between border-b border-page-border px-4 py-4 md:px-5">
+            <div>
+              <h2 class="text-base font-bold text-page-title">Últimos accesos</h2>
+              <p class="mt-0.5 text-xs text-page-subtitle">Actividad reciente del gimnasio</p>
+            </div>
             <BaseButton
               variant="ghost"
               @click="showLastAccessModal = true"
               size="sm"
-              class="!text-xs !uppercase !tracking-wider !font-bold"
+              class="!text-xs !font-semibold"
             >
               Ver todos
             </BaseButton>
@@ -192,34 +193,37 @@
           </div>
 
           <div v-else class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full min-w-[520px]">
               <thead>
-                <tr class="border-b border-page-border">
-                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Socio</th>
-                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">DNI</th>
-                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Hora</th>
-                  <th class="text-left py-3 px-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Estado</th>
+                <tr class="border-b border-page-border bg-page-bg/60">
+                  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:px-5">Socio</th>
+                  <th class="hidden px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted sm:table-cell md:px-5">DNI</th>
+                  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:px-5">Hora</th>
+                  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:px-5">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 <tr 
                   v-for="checkin in recentCheckIns" 
                   :key="checkin.id"
-                  class="border-b border-page-border last:border-0 hover:bg-white/[0.02] transition-colors"
+                  class="border-b border-page-border last:border-0 hover:bg-page-card-hover transition-colors"
                 >
-                  <td class="py-4 px-6 text-sm font-semibold text-page-title">
+                  <td class="px-4 py-3 text-sm font-semibold text-page-title md:px-5">
                     <BaseButton
                       variant="ghost"
                       size="sm"
                       class="w-full justify-start px-0 py-0 hover:bg-transparent focus:ring-0 !font-semibold"
                       @click="goToMember(checkin.memberId)"
                     >
-                      {{ checkin.name }}
+                      <span class="flex flex-col items-start">
+                        <span>{{ checkin.name }}</span>
+                        <span class="mt-0.5 text-xs font-normal text-page-muted sm:hidden">DNI {{ checkin.dni }}</span>
+                      </span>
                     </BaseButton>
                   </td>
-                  <td class="py-4 px-6 text-sm text-gray-500 dark:text-gray-400 font-mono">{{ checkin.dni }}</td>
-                  <td class="py-4 px-6 text-sm text-gray-500 dark:text-gray-400">{{ checkin.time }}</td>
-                  <td class="py-4 px-6">
+                  <td class="hidden px-4 py-3 font-mono text-xs text-page-subtitle sm:table-cell md:px-5">{{ checkin.dni }}</td>
+                  <td class="px-4 py-3 text-xs text-page-subtitle md:px-5">{{ checkin.time }}</td>
+                  <td class="px-4 py-3 md:px-5">
                     <StatusBadge
                       :status="checkin.status"
                       :label="checkin.statusLabel"
@@ -229,11 +233,11 @@
               </tbody>
             </table>
             
-            <div v-if="recentCheckIns.length === 0" class="text-center py-8 text-gray-400 dark:text-gray-500">
+            <div v-if="recentCheckIns.length === 0" class="py-8 text-center text-sm text-page-muted">
               No hay check-ins recientes
             </div>
           </div>
-        </div>
+        </section>
 
       </div>
     </div>
@@ -247,17 +251,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
-import { useSettings } from '@/composables/useSettings'
 import { useAppResume } from '@/composables/useAppResume'
 import { errorAlert } from '@/lib/alerts'
 import { reportClientError } from '@/lib/observability'
 import { formatCurrencyFull, formatDateTime } from '@/utils/formatters'
 import { useAttendance } from '@/composables/useAttendance'
-import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
+import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, Search, Bell } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import DashboardActionCard from '@/components/dashboard/DashboardActionCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -265,11 +268,28 @@ import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LastAccessModal from '@/components/modals/LastAccessModal.vue'
 import AssistanceChart from '@/components/charts/AssistanceChart.vue'
+import TopBar from '@/components/layout/TopBar.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const gymStore = useGymStore()
-const { settings } = useSettings()
+
+const dashboardDate = computed(() => {
+  const value = new Intl.DateTimeFormat('es-AR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  }).format(new Date())
+
+  return value.charAt(0).toUpperCase() + value.slice(1)
+})
+
+const userInitial = computed(() => (userStore.userEmail || 'U').charAt(0).toUpperCase())
+const roleLabel = computed(() => ({
+  admin: 'Administrador',
+  recepcion: 'Recepción',
+  staff: 'Staff'
+}[userStore.userRole] || 'Usuario'))
 
 const loading = ref(false)
 const showLastAccessModal = ref(false)
