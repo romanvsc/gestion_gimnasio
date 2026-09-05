@@ -85,7 +85,7 @@
                 <span>{{ formData.logo_url ? 'Cambiar' : 'Subir' }} Logo</span>
                 <input
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/jpg"
+                  :accept="LOGO_ACCEPT"
                   @change="handleLogoUpload"
                   class="hidden"
                   :disabled="uploadingLogo"
@@ -109,7 +109,7 @@
               </p>
             </div>
           </div>
-          <p class="text-xs text-page-muted mt-3">JPG, PNG o WEBP. Máximo 5MB.</p>
+          <p class="text-xs text-page-muted mt-3">JPG, PNG, WEBP o SVG. Máximo 5MB.</p>
         </div>
       </section>
 
@@ -350,6 +350,7 @@ import PlanModal from '@/components/settings/PlanModal.vue'
 import SuccessModal from '@/components/ui/SuccessModal.vue'
 import GymLogo from '@/components/brand/GymLogo.vue'
 import { BRAND } from '@/config/brand'
+import { LOGO_ACCEPT, validateLogoFile } from '@/utils/logoUpload'
 import { 
   ArrowLeft, 
   ImageIcon, 
@@ -491,15 +492,9 @@ async function handleLogoUpload(event) {
   const file = event.target.files[0]
   if (!file) return
 
-  if (file.size > 5 * 1024 * 1024) {
-    toast.error('El logo no debe superar 5MB')
-    event.target.value = ''
-    return
-  }
-
-  const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
-  if (!validTypes.includes(file.type)) {
-    toast.error('Formato no válido. Usa JPG, PNG o WEBP')
+  const validation = validateLogoFile(file)
+  if (!validation.valid) {
+    toast.error(validation.message)
     event.target.value = ''
     return
   }

@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 import { toast } from 'vue-sonner'
 import { BRAND } from '@/config/brand'
+import { getLogoUploadInfo, validateLogoFile } from '@/utils/logoUpload'
 
 // Estado reactivo global compartido (Singleton)
 const state = reactive({
@@ -102,18 +103,22 @@ export function useSettings() {
       state.loading = true
       state.error = null
 
-      // 1. Comprimir la imagen
-      const options = {
-        maxSizeMB: 0.2, // 200KB máximo
-        maxWidthOrHeight: 800,
-        useWebWorker: true,
-        fileType: 'image/webp'
-      }
+      const validation = validateLogoFile(file)
+      if (!validation.valid) throw new Error(validation.message)
 
-      const compressedFile = await imageCompression(file, options)
+      const uploadInfo = getLogoUploadInfo(file)
+      // Los SVG se conservan intactos; las imágenes raster siguen optimizándose.
+      const fileToUpload = uploadInfo.isVector
+        ? file
+        : await imageCompression(file, {
+            maxSizeMB: 0.2,
+            maxWidthOrHeight: 800,
+            useWebWorker: true,
+            fileType: 'image/webp'
+          })
       
-      // 2. Generar nombre único
-      const fileName = `logo-${Date.now()}.webp`
+      // 2. Generar nombre único respetando el formato vectorial
+      const fileName = `logo-${Date.now()}.${uploadInfo.extension}`
 
       // 3. Si existe logo anterior, borrarlo del bucket
       if (state.settings.logo_url) {
@@ -135,8 +140,9 @@ export function useSettings() {
       // 4. Subir nuevo logo
       const { error: uploadError } = await supabase.storage
         .from('config')
-        .upload(fileName, compressedFile, {
+        .upload(fileName, fileToUpload, {
           cacheControl: '3600',
+          contentType: uploadInfo.contentType,
           upsert: false
         })
 
