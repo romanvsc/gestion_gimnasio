@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+    <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <h2 class="text-base font-bold text-page-title">Asistencia semanal</h2>
         <p class="mt-1 text-xs text-page-subtitle">
@@ -14,7 +14,7 @@
 
     <!-- Gráfico de barras con Chart.js -->
     <div
-      class="h-64 md:h-72"
+      class="h-56 sm:h-60 md:h-[260px] xl:h-[280px]"
       role="img"
       :aria-label="`Asistencia semanal: ${totalWeek} ${totalWeek === 1 ? 'acceso' : 'accesos'}. Mejor día: ${bestDay.fullDay}, con ${bestDay.count} ${bestDay.count === 1 ? 'acceso' : 'accesos'}.`"
     >
@@ -95,7 +95,7 @@ const chartData = computed(() => ({
       }),
       borderColor: colorToRgba(BRAND.colors.primary, 1),
       borderWidth: 0,
-      borderRadius: 8,
+      borderRadius: 6,
       borderSkipped: false,
       hoverBackgroundColor: colorToRgba(BRAND.colors.primary, 0.9),
       barThickness: 'flex',
@@ -113,15 +113,15 @@ const chartOptions = computed(() => ({
     },
     tooltip: {
       backgroundColor: colorToRgba(COLOR_SCALES.neutral[800], 0.95),
-      padding: 12,
-      cornerRadius: 8,
+      padding: 10,
+      cornerRadius: 6,
       displayColors: false,
       titleFont: {
-        size: 14,
+        size: 13,
         weight: 'bold'
       },
       bodyFont: {
-        size: 13
+        size: 12
       },
       callbacks: {
         title: (context) => {
@@ -142,7 +142,7 @@ const chartOptions = computed(() => ({
       },
       ticks: {
         font: {
-          size: 12,
+          size: 11,
           weight: '500'
         },
         color: isDark.value ? COLOR_SCALES.neutral[400] : COLOR_SCALES.neutral[500]
@@ -158,7 +158,7 @@ const chartOptions = computed(() => ({
       },
       ticks: {
         font: {
-          size: 11
+          size: 10
         },
         color: isDark.value ? COLOR_SCALES.neutral[400] : COLOR_SCALES.neutral[500],
         stepSize: 1,
@@ -180,7 +180,7 @@ const chartOptions = computed(() => ({
     mode: 'index'
   },
   animation: {
-    duration: 800,
+    duration: 500,
     easing: 'easeOutQuart'
   }
 }))

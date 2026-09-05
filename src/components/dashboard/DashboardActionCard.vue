@@ -3,15 +3,15 @@
     :variant="featured ? 'primary' : 'card'"
     type="button"
     :aria-label="ariaLabel || title"
-    class="group min-h-14 w-full flex items-center gap-3 text-left !rounded-lg !p-3 transition-all duration-200 md:gap-3.5"
+    class="group min-h-[60px] w-full items-center gap-3 text-left !rounded-lg !p-3 transition-colors duration-200 md:gap-3.5"
     :class="featured ? '!border-primary-600 !shadow-sm' : hoverBorderClass"
     @click="$emit('click')"
   >
     <div
-      class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105"
+      class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
       :class="featured ? 'bg-white/15 text-white' : [darkIconBg, darkIconText]"
     >
-      <component :is="icon" aria-hidden="true" class="h-5 w-5" />
+      <component :is="icon" aria-hidden="true" class="h-4 w-4" />
     </div>
 
     <div class="flex-1 min-w-0">

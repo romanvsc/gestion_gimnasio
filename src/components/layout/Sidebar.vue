@@ -15,7 +15,7 @@
           v-for="section in navigationSections"
           :key="`compact-${section.label}`"
           class="space-y-1 first:mt-0"
-          :class="section.label === 'Administración' ? 'mt-6 border-t border-white/10 pt-4' : ''"
+          :class="section.label === 'Administración' ? 'mt-5 border-t border-white/10 pt-4' : ''"
         >
           <router-link
             v-for="item in section.items"
@@ -30,7 +30,7 @@
               'group flex h-11 w-full items-center justify-center rounded-lg transition-colors'
             ]"
           >
-            <img :src="item.iconSrc" alt="" aria-hidden="true" class="h-7 w-7 object-contain" />
+            <NavigationIcon :name="item.icon" class="h-5 w-5" />
           </router-link>
         </div>
       </nav>
@@ -75,11 +75,11 @@
           </div>
         </div>
 
-        <nav class="flex-1 overflow-y-auto px-3 py-5" aria-label="Navegación de la aplicación">
+        <nav class="flex-1 overflow-y-auto px-3 py-4" aria-label="Navegación de la aplicación">
           <div
             v-for="section in navigationSections"
             :key="section.label"
-            :class="section.label === 'Administración' ? 'mt-7 border-t border-white/10 pt-5' : ''"
+            :class="section.label === 'Administración' ? 'mt-5 border-t border-white/10 pt-4' : ''"
           >
             <p class="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500">
               {{ section.label }}
@@ -93,15 +93,10 @@
                   isActive(item.to)
                     ? 'bg-primary-600 text-white shadow-sm'
                     : 'text-neutral-300 hover:bg-white/10 hover:text-white',
-                  'group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 ease-in-out'
+                  'group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 ease-in-out'
                 ]"
               >
-                <img
-                  :src="item.iconSrc"
-                  alt=""
-                  aria-hidden="true"
-                  class="mr-3 h-6 w-6 flex-shrink-0 object-contain"
-                />
+                <NavigationIcon :name="item.icon" class="mr-3 h-5 w-5 flex-shrink-0" />
                 {{ item.name }}
               </router-link>
             </div>
@@ -122,25 +117,16 @@
             </button>
           </div>
 
-          <div class="p-4 pt-1">
-            <div class="flex items-center">
-              <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white">
-                {{ userInitial }}
-              </div>
-              <div class="ml-3 min-w-0 flex-1">
-                <p class="truncate text-sm font-medium text-neutral-100">{{ userStore.userEmail }}</p>
-                <p class="truncate text-xs font-medium text-neutral-500">{{ roleLabel }}</p>
-              </div>
-              <button
-                type="button"
-                @click="handleLogout"
-                class="ml-2 rounded-md p-1.5 text-neutral-500 transition-colors hover:bg-danger-900/40 hover:text-danger-300"
-                aria-label="Cerrar sesión"
-                title="Cerrar sesión"
-              >
-                <LogOut class="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
+          <div class="flex items-center justify-end px-4 py-3">
+            <button
+              type="button"
+              @click="handleLogout"
+              class="rounded-md p-1.5 text-neutral-500 transition-colors hover:bg-danger-900/40 hover:text-danger-300"
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+            >
+              <LogOut class="h-4 w-4" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </div>
@@ -157,6 +143,7 @@ import { useSettings } from '@/composables/useSettings'
 import { useTheme } from '@/composables/useTheme'
 import { confirmAlert } from '@/lib/alerts'
 import GymLogo from '@/components/brand/GymLogo.vue'
+import NavigationIcon from '@/components/ui/NavigationIcon.vue'
 import { LogOut, Moon, Sun } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -166,14 +153,14 @@ const { settings } = useSettings()
 const { isDark, toggleTheme } = useTheme()
 
 const navigationItems = [
-  { name: 'Dashboard', to: '/', iconSrc: '/brand/navigation/dashboard.svg', section: 'Operación' },
-  { name: 'Socios', to: '/miembros', iconSrc: '/brand/navigation/members.svg', section: 'Operación' },
-  { name: 'Check-In', to: '/checkin', iconSrc: '/brand/navigation/check-in.svg', section: 'Operación' },
-  { name: 'Pagos', to: '/pagos/nuevo', iconSrc: '/brand/navigation/payments.svg', section: 'Operación' },
-  { name: 'Reportes', to: '/reports', iconSrc: '/brand/navigation/reports.svg', section: 'Operación', adminOnly: true },
-  { name: 'Caja', to: '/caja', iconSrc: '/brand/navigation/cash.svg', section: 'Administración', roles: ['admin', 'recepcion'] },
-  { name: 'Usuarios', to: '/staff', iconSrc: '/brand/navigation/staff.svg', section: 'Administración', adminOnly: true },
-  { name: 'Configuración', to: '/settings', iconSrc: '/brand/navigation/settings.svg', section: 'Administración', adminOnly: true }
+  { name: 'Dashboard', to: '/', icon: 'dashboard', section: 'Operación' },
+  { name: 'Socios', to: '/miembros', icon: 'members', section: 'Operación' },
+  { name: 'Check-In', to: '/checkin', icon: 'check-in', section: 'Operación' },
+  { name: 'Pagos', to: '/pagos/nuevo', icon: 'payments', section: 'Operación' },
+  { name: 'Reportes', to: '/reports', icon: 'reports', section: 'Operación', adminOnly: true },
+  { name: 'Caja', to: '/caja', icon: 'cash', section: 'Administración', roles: ['admin', 'recepcion'] },
+  { name: 'Usuarios', to: '/staff', icon: 'staff', section: 'Administración', adminOnly: true },
+  { name: 'Configuración', to: '/settings', icon: 'settings', section: 'Administración', adminOnly: true }
 ]
 
 const visibleNavigation = computed(() => navigationItems.filter(item => {
@@ -188,14 +175,6 @@ const navigationSections = computed(() => ['Operación', 'Administración']
     items: visibleNavigation.value.filter(item => item.section === label)
   }))
   .filter(section => section.items.length > 0))
-
-const userInitial = computed(() => (userStore.userEmail || 'U').charAt(0).toUpperCase())
-
-const roleLabel = computed(() => ({
-  admin: 'Administrador',
-  recepcion: 'Recepción',
-  staff: 'Staff'
-}[userStore.userRole] || 'Usuario'))
 
 function isActive(path) {
   if (path === '/') return route.path === '/'

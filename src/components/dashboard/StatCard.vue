@@ -5,48 +5,47 @@
     :aria-label="route ? `${title}: abrir detalle` : undefined"
     @click="route && handleClick()"
     :class="[
-      'rounded-xl border p-4 transition-all duration-200 hover:shadow-sm md:p-5',
+      'rounded-lg border p-4 transition-colors duration-200 hover:border-page-border md:p-4',
       route ? 'w-full cursor-pointer text-left' : '',
       badgeVariant === 'urgent'
         ? 'border-danger-200 bg-danger-50 hover:border-danger-300 dark:border-danger-800 dark:bg-danger-950/40 dark:hover:border-danger-700'
         : 'border-page-border bg-page-card hover:bg-page-card-hover'
     ]"
   >
-    <div class="mb-4 flex items-start justify-between">
-      <div 
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <p
+          class="mb-1 text-[10px] font-bold uppercase tracking-[0.14em]"
+          :class="badgeVariant === 'urgent' ? 'text-danger-700 dark:text-danger-300' : 'text-page-subtitle'"
+        >{{ title }}</p>
+        <p
+          class="text-3xl font-extrabold leading-none tracking-tight"
+          :class="badgeVariant === 'urgent' ? 'text-danger-950 dark:text-danger-50' : 'text-page-title'"
+        >{{ value }}</p>
+      </div>
+      <div
         :class="[
-          'flex h-10 w-10 items-center justify-center rounded-lg',
+          'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md',
           darkIconBgColor
         ]"
       >
-        <component 
-          :is="icon" 
+        <component
+          :is="icon"
           aria-hidden="true"
-          :class="[
-            'h-5 w-5',
-            darkIconColor
-          ]"
+          :class="['h-4 w-4', darkIconColor]"
         />
       </div>
-      <span
-        v-if="badge"
-        :class="[
-          'rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-widest',
-          badgeClasses
-        ]"
-      >
-        {{ badge }}
-      </span>
     </div>
 
-    <p
-      class="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
-      :class="badgeVariant === 'urgent' ? 'text-danger-700 dark:text-danger-300' : 'text-page-subtitle'"
-    >{{ title }}</p>
-    <p
-      class="text-3xl font-extrabold tracking-tight"
-      :class="badgeVariant === 'urgent' ? 'text-danger-950 dark:text-danger-50' : 'text-page-title'"
-    >{{ value }}</p>
+    <span
+      v-if="badge"
+      :class="[
+        'mt-3 inline-flex rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-widest',
+        badgeClasses
+      ]"
+    >
+      {{ badge }}
+    </span>
     
     <!-- Comparison with previous period -->
     <div v-if="showComparison" class="mt-2 flex items-center gap-1.5">

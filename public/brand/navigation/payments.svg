@@ -1,11 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
-  <title id="title">Pagos</title>
-  <desc id="desc">Tarjeta y moneda de pago</desc>
-  <defs><linearGradient id="orange" x1="17" y1="48" x2="73" y2="80" gradientUnits="userSpaceOnUse"><stop stop-color="#ffad00"/><stop offset="1" stop-color="#ff5b00"/></linearGradient></defs>
-  <rect x="4" y="4" width="88" height="88" rx="22" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
-  <path d="m19 27 47-11c4-1 8 2 9 6l5 22-55 13c-4 1-8-2-9-6l-5-16c-1-4 2-7 8-8Z" fill="#26323c" stroke="#111b24" stroke-width="4"/>
-  <path d="m18 39 51-1c5 0 8 3 8 8v16c0 4-4 7-8 7H22c-5 0-8-3-8-7V47c0-5 2-8 4-8Z" fill="url(#orange)" stroke="#111b24" stroke-width="4"/>
-  <path d="M23 54h20M23 61h12" stroke="#f8fafc" stroke-linecap="round" stroke-width="3"/>
-  <circle cx="72" cy="67" r="17" fill="#ff6a00" stroke="#111b24" stroke-width="4"/>
-  <path d="M72 57v20M77 61c-2-3-10-3-10 2 0 6 11 2 11 9 0 5-8 6-11 2" fill="none" stroke="#111b24" stroke-linecap="round" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <title>Pagos</title>
+  <desc>Tarjeta de pago con símbolo monetario</desc>
+  <g id="icon" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 9h18M7 14h4" />
+    <path d="M17 12v6M19 13c-.5-.7-1.5-1-2.2-.5-.9.6-.3 1.5.8 1.8 1.2.3 1.8.9 1.3 1.8-.4.8-1.7 1-2.5.3" />
+  </g>
 </svg>

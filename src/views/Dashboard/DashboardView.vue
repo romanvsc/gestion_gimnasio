@@ -25,10 +25,10 @@
       </TopBar>
 
       <!-- Loading Skeleton -->
-      <div v-if="loading" class="space-y-6">
+      <div v-if="loading" class="space-y-5">
         <!-- Skeleton para Tarjetas de Métricas -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div v-for="i in 4" :key="i" class="rounded-xl border border-page-border bg-page-card p-4">
+          <div v-for="i in 4" :key="i" class="rounded-lg border border-page-border bg-page-card p-4">
             <div class="flex items-start justify-between">
               <div class="flex-1 space-y-3">
                 <BaseSkeleton width="60%" height="0.875rem" />
@@ -40,7 +40,7 @@
         </div>
         
         <!-- Skeleton para Tabla de Check-ins -->
-        <div class="rounded-xl border border-page-border bg-page-card p-5">
+        <div class="rounded-lg border border-page-border bg-page-card p-4 md:p-5">
           <BaseSkeleton width="180px" height="1.5rem" class="mb-6" />
           <div class="space-y-4">
             <div v-for="i in 4" :key="i" class="flex items-center gap-4 py-3">
@@ -136,43 +136,68 @@
           </div>
         </section>
 
-        <!-- Gráfico de Asistencia -->
-        <section class="mb-6 rounded-xl border border-page-border bg-page-card p-4 md:p-5">
-          <AssistanceChart />
-        </section>
-
-        <!-- Tarjeta de Alerta: Socios Vencidos -->
-        <div v-if="stats.expiredMembers > 0" class="mb-6 flex flex-col gap-4 rounded-xl border border-danger-200 bg-danger-50 p-4 dark:border-danger-800 dark:bg-danger-950/35 md:flex-row md:items-center md:justify-between md:p-5">
-          <div class="flex items-start gap-3">
-            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-300">
-              <AlertCircle class="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 class="text-base font-bold tracking-tight text-danger-900 dark:text-danger-100">
-                {{ stats.expiredMembers }} socios con cuota vencida
-              </h3>
-              <p v-if="statsUpdatedAt" class="mt-1 text-xs text-danger-700/80 dark:text-danger-300/80">
-                Actualizado: {{ formatDateTime(statsUpdatedAt) }}
-              </p>
-              <p class="mt-1 text-sm text-danger-800/80 dark:text-danger-200/80">
-                Revisá los socios que necesitan regularizar su cuota.
-              </p>
-            </div>
+        <!-- Asistencia y prioridad operativa -->
+        <section class="mb-6 grid items-start gap-4 xl:grid-cols-3">
+          <div class="rounded-lg border border-page-border bg-page-card p-4 md:p-5 xl:col-span-2">
+            <AssistanceChart />
           </div>
 
-          <BaseButton
-            variant="danger"
-            size="sm"
-            @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
-            class="flex-shrink-0 !font-semibold"
+          <aside
+            class="flex flex-col rounded-lg border p-4 md:p-5"
+            :class="stats.expiredMembers > 0
+              ? 'border-danger-200 bg-danger-50/70 dark:border-danger-800 dark:bg-danger-950/30'
+              : 'border-page-border bg-page-card'"
+            aria-labelledby="expired-members-title"
           >
-            Gestionar vencidos
-          </BaseButton>
-        </div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-page-muted">Atención prioritaria</p>
+                <h2
+                  id="expired-members-title"
+                  class="mt-1 text-base font-bold tracking-tight"
+                  :class="stats.expiredMembers > 0 ? 'text-danger-900 dark:text-danger-100' : 'text-page-title'"
+                >
+                  Cuotas vencidas
+                </h2>
+              </div>
+              <div
+                class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg"
+                :class="stats.expiredMembers > 0
+                  ? 'bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-300'
+                  : 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-300'"
+              >
+                <AlertCircle v-if="stats.expiredMembers > 0" class="h-4 w-4" aria-hidden="true" />
+                <CheckCircle v-else class="h-4 w-4" aria-hidden="true" />
+              </div>
+            </div>
+
+            <p
+              class="mt-6 text-3xl font-extrabold tracking-tight"
+              :class="stats.expiredMembers > 0 ? 'text-danger-950 dark:text-danger-50' : 'text-page-title'"
+            >
+              {{ stats.expiredMembers }}
+            </p>
+            <p class="mt-1 text-sm" :class="stats.expiredMembers > 0 ? 'text-danger-800/80 dark:text-danger-200/80' : 'text-page-subtitle'">
+              {{ stats.expiredMembers > 0 ? 'socios necesitan regularizar su cuota.' : 'No hay cuotas vencidas para revisar.' }}
+            </p>
+            <p v-if="statsUpdatedAt" class="mt-2 text-xs text-page-muted">
+              Actualizado: {{ formatDateTime(statsUpdatedAt) }}
+            </p>
+
+            <BaseButton
+              :variant="stats.expiredMembers > 0 ? 'danger' : 'secondary'"
+              size="sm"
+              class="mt-auto w-full !font-semibold"
+              @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
+            >
+              Gestionar vencidos
+            </BaseButton>
+          </aside>
+        </section>
 
         <!-- Últimos Check-Ins -->
-        <section class="overflow-hidden rounded-xl border border-page-border bg-page-card">
-          <div class="flex items-center justify-between border-b border-page-border px-4 py-4 md:px-5">
+        <section class="overflow-hidden rounded-lg border border-page-border bg-page-card">
+          <div class="flex items-center justify-between border-b border-page-border px-4 py-3.5 md:px-5">
             <div>
               <h2 class="text-base font-bold text-page-title">Últimos accesos</h2>
               <p class="mt-0.5 text-xs text-page-subtitle">Actividad reciente del gimnasio</p>
@@ -193,22 +218,22 @@
           </div>
 
           <div v-else class="overflow-x-auto">
-            <table class="w-full min-w-[520px]">
+            <table class="w-full table-fixed">
               <thead>
                 <tr class="border-b border-page-border bg-page-bg/60">
-                  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:px-5">Socio</th>
-                  <th class="hidden px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted sm:table-cell md:px-5">DNI</th>
-                  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:px-5">Hora</th>
-                  <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:px-5">Estado</th>
+                  <th class="w-[48%] px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:w-auto md:px-5">Socio</th>
+                  <th class="hidden px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted sm:table-cell md:px-5">DNI</th>
+                  <th class="w-[25%] px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:w-auto md:px-5">Hora</th>
+                  <th class="w-[27%] px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-page-muted md:w-auto md:px-5">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 <tr 
                   v-for="checkin in recentCheckIns" 
                   :key="checkin.id"
-                  class="border-b border-page-border last:border-0 hover:bg-page-card-hover transition-colors"
+                  class="border-b border-page-border last:border-0 transition-colors hover:bg-page-card-hover"
                 >
-                  <td class="px-4 py-3 text-sm font-semibold text-page-title md:px-5">
+                  <td class="px-4 py-2.5 text-sm font-semibold text-page-title md:px-5">
                     <BaseButton
                       variant="ghost"
                       size="sm"
@@ -221,9 +246,9 @@
                       </span>
                     </BaseButton>
                   </td>
-                  <td class="hidden px-4 py-3 font-mono text-xs text-page-subtitle sm:table-cell md:px-5">{{ checkin.dni }}</td>
-                  <td class="px-4 py-3 text-xs text-page-subtitle md:px-5">{{ checkin.time }}</td>
-                  <td class="px-4 py-3 md:px-5">
+                  <td class="hidden px-4 py-2.5 font-mono text-xs text-page-subtitle sm:table-cell md:px-5">{{ checkin.dni }}</td>
+                  <td class="whitespace-nowrap px-4 py-2.5 text-xs text-page-subtitle md:px-5">{{ checkin.time }}</td>
+                  <td class="px-4 py-2.5 md:px-5">
                     <StatusBadge
                       :status="checkin.status"
                       :label="checkin.statusLabel"

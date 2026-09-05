@@ -1,11 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
-  <title id="title">Reportes</title>
-  <desc id="desc">Documento con métricas y gráfico</desc>
-  <defs><linearGradient id="orange" x1="18" y1="16" x2="72" y2="82" gradientUnits="userSpaceOnUse"><stop stop-color="#ffad00"/><stop offset="1" stop-color="#ff5b00"/></linearGradient></defs>
-  <rect x="4" y="4" width="88" height="88" rx="22" fill="#171717" stroke="#29323a" stroke-width="2"/>
-  <path d="M24 14h35l14 14v54H24V14Z" fill="#26323c" stroke="#f8fafc" stroke-linejoin="round" stroke-width="4"/>
-  <path d="M59 14v16h14" fill="#ff6a00" stroke="#f8fafc" stroke-linejoin="round" stroke-width="4"/>
-  <path d="M34 62v-9M44 62V42M54 62V49" stroke="#f8fafc" stroke-linecap="round" stroke-width="5"/>
-  <path d="M44 62V47M31 70h28M31 76h18" stroke="#ff6a00" stroke-linecap="round" stroke-width="3"/>
-  <path d="m58 73 11-2 4 9-9 4Z" fill="url(#orange)" stroke="#111b24" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <title>Reportes</title>
+  <desc>Documento con gráfico de barras</desc>
+  <g id="icon" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 3h9l3 3v15H6z" />
+    <path d="M15 3v4h3M9 17v-3M12 17v-6M15 17v-4" />
+  </g>
 </svg>
