@@ -20,7 +20,7 @@
           isActive(item.to) ? 'scale-110' : '',
           'transition-transform duration-200'
         ]">
-          <component :is="item.icon" class="w-6 h-6 mb-1" />
+          <img :src="item.iconSrc" alt="" aria-hidden="true" class="mb-1 h-6 w-6 object-contain" />
         </div>
         <span :class="[
           isActive(item.to) ? 'font-semibold' : 'font-medium',
@@ -90,7 +90,7 @@
               'flex items-center gap-4 px-4 py-3 rounded-xl transition-colors touch-manipulation'
             ]"
           >
-            <component :is="item.icon" class="w-6 h-6" />
+            <img :src="item.iconSrc" alt="" aria-hidden="true" class="h-6 w-6 object-contain" />
             <span class="font-medium">{{ item.name }}</span>
           </router-link>
 
@@ -282,18 +282,18 @@ const LogoutIcon = () => h('svg', {
 
 // Navegación principal (5 items máximo para bottom nav)
 const navigationItems = [
-  { name: 'Inicio', to: '/', icon: HomeIcon },
-  { name: 'Socios', to: '/miembros', icon: UsersIcon },
-  { name: 'Check-In', to: '/checkin', icon: CheckIcon },
-  { name: 'Pagos', to: '/pagos/nuevo', icon: PaymentIcon },
-  { name: 'Caja', to: '/caja', icon: CashIcon, roles: ['admin', 'recepcion'] }
+  { name: 'Inicio', to: '/', iconSrc: '/brand/navigation/dashboard.svg' },
+  { name: 'Socios', to: '/miembros', iconSrc: '/brand/navigation/members.svg' },
+  { name: 'Check-In', to: '/checkin', iconSrc: '/brand/navigation/check-in.svg' },
+  { name: 'Pagos', to: '/pagos/nuevo', iconSrc: '/brand/navigation/payments.svg' },
+  { name: 'Caja', to: '/caja', iconSrc: '/brand/navigation/cash.svg', roles: ['admin', 'recepcion'] }
 ]
 
 // Items del menú "Más"
 const moreMenuItemsList = [
-  { name: 'Usuarios', to: '/staff', icon: StaffIcon, adminOnly: true },
-  { name: 'Reportes', to: '/reports', icon: ReportsIcon, adminOnly: true },
-  { name: 'Configuración', to: '/settings', icon: SettingsIcon, adminOnly: true }
+  { name: 'Usuarios', to: '/staff', iconSrc: '/brand/navigation/staff.svg', adminOnly: true },
+  { name: 'Reportes', to: '/reports', iconSrc: '/brand/navigation/reports.svg', adminOnly: true },
+  { name: 'Configuración', to: '/settings', iconSrc: '/brand/navigation/settings.svg', adminOnly: true }
 ]
 
 const navigation = computed(() => {

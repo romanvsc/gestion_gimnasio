@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Check-In</title>
+  <desc id="desc">Puerta de acceso con confirmación</desc>
+  <defs><linearGradient id="orange" x1="50" y1="24" x2="84" y2="78" gradientUnits="userSpaceOnUse"><stop stop-color="#ffad00"/><stop offset="1" stop-color="#ff5b00"/></linearGradient></defs>
+  <rect x="4" y="4" width="88" height="88" rx="22" fill="#171717" stroke="#29323a" stroke-width="2"/>
+  <path d="M37 19 70 9v49L37 68V19Z" fill="#26323c" stroke="#f8fafc" stroke-linejoin="round" stroke-width="4"/>
+  <path d="M70 9 82 16v48L70 58" fill="#ff6a00" stroke="#111b24" stroke-linejoin="round" stroke-width="4"/>
+  <path d="M48 48h1" stroke="#ffad00" stroke-linecap="round" stroke-width="5"/>
+  <path d="M25 34H12M25 46H9M25 58H12" stroke="#ff6a00" stroke-linecap="round" stroke-width="4"/>
+  <circle cx="66" cy="66" r="17" fill="url(#orange)" stroke="#111b24" stroke-width="4"/>
+  <path d="m58 66 5 5 10-11" fill="none" stroke="#f8fafc" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+</svg>

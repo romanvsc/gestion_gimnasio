@@ -30,7 +30,7 @@
               'group flex h-11 w-full items-center justify-center rounded-lg transition-colors'
             ]"
           >
-            <component :is="item.icon" aria-hidden="true" class="h-5 w-5" />
+            <img :src="item.iconSrc" alt="" aria-hidden="true" class="h-7 w-7 object-contain" />
           </router-link>
         </div>
       </nav>
@@ -96,13 +96,11 @@
                   'group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 ease-in-out'
                 ]"
               >
-                <component
-                  :is="item.icon"
+                <img
+                  :src="item.iconSrc"
+                  alt=""
                   aria-hidden="true"
-                  :class="[
-                    isActive(item.to) ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-200',
-                    'mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-150'
-                  ]"
+                  class="mr-3 h-6 w-6 flex-shrink-0 object-contain"
                 />
                 {{ item.name }}
               </router-link>
@@ -159,7 +157,7 @@ import { useSettings } from '@/composables/useSettings'
 import { useTheme } from '@/composables/useTheme'
 import { confirmAlert } from '@/lib/alerts'
 import GymLogo from '@/components/brand/GymLogo.vue'
-import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, Settings, BarChart3, LogOut, Moon, Sun } from 'lucide-vue-next'
+import { LogOut, Moon, Sun } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
@@ -168,14 +166,14 @@ const { settings } = useSettings()
 const { isDark, toggleTheme } = useTheme()
 
 const navigationItems = [
-  { name: 'Dashboard', to: '/', icon: LayoutDashboard, section: 'Operación' },
-  { name: 'Socios', to: '/miembros', icon: Users, section: 'Operación' },
-  { name: 'Check-In', to: '/checkin', icon: CheckCircle, section: 'Operación' },
-  { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign, section: 'Operación' },
-  { name: 'Reportes', to: '/reports', icon: BarChart3, section: 'Operación', adminOnly: true },
-  { name: 'Caja', to: '/caja', icon: Wallet, section: 'Administración', roles: ['admin', 'recepcion'] },
-  { name: 'Usuarios', to: '/staff', icon: Settings, section: 'Administración', adminOnly: true },
-  { name: 'Configuración', to: '/settings', icon: Settings, section: 'Administración', adminOnly: true }
+  { name: 'Dashboard', to: '/', iconSrc: '/brand/navigation/dashboard.svg', section: 'Operación' },
+  { name: 'Socios', to: '/miembros', iconSrc: '/brand/navigation/members.svg', section: 'Operación' },
+  { name: 'Check-In', to: '/checkin', iconSrc: '/brand/navigation/check-in.svg', section: 'Operación' },
+  { name: 'Pagos', to: '/pagos/nuevo', iconSrc: '/brand/navigation/payments.svg', section: 'Operación' },
+  { name: 'Reportes', to: '/reports', iconSrc: '/brand/navigation/reports.svg', section: 'Operación', adminOnly: true },
+  { name: 'Caja', to: '/caja', iconSrc: '/brand/navigation/cash.svg', section: 'Administración', roles: ['admin', 'recepcion'] },
+  { name: 'Usuarios', to: '/staff', iconSrc: '/brand/navigation/staff.svg', section: 'Administración', adminOnly: true },
+  { name: 'Configuración', to: '/settings', iconSrc: '/brand/navigation/settings.svg', section: 'Administración', adminOnly: true }
 ]
 
 const visibleNavigation = computed(() => navigationItems.filter(item => {

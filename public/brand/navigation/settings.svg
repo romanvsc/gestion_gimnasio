@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Configuración</title>
+  <desc id="desc">Engranaje de configuración</desc>
+  <defs><linearGradient id="orange" x1="20" y1="20" x2="72" y2="82" gradientUnits="userSpaceOnUse"><stop stop-color="#ffad00"/><stop offset="1" stop-color="#ff5b00"/></linearGradient></defs>
+  <rect x="4" y="4" width="88" height="88" rx="22" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+  <path d="m48 13 7 8 10-1 3 10 9 5-4 10 4 10-9 5-3 10-10-1-7 8-7-8-10 1-3-10-9-5 4-10-4-10 9-5 3-10 10 1 7-8Z" fill="#26323c" stroke="#111b24" stroke-linejoin="round" stroke-width="4"/>
+  <circle cx="48" cy="48" r="21" fill="url(#orange)" stroke="#111b24" stroke-width="4"/>
+  <circle cx="48" cy="48" r="9" fill="#171717"/>
+  <circle cx="48" cy="48" r="4" fill="#26323c"/>
+</svg>
