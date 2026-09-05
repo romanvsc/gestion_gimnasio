@@ -14,6 +14,9 @@
       :type="type"
       :value="modelValue"
       :placeholder="placeholder"
+      :min="min"
+      :max="max"
+      :step="step"
       :required="required"
       :disabled="disabled"
       :autocomplete="autocomplete"
@@ -85,6 +88,18 @@ const props = defineProps({
   autocomplete: {
     type: String,
     default: 'off'
+  },
+  min: {
+    type: [String, Number],
+    default: undefined
+  },
+  max: {
+    type: [String, Number],
+    default: undefined
+  },
+  step: {
+    type: [String, Number],
+    default: undefined
   },
   autofocus: {
     type: Boolean,

@@ -5,10 +5,12 @@ import { registerPayment as registerPaymentUseCase } from './application/use-cas
 import { listMemberPayments as listMemberPaymentsUseCase } from './application/use-cases/listMemberPayments.js'
 import { loadCashRange as loadCashRangeUseCase } from './application/use-cases/loadCashRange.js'
 import { registerManualTransaction as registerManualTransactionUseCase } from './application/use-cases/registerManualTransaction.js'
+import { adjustPaymentSnapshot as adjustPaymentSnapshotUseCase } from './application/use-cases/adjustPaymentSnapshot.js'
 import { calculatePaymentEndDate } from './domain/services/paymentSchedule.js'
 import { calculateCashSummary } from './domain/services/calculateCashSummary.js'
 import { createSupabasePaymentRepository } from './infrastructure/persistence/SupabasePaymentRepository.js'
 import { createSupabaseCashTransactionRepository } from './infrastructure/persistence/SupabaseCashTransactionRepository.js'
+import { createSupabasePaymentAdjustmentRepository } from './infrastructure/persistence/SupabasePaymentAdjustmentRepository.js'
 import { createSupabaseCurrentUserProvider } from './infrastructure/auth/SupabaseCurrentUserProvider.js'
 import { createPlanCatalogBillingReader } from './infrastructure/acl/PlanCatalogBillingReader.js'
 
@@ -20,6 +22,7 @@ const cashTransactionRepository = createSupabaseCashTransactionRepository({
   client: supabase,
   executeQuery: runQuery
 })
+const paymentAdjustmentRepository = createSupabasePaymentAdjustmentRepository({ client: supabase })
 const currentUserProvider = createSupabaseCurrentUserProvider({ client: supabase })
 const planBillingReader = createPlanCatalogBillingReader({ catalog: planCatalog })
 
@@ -70,6 +73,13 @@ export const billingCash = Object.freeze({
       currentUserProvider,
       input
     }))
+  },
+
+  async adjustPaymentSnapshot(input) {
+    return (await adjustPaymentSnapshotUseCase({
+      paymentAdjustmentRepository,
+      input
+    })).toJSON()
   }
 })
 

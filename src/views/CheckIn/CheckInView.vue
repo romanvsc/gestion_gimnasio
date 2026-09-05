@@ -1,17 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-page-bg dark:to-page-card transition-colors duration-200">
+  <div class="relative min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 transition-colors duration-200 dark:from-page-bg dark:to-page-card">
+    <div v-if="isKioskMode" class="absolute right-4 top-4 z-20">
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        aria-label="Salir del modo kiosco"
+        @click="exitKioskMode"
+      >
+        Salir del kiosco
+      </BaseButton>
+    </div>
     <div class="min-h-[100dvh] flex flex-col xl:flex-row">
       
       <!-- Área Principal: Kiosco de Acceso -->
-      <div class="flex-1 flex flex-col items-center justify-center p-6">
+      <div class="flex-1 flex flex-col items-center justify-center p-4 md:p-6">
         
         <!-- Icono Decorativo + Header -->
         <div class="mb-8 text-center">
           <div class="mb-6 flex justify-center">
-            <CreditCard class="w-16 h-16 text-gray-200 dark:text-gray-700" />
+            <CreditCard class="h-12 w-12 text-gray-200 dark:text-gray-700 md:h-16 md:w-16" aria-hidden="true" />
           </div>
-          <h1 class="text-3xl md:text-4xl font-bold text-page-title mb-2">Acceso al Gimnasio</h1>
-          <p class="text-page-subtitle text-lg">Escanea o ingresa tu DNI</p>
+          <h1 class="mb-2 text-2xl font-bold text-page-title md:text-4xl">Acceso al Gimnasio</h1>
+          <p class="text-base text-page-subtitle md:text-lg">Escanea o ingresa tu DNI</p>
         </div>
 
         <!-- Buscador Gigante Centrado -->
@@ -51,7 +61,7 @@
         </div>
 
         <!-- Loading -->
-        <div v-if="loading" class="text-center">
+        <div v-if="loading" class="text-center" role="status" aria-live="polite">
           <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent"></div>
           <p class="text-gray-600 dark:text-gray-400 mt-4 text-lg">Buscando...</p>
         </div>
@@ -64,29 +74,29 @@
             type="button"
             :aria-label="`${canCheckIn(member) ? 'Registrar acceso permitido' : 'Registrar acceso denegado'} para ${member.nombre} ${member.apellido}`"
             @click="handleCheckIn(member)"
-            class="w-full text-left transform transition-transform cursor-pointer hover:scale-[1.02] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300 rounded-3xl"
+            class="w-full transform cursor-pointer rounded-3xl text-left transition-transform hover:scale-[1.01] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300 md:hover:scale-[1.02]"
           >
             <!-- ACCESO PERMITIDO -->
             <div
               v-if="canCheckIn(member)"
-              class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/20 border-4 border-emerald-500 rounded-3xl p-8 shadow-2xl"
+              class="rounded-3xl border-4 border-emerald-500 bg-gradient-to-r from-emerald-50 to-teal-50 p-4 shadow-2xl dark:from-emerald-900/30 dark:to-teal-900/20 md:p-8"
             >
-              <div class="flex items-center gap-6">
+              <div class="flex items-center gap-3 md:gap-6">
                 <!-- Avatar Grande -->
-                <div class="h-24 w-24 rounded-full bg-emerald-500 text-white flex items-center justify-center text-3xl font-bold flex-shrink-0 shadow-lg">
+                <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xl font-bold text-white shadow-lg md:h-24 md:w-24 md:text-3xl">
                   {{ getInitials(member.nombre, member.apellido) }}
                 </div>
                 
                 <!-- Info -->
                 <div class="flex-1">
-                  <p class="text-3xl font-bold text-page-title mb-1">
+                  <p class="mb-1 text-xl font-bold text-page-title md:text-3xl">
                     {{ member.nombre }} {{ member.apellido }}
                   </p>
-                  <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">DNI: {{ member.dni }}</p>
-                  <div class="flex items-start gap-3 bg-white dark:bg-white/5 rounded-xl px-4 py-3 shadow-sm">
-                    <CheckCircle class="h-8 w-8 text-emerald-500 mt-0.5" />
+                  <p class="mb-4 text-base text-gray-600 dark:text-gray-400 md:text-lg">DNI: {{ member.dni }}</p>
+                  <div class="flex items-start gap-3 rounded-xl bg-white px-3 py-3 shadow-sm dark:bg-white/5 md:px-4">
+                    <CheckCircle class="mt-0.5 h-6 w-6 flex-shrink-0 text-emerald-500 md:h-8 md:w-8" aria-hidden="true" />
                     <div class="flex-1">
-                      <span class="text-2xl font-bold text-emerald-600 block">ACCESO PERMITIDO</span>
+                      <span class="block text-lg font-bold text-emerald-600 md:text-2xl">ACCESO PERMITIDO</span>
                       <span
                         v-if="member.estado_apto_fisico !== 'vigente'"
                         class="text-sm font-medium text-amber-600"
@@ -102,24 +112,24 @@
             <!-- ACCESO DENEGADO -->
             <div
               v-else
-              class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/20 border-4 border-red-500 rounded-3xl p-8 shadow-2xl"
+              class="rounded-3xl border-4 border-red-500 bg-gradient-to-r from-red-50 to-orange-50 p-4 shadow-2xl dark:from-red-900/30 dark:to-orange-900/20 md:p-8"
             >
-              <div class="flex items-center gap-6">
+              <div class="flex items-center gap-3 md:gap-6">
                 <!-- Avatar Grande -->
-                <div class="h-24 w-24 rounded-full bg-red-500 text-white flex items-center justify-center text-3xl font-bold flex-shrink-0 shadow-lg">
+                <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-red-500 text-xl font-bold text-white shadow-lg md:h-24 md:w-24 md:text-3xl">
                   {{ getInitials(member.nombre, member.apellido) }}
                 </div>
                 
                 <!-- Info -->
                 <div class="flex-1">
-                  <p class="text-3xl font-bold text-page-title mb-1">
+                  <p class="mb-1 text-xl font-bold text-page-title md:text-3xl">
                     {{ member.nombre }} {{ member.apellido }}
                   </p>
-                  <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">DNI: {{ member.dni }}</p>
-                  <div class="flex items-center gap-3 bg-white dark:bg-white/5 rounded-xl px-4 py-3 shadow-sm">
-                    <AlertCircle class="h-8 w-8 text-red-500" />
+                  <p class="mb-4 text-base text-gray-600 dark:text-gray-400 md:text-lg">DNI: {{ member.dni }}</p>
+                  <div class="flex items-center gap-3 rounded-xl bg-white px-3 py-3 shadow-sm dark:bg-white/5 md:px-4">
+                    <AlertCircle class="h-6 w-6 flex-shrink-0 text-red-500 md:h-8 md:w-8" aria-hidden="true" />
                     <div class="flex-1">
-                      <span class="text-2xl font-bold text-red-600 block">ACCESO DENEGADO</span>
+                      <span class="block text-lg font-bold text-red-600 md:text-2xl">ACCESO DENEGADO</span>
                       <span class="text-base text-red-500 font-medium">
                         {{ accessDeniedReason(member) }}
                       </span>
@@ -157,7 +167,7 @@
           <p class="text-xs text-gray-500 mt-1">Actividad en vivo · Se actualiza automáticamente</p>
         </div>
         
-        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50 dark:divide-gray-700/50">
+        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50 dark:divide-gray-700/50" aria-live="polite" aria-label="Últimos accesos registrados">
           <div
             v-for="checkIn in recentCheckIns"
             :key="checkIn.id"
@@ -200,11 +210,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { supabase } from '@/lib/supabase'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAppResume } from '@/composables/useAppResume'
+import { useMembers } from '@/composables/useMembers'
+import { useAttendance } from '@/composables/useAttendance'
 import { BRAND } from '@/config/brand'
+import { reportClientError } from '@/lib/observability'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -212,17 +224,31 @@ import Swal from 'sweetalert2'
 
 const searchQuery = ref('')
 const router = useRouter()
+const route = useRoute()
+const isKioskMode = computed(() => route.query.kiosk === '1')
 const searchResults = ref([])
-const recentCheckIns = ref([])
 const loading = ref(false)
 const selectedAttendanceDate = ref(getTodayDateValue())
+const { searchMembersForAccess } = useMembers()
+const {
+  recentCheckIns,
+  loadRecentCheckIns,
+  hasCheckInOnDate,
+  registerCheckIn,
+  subscribeToAttendanceInserts,
+  unsubscribe: unsubscribeAttendance
+} = useAttendance({ recentLimit: 10 })
 
 let searchTimeout = null
-let realtimeSubscription = null
+let stopAttendanceSubscription = null
 
 function clearSearch() {
   searchQuery.value = ''
   searchResults.value = []
+}
+
+function exitKioskMode() {
+  router.replace({ name: 'CheckIn' })
 }
 
 async function searchMembers() {
@@ -236,16 +262,9 @@ async function searchMembers() {
   searchTimeout = setTimeout(async () => {
     loading.value = true
     try {
-      const query = searchQuery.value.toLowerCase()
-      const { data } = await supabase
-        .from('v_socios_estado')
-        .select('*')
-        .or(`nombre.ilike.%${query}%,apellido.ilike.%${query}%,dni.ilike.%${query}%`)
-        .limit(5)
-
-      searchResults.value = data || []
+      searchResults.value = await searchMembersForAccess(searchQuery.value)
     } catch (error) {
-      console.error('Error buscando socios:', error)
+      reportClientError('checkin.member_search', error)
     } finally {
       loading.value = false
     }
@@ -258,12 +277,12 @@ function canCheckIn(member) {
   const cuotaActiva = member.estado_cuota === 'activo'
   
   if (!cuotaActiva) {
-    console.log('❌ Acceso denegado:', {
-      nombre: `${member.nombre} ${member.apellido}`,
-      dni: member.dni,
-      estado_cuota: member.estado_cuota,
-      estado_apto_fisico: member.estado_apto_fisico
-    })
+    if (import.meta.env.DEV) {
+      console.debug('Check-in denegado', {
+        estado_cuota: member.estado_cuota,
+        estado_apto_fisico: member.estado_apto_fisico
+      })
+    }
   }
   
   return cuotaActiva
@@ -287,19 +306,15 @@ async function handleCheckIn(member) {
   try {
     const { startISO, endISO } = getDateRangeForQuery(selectedAttendanceDate.value)
     
-    const { data: existingCheckIn, error: checkError } = await supabase
-      .from('attendance')
-      .select('id, created_at')
-      .eq('member_id', member.id)
-      .gte('created_at', startISO)
-      .lt('created_at', endISO)
-      .limit(1)
-
-    if (checkError) throw checkError
+    const existingCheckIn = await hasCheckInOnDate({
+      memberId: member.id,
+      startISO,
+      endISO
+    })
 
     // Si ya existe un check-in en la fecha seleccionada, mostrar mensaje y no registrar
-    if (existingCheckIn && existingCheckIn.length > 0) {
-      const checkInTime = new Date(existingCheckIn[0].created_at).toLocaleTimeString('es-AR', {
+    if (existingCheckIn) {
+      const checkInTime = new Date(existingCheckIn.created_at).toLocaleTimeString('es-AR', {
         hour: '2-digit',
         minute: '2-digit'
       })
@@ -329,15 +344,11 @@ async function handleCheckIn(member) {
     // Registrar asistencia
     const createdAtISO = buildCheckInDateTime(selectedAttendanceDate.value)
 
-    const { error } = await supabase
-      .from('attendance')
-      .insert([{
-        member_id: member.id,
-        acceso_permitido: allowed,
-        created_at: createdAtISO
-      }])
-
-    if (error) throw error
+    await registerCheckIn({
+      memberId: member.id,
+      allowed,
+      createdAt: createdAtISO
+    })
 
     const humanDate = formatDateForHuman(selectedAttendanceDate.value)
 
@@ -381,7 +392,7 @@ async function handleCheckIn(member) {
     searchQuery.value = ''
     searchResults.value = []
   } catch (error) {
-    console.error('Error en check-in:', error)
+    reportClientError('checkin_failed', error)
     await Swal.fire({
       title: 'Error al registrar asistencia',
       text: 'Ocurrió un problema al guardar el check-in. Intentá nuevamente.',
@@ -446,29 +457,6 @@ function formatDateForHuman(dateValue) {
   })
 }
 
-async function loadRecentCheckIns() {
-  try {
-    const { data } = await supabase
-      .from('attendance')
-      .select(`
-        *,
-        members:member_id (
-          nombre,
-          apellido
-        )
-      `)
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    recentCheckIns.value = data?.map(item => ({
-      ...item,
-      member_name: `${item.members.nombre} ${item.members.apellido}`
-    })) || []
-  } catch (error) {
-    console.error('Error cargando check-ins:', error)
-  }
-}
-
 function formatTime(dateString) {
   const date = new Date(dateString)
   return date.toLocaleString('es-AR', {
@@ -479,28 +467,13 @@ function formatTime(dateString) {
   })
 }
 
-function removeAttendanceSubscription() {
-  if (realtimeSubscription) {
-    supabase.removeChannel(realtimeSubscription)
-    realtimeSubscription = null
-  }
-}
-
 // Suscripción a Supabase Realtime para actualizar el feed en vivo
 function subscribeToAttendance() {
-  removeAttendanceSubscription()
-
-  realtimeSubscription = supabase
-    .channel('public:attendance')
-    .on(
-      'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'attendance' },
-      () => {
-        // Cuando entra un nuevo check-in, recargamos la lista
-        loadRecentCheckIns()
-      }
-    )
-    .subscribe()
+  stopAttendanceSubscription?.()
+  stopAttendanceSubscription = subscribeToAttendanceInserts({
+    channelName: 'checkin-attendance',
+    limit: 10
+  })
 }
 
 async function refreshCheckInView() {
@@ -517,7 +490,8 @@ useAppResume(async () => {
 }, { minIntervalMs: 1500, showToast: true })
 
 onUnmounted(() => {
-  removeAttendanceSubscription()
+  stopAttendanceSubscription?.()
+  unsubscribeAttendance()
   if (searchTimeout) clearTimeout(searchTimeout)
 })
 </script>

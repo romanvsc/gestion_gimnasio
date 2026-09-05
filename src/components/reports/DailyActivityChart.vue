@@ -38,6 +38,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
+import { COLOR_SCALES, colorToRgba } from '@/config/brand'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -90,22 +91,22 @@ const chartData = computed(() => {
         label: 'Asistencias',
         data: activityByDay,
         backgroundColor: [
-          'rgba(239, 68, 68, 0.8)',   // Domingo - Rojo (día libre)
-          'rgba(59, 130, 246, 0.8)',   // Lunes
-          'rgba(59, 130, 246, 0.8)',   // Martes
-          'rgba(59, 130, 246, 0.8)',   // Miércoles
-          'rgba(59, 130, 246, 0.8)',   // Jueves
-          'rgba(59, 130, 246, 0.8)',   // Viernes
-          'rgba(251, 146, 60, 0.8)'    // Sábado - Naranja (medio día)
+          colorToRgba(COLOR_SCALES.danger[500], 0.8),
+          colorToRgba(COLOR_SCALES.info[500], 0.8),
+          colorToRgba(COLOR_SCALES.info[500], 0.8),
+          colorToRgba(COLOR_SCALES.info[500], 0.8),
+          colorToRgba(COLOR_SCALES.info[500], 0.8),
+          colorToRgba(COLOR_SCALES.info[500], 0.8),
+          colorToRgba(COLOR_SCALES.primary[400], 0.8)
         ],
         borderColor: [
-          'rgb(239, 68, 68)',
-          'rgb(59, 130, 246)',
-          'rgb(59, 130, 246)',
-          'rgb(59, 130, 246)',
-          'rgb(59, 130, 246)',
-          'rgb(59, 130, 246)',
-          'rgb(251, 146, 60)'
+          COLOR_SCALES.danger[500],
+          COLOR_SCALES.info[500],
+          COLOR_SCALES.info[500],
+          COLOR_SCALES.info[500],
+          COLOR_SCALES.info[500],
+          COLOR_SCALES.info[500],
+          COLOR_SCALES.primary[400]
         ],
         borderWidth: 1,
         borderRadius: 4,
@@ -127,7 +128,7 @@ const chartOptions = {
       display: false
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: colorToRgba(COLOR_SCALES.neutral[950], 0.8),
       padding: 12,
       titleFont: {
         size: 14,
@@ -159,7 +160,7 @@ const chartOptions = {
     y: {
       beginAtZero: true,
       grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
+        color: colorToRgba(COLOR_SCALES.neutral[950], 0.05)
       },
       ticks: {
         font: {

@@ -279,8 +279,8 @@
             <button
               v-for="method in paymentMethods"
               :key="method.id"
-              @click="togglePaymentMethod(method)"
               type="button"
+              @click="togglePaymentMethod(method)"
               :aria-pressed="method.activo"
               :aria-label="`${method.activo ? 'Desactivar' : 'Activar'} medio de pago ${method.nombre}`"
               class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all touch-manipulation"
@@ -351,6 +351,7 @@ import SuccessModal from '@/components/ui/SuccessModal.vue'
 import GymLogo from '@/components/brand/GymLogo.vue'
 import { BRAND } from '@/config/brand'
 import { LOGO_ACCEPT, validateLogoFile } from '@/utils/logoUpload'
+import { reportClientError } from '@/lib/observability'
 import { 
   ArrowLeft, 
   ImageIcon, 
@@ -512,7 +513,7 @@ async function handleLogoUpload(event) {
     )
     formData.logo_url = settings.logo_url
   } catch (err) {
-    console.error('Error al subir logo:', err)
+    reportClientError('settings.view_logo_upload', err)
   } finally {
     uploadingLogo.value = false
     event.target.value = ''
@@ -537,7 +538,7 @@ async function handleDeleteLogo() {
     )
     formData.logo_url = null
   } catch (err) {
-    console.error('Error al eliminar logo:', err)
+    reportClientError('settings.view_logo_delete', err)
   }
 }
 
@@ -604,7 +605,7 @@ async function handleSavePlan(planData) {
       }
     }
   } catch (err) {
-    console.error('Error guardando plan:', err)
+    reportClientError('settings.plan_create', err)
     toast.error('Error inesperado')
   }
 }
@@ -625,7 +626,7 @@ async function togglePaymentMethod(method) {
       toast.error('Error al actualizar')
     }
   } catch (err) {
-    console.error('Error:', err)
+    reportClientError('settings.plan_update', err)
     toast.error('Error inesperado')
   }
 }
@@ -659,7 +660,7 @@ async function handleSave() {
     successModalConfig.buttonText = 'Perfecto'
     showSuccessModal.value = true
   } catch (err) {
-    console.error('Error al guardar:', err)
+    reportClientError('settings.save', err)
     toast.error('Error al guardar la configuración')
   } finally {
     saving.value = false

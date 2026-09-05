@@ -37,8 +37,9 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
-import { supabase } from '@/lib/supabase'
-import { BRAND } from '@/config/brand'
+import { BRAND, COLOR_SCALES, colorToRgba } from '@/config/brand'
+import { useReports } from '@/composables/useReports'
+import { reportClientError } from '@/lib/observability'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -59,6 +60,7 @@ const weekData = ref([
   { day: 'Sáb', fullDay: 'Sábado', count: 0 },
   { day: 'Dom', fullDay: 'Domingo', count: 0 }
 ])
+const { fetchAttendanceByRange } = useReports()
 
 const totalWeek = computed(() => {
   return weekData.value.reduce((sum, d) => sum + d.count, 0)
@@ -87,15 +89,15 @@ const chartData = computed(() => ({
         const today = new Date()
         const todayIndex = (today.getDay() + 6) % 7
         if (index === todayIndex) {
-          return `rgba(${BRAND.colors.primaryRgb}, 1)` // primary-600 sólido para hoy
+          return colorToRgba(BRAND.colors.primary, 1)
         }
-        return `rgba(${BRAND.colors.primaryRgb}, 0.6)` // primary-600 con transparencia
+        return colorToRgba(BRAND.colors.primary, 0.6)
       }),
-      borderColor: `rgba(${BRAND.colors.primaryRgb}, 1)`,
+      borderColor: colorToRgba(BRAND.colors.primary, 1),
       borderWidth: 0,
       borderRadius: 8,
       borderSkipped: false,
-      hoverBackgroundColor: `rgba(${BRAND.colors.primaryRgb}, 0.9)`,
+      hoverBackgroundColor: colorToRgba(BRAND.colors.primary, 0.9),
       barThickness: 'flex',
       maxBarThickness: 50
     }
@@ -110,7 +112,7 @@ const chartOptions = {
       display: false
     },
     tooltip: {
-      backgroundColor: 'rgba(31, 41, 55, 0.95)',
+      backgroundColor: colorToRgba(COLOR_SCALES.neutral[800], 0.95),
       padding: 12,
       cornerRadius: 8,
       displayColors: false,
@@ -143,7 +145,7 @@ const chartOptions = {
           size: 12,
           weight: '500'
         },
-        color: '#6b7280'
+        color: COLOR_SCALES.neutral[500]
       },
       border: {
         display: false
@@ -151,14 +153,14 @@ const chartOptions = {
     },
     y: {
       grid: {
-        color: 'rgba(229, 231, 235, 0.5)',
+        color: colorToRgba(COLOR_SCALES.neutral[200], 0.5),
         drawBorder: false
       },
       ticks: {
         font: {
           size: 11
         },
-        color: '#9ca3af',
+        color: COLOR_SCALES.neutral[400],
         stepSize: 1,
         callback: (value) => {
           if (Number.isInteger(value)) {
@@ -191,17 +193,14 @@ async function loadWeekData() {
     lastWeek.setDate(today.getDate() - 6)
     lastWeek.setHours(0, 0, 0, 0)
 
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('created_at')
-      .gte('created_at', lastWeek.toISOString())
+    const endDate = new Date(today)
+    endDate.setDate(endDate.getDate() + 1)
+    const result = await fetchAttendanceByRange(lastWeek.toISOString(), endDate.toISOString())
 
-    if (error) throw error
-
-    if (data) {
+    if (result.success) {
       // Contar por día de la semana
       const counts = [0, 0, 0, 0, 0, 0, 0]
-      data.forEach(item => {
+      result.data.forEach(item => {
         const date = new Date(item.created_at)
         const dayIndex = (date.getDay() + 6) % 7 // Ajustar para que Lun=0
         counts[dayIndex]++
@@ -213,7 +212,7 @@ async function loadWeekData() {
       }))
     }
   } catch (error) {
-    console.error('Error cargando datos de asistencia:', error)
+    reportClientError('reports.assistance_chart', error)
   }
 }
 

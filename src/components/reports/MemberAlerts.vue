@@ -171,8 +171,8 @@ function handleShowInactive() {
   showInactiveModal.value = true
 }
 
-function handleExportOverdue() {
-  const result = exportOverdueMembers()
+async function handleExportOverdue() {
+  const result = await exportOverdueMembers()
   if (result.success) {
     toast.success('Archivo Excel descargado correctamente')
   } else {
@@ -180,8 +180,8 @@ function handleExportOverdue() {
   }
 }
 
-function handleExportInactive() {
-  const result = exportInactiveMembers()
+async function handleExportInactive() {
+  const result = await exportInactiveMembers()
   if (result.success) {
     toast.success('Archivo Excel descargado correctamente')
   } else {

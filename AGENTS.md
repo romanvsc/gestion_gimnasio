@@ -105,7 +105,7 @@ primario; los demás participan como revisores cuando sus contratos son afectado
 **Propietario de:**
 
 - login, sesión, cierre de sesión y recuperación del estado autenticado;
-- roles `admin` y `staff`, guardas de rutas y permisos;
+- roles `admin` y `recepcion` (con `staff` heredado si aparece en datos), guardas de rutas y permisos;
 - altas, edición y activación/desactivación de usuarios internos;
 - `auth.users`, `staff` y el adaptador `supabaseGhost`.
 

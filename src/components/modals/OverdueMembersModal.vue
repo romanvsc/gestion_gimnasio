@@ -1,32 +1,15 @@
 <template>
-  <Teleport to="body">
-    <div v-if="visible" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex min-h-[100dvh] items-end justify-center px-0 pt-0 pb-0 text-center sm:items-center sm:px-4 sm:pt-4 sm:pb-20 sm:p-0">
-        <!-- Overlay -->
-        <div 
-          class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          @click="$emit('close')"
-        ></div>
-
-        <!-- Modal Panel -->
-        <div class="relative inline-block max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full align-bottom overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transform transition-all dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:my-8 sm:max-h-[90vh] sm:align-middle sm:max-w-4xl sm:rounded-lg" role="dialog" aria-modal="true" aria-labelledby="overdue-members-modal-title">
-          <!-- Header -->
-          <div class="border-b border-red-100 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-900/20 sm:px-6 sm:py-4">
-            <div class="flex items-center justify-between">
-              <h3 id="overdue-members-modal-title" class="text-lg font-semibold text-red-900 dark:text-red-300 flex items-center gap-2">
-                <AlertCircle class="w-5 h-5" />
-                Socios con Cuota Vencida ({{ members.length }})
-              </h3>
-              <button 
-                type="button"
-                aria-label="Cerrar socios con cuota vencida"
-                @click="$emit('close')"
-                class="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-400 transition-colors"
-              >
-                <X class="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+  <BaseModal
+    :model-value="visible"
+    :title="`Socios con cuota vencida (${members.length})`"
+    size="xl"
+    header-class="bg-red-50 dark:bg-red-900/20"
+    :max-body-height="'calc(100dvh - var(--mobile-nav-height) - 8rem)'"
+    @close="$emit('close')"
+  >
+    <template #icon>
+      <AlertCircle class="h-5 w-5 text-red-600 dark:text-red-400" aria-hidden="true" />
+    </template>
 
           <!-- Tarjetas para pantallas compactas -->
           <div class="max-h-[calc(100dvh-var(--mobile-nav-height)-12rem)] space-y-3 overflow-y-auto p-4 xl:hidden">
@@ -78,8 +61,8 @@
             </table>
           </div>
 
-          <!-- Footer -->
-          <div class="flex flex-col items-start justify-between gap-3 bg-gray-50 px-4 py-3 dark:bg-white/5 sm:flex-row sm:items-center sm:px-6 sm:py-4">
+    <template #footer>
+      <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
             <p class="text-sm text-gray-600 dark:text-gray-400">
               Total: {{ members.length }} socios
             </p>
@@ -92,17 +75,16 @@
                 Exportar Excel
               </BaseButton>
             </div>
-          </div>
-        </div>
       </div>
-    </div>
-  </Teleport>
+    </template>
+  </BaseModal>
 </template>
 
 <script setup>
-import { AlertCircle, X, Download } from 'lucide-vue-next'
+import { AlertCircle, Download } from 'lucide-vue-next'
 import { formatDate } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
 
 defineProps({
   visible: {

@@ -16,6 +16,7 @@
         <svg 
           v-if="type === 'danger'" 
           class="w-5 h-5" 
+          aria-hidden="true"
           :class="iconClasses"
           xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
         >
@@ -24,6 +25,7 @@
         <svg 
           v-else-if="type === 'warning'" 
           class="w-5 h-5" 
+          aria-hidden="true"
           :class="iconClasses"
           xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
         >
@@ -32,6 +34,7 @@
         <svg 
           v-else 
           class="w-5 h-5" 
+          aria-hidden="true"
           :class="iconClasses"
           xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
         >
@@ -69,6 +72,7 @@
 import { computed } from 'vue'
 import BaseModal from './BaseModal.vue'
 import BaseButton from './BaseButton.vue'
+import { UI_TOKENS } from '@/config/uiTokens'
 
 const props = defineProps({
   modelValue: {
@@ -105,15 +109,11 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'confirm', 'cancel'])
 
 const iconContainerClasses = computed(() => ({
-  'bg-red-100 dark:bg-red-900/30': props.type === 'danger',
-  'bg-amber-100 dark:bg-amber-900/30': props.type === 'warning',
-  'bg-blue-100 dark:bg-blue-900/30': props.type === 'info'
+  [UI_TOKENS.iconTones[props.type]]: true
 }))
 
 const iconClasses = computed(() => ({
-  'text-red-600 dark:text-red-400': props.type === 'danger',
-  'text-amber-600 dark:text-amber-400': props.type === 'warning',
-  'text-blue-600 dark:text-blue-400': props.type === 'info'
+  [UI_TOKENS.iconTextTones[props.type]]: true
 }))
 
 function handleConfirm() {

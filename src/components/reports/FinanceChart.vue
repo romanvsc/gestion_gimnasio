@@ -49,6 +49,7 @@ import {
   Filler
 } from 'chart.js'
 import { formatCurrencyFull } from '@/utils/formatters'
+import { BRAND, COLOR_SCALES, colorToRgba } from '@/config/brand'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -103,29 +104,29 @@ const chartData = computed(() => {
       {
         label: 'Ingresos',
         data: props.data.map(item => parseFloat(item.ingresos) || 0),
-        borderColor: 'rgb(16, 185, 129)', // green-500
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderColor: BRAND.colors.success,
+        backgroundColor: colorToRgba(BRAND.colors.success, 0.1),
         borderWidth: 2,
         tension: 0.4, // Curva suave
         fill: true,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgb(16, 185, 129)',
-        pointBorderColor: '#fff',
+        pointBackgroundColor: BRAND.colors.success,
+        pointBorderColor: COLOR_SCALES.neutral[50],
         pointBorderWidth: 2
       },
       {
         label: 'Egresos',
         data: props.data.map(item => parseFloat(item.egresos) || 0),
-        borderColor: 'rgb(239, 68, 68)', // red-500
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        borderColor: BRAND.colors.danger,
+        backgroundColor: colorToRgba(BRAND.colors.danger, 0.1),
         borderWidth: 2,
         tension: 0.4,
         fill: true,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: 'rgb(239, 68, 68)',
-        pointBorderColor: '#fff',
+        pointBackgroundColor: BRAND.colors.danger,
+        pointBorderColor: COLOR_SCALES.neutral[50],
         pointBorderWidth: 2
       }
     ]
@@ -161,7 +162,7 @@ const chartOptions = {
       }
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: colorToRgba(COLOR_SCALES.neutral[950], 0.8),
       padding: 12,
       titleFont: {
         size: 14,
@@ -174,7 +175,7 @@ const chartOptions = {
         label: function(context) {
           const label = context.dataset.label || ''
           const value = context.parsed.y
-          return `${label}: $${value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+          return `${label}: ${formatCurrencyFull(value)}`
         }
       }
     }
@@ -193,14 +194,14 @@ const chartOptions = {
     y: {
       beginAtZero: true,
       grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
+        color: colorToRgba(COLOR_SCALES.neutral[950], 0.05)
       },
       ticks: {
         font: {
           size: 11
         },
         callback: function(value) {
-          return '$' + value.toLocaleString('es-AR', { minimumFractionDigits: 0 })
+          return formatCurrencyFull(value)
         }
       }
     }

@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { planCatalog } from '@/contexts/plans-catalog'
 import { billingCash } from '@/contexts/billing-cash'
+import { reportClientError } from '@/lib/observability'
 
 export function usePayments() {
   const payments = ref([])
@@ -22,7 +23,7 @@ export function usePayments() {
       plans.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener planes:', err)
+      reportClientError('billing.plans_fetch', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -42,7 +43,7 @@ export function usePayments() {
 
       return { success: true, data }
     } catch (err) {
-      console.error('Error al crear pago:', err)
+      reportClientError('billing.payment_create', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -63,7 +64,7 @@ export function usePayments() {
       payments.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener pagos:', err)
+      reportClientError('billing.payments_fetch', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {

@@ -40,13 +40,20 @@
               <th 
                 v-for="col in columns" 
                 :key="col.key"
+                scope="col"
                 :class="[
                   'px-6 py-4 text-xs font-semibold uppercase tracking-wider',
                   col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
                   col.sortable ? 'cursor-pointer select-none hover:text-primary-600 dark:hover:text-primary-400 transition-colors' : '',
                   'text-gray-500 dark:text-gray-400'
                 ]"
+                :tabindex="col.sortable ? 0 : undefined"
+                :role="col.sortable ? 'button' : undefined"
+                :aria-label="col.sortable ? `Ordenar por ${col.label}` : undefined"
+                :aria-sort="col.sortable && sortKey === col.key ? (sortOrder === 'asc' ? 'ascending' : 'descending') : undefined"
                 @click="col.sortable && handleSort(col.key)"
+                @keydown.enter.prevent="col.sortable && handleSort(col.key)"
+                @keydown.space.prevent="col.sortable && handleSort(col.key)"
               >
                 <span class="inline-flex items-center gap-1">
                   {{ col.label }}

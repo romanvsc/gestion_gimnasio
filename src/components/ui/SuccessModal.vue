@@ -1,77 +1,44 @@
 <template>
-  <Teleport to="body">
-    <Transition name="modal">
-      <div 
-        v-if="modelValue" 
-        class="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
-        @click.self="close"
-      >
-        <!-- Backdrop con blur -->
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-        
-        <!-- Modal Card -->
-        <div class="relative max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full max-w-sm transform overflow-y-auto rounded-t-3xl bg-white shadow-2xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[95vh] sm:rounded-3xl" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
-          <!-- Fondo decorativo superior con degradado -->
-          <div 
-            class="absolute top-0 left-0 right-0 h-36"
-            :class="bgGradientClass"
-          />
-          
-          <!-- Partículas decorativas -->
-          <div class="absolute top-4 left-6 w-2 h-2 bg-white/30 rounded-full animate-pulse" />
-          <div class="absolute top-8 right-8 w-3 h-3 bg-white/20 rounded-full animate-pulse delay-100" />
-          <div class="absolute top-16 left-12 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse delay-200" />
-          
-          <!-- Contenido -->
-          <div class="relative p-6 pt-10">
-            <!-- Ícono circular grande con sombra -->
-            <div class="flex justify-center mb-5">
-              <div 
-                class="w-24 h-24 rounded-full flex items-center justify-center shadow-xl ring-4 ring-white"
-                :class="iconBgClass"
-              >
-                <component 
-                  :is="iconComponent" 
-                  class="w-12 h-12"
-                  :class="iconColorClass"
-                />
-              </div>
-            </div>
-            
-            <!-- Título -->
-            <h3 id="success-modal-title" class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-2">
-              {{ title }}
-            </h3>
-            
-            <!-- Mensaje -->
-            <p class="text-center text-gray-500 dark:text-gray-400 mb-6 text-base leading-relaxed px-2">
-              {{ message }}
-            </p>
-            
-            <!-- Detalles (slot para contenido adicional) -->
-            <div v-if="$slots.default" class="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 mb-6">
-              <slot />
-            </div>
-            
-            <!-- Botón con degradado -->
-            <button
-              type="button"
-              @click="close"
-              class="w-full py-4 rounded-2xl font-semibold text-white transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-              :class="buttonClass"
-            >
-              {{ buttonText }}
-            </button>
-          </div>
-        </div>
+  <BaseModal
+    :model-value="modelValue"
+    :title="title"
+    size="sm"
+    :show-close="false"
+    :max-body-height="'calc(100dvh - var(--mobile-nav-height) - 8rem)'"
+    @close="close"
+  >
+    <template #icon>
+      <component :is="iconComponent" class="h-5 w-5" :class="iconColorClass" aria-hidden="true" />
+    </template>
+
+    <div class="py-2 text-center">
+      <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full shadow-lg ring-4 ring-white dark:ring-page-card" :class="iconBgClass">
+        <component :is="iconComponent" class="h-10 w-10" :class="iconColorClass" aria-hidden="true" />
       </div>
-    </Transition>
-  </Teleport>
+      <p class="text-base leading-relaxed text-page-subtitle">{{ message }}</p>
+
+      <div v-if="$slots.default" class="mt-5 rounded-2xl bg-gray-50 p-4 dark:bg-white/5">
+        <slot />
+      </div>
+    </div>
+
+    <template #footer>
+      <button
+        type="button"
+        @click="close"
+        class="w-full rounded-xl px-4 py-3 font-semibold text-white transition-all hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+        :class="buttonClass"
+      >
+        {{ buttonText }}
+      </button>
+    </template>
+  </BaseModal>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-vue-next'
+import BaseModal from './BaseModal.vue'
 
 const props = defineProps({
   modelValue: {
@@ -80,7 +47,7 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'success', // success, warning, error, info
+    default: 'success',
     validator: (val) => ['success', 'warning', 'error', 'info'].includes(val)
   },
   title: {
@@ -99,31 +66,26 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'close'])
 
-// Mapeo de configuración según el tipo
 const typeConfig = computed(() => ({
   success: {
-    bgGradient: 'bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600',
-    iconBg: 'bg-white',
-    iconColor: 'text-emerald-500',
-    button: 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/30',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    button: 'bg-emerald-600 hover:bg-emerald-700'
   },
   warning: {
-    bgGradient: 'bg-gradient-to-br from-amber-400 via-orange-500 to-yellow-600',
-    iconBg: 'bg-white',
-    iconColor: 'text-amber-500',
-    button: 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700'
+    iconBg: 'bg-warning-100 dark:bg-warning-900/30',
+    iconColor: 'text-warning-700 dark:text-warning-300',
+    button: 'bg-warning-600 hover:bg-warning-700'
   },
   error: {
-    bgGradient: 'bg-gradient-to-br from-red-400 via-rose-500 to-pink-600',
-    iconBg: 'bg-white',
-    iconColor: 'text-red-500',
-    button: 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700'
+    iconBg: 'bg-danger-100 dark:bg-danger-900/30',
+    iconColor: 'text-danger-600 dark:text-danger-400',
+    button: 'bg-danger-600 hover:bg-danger-700'
   },
   info: {
-    bgGradient: 'bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600',
-    iconBg: 'bg-white',
-    iconColor: 'text-blue-500',
-    button: 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700'
+    iconBg: 'bg-info-100 dark:bg-info-900/30',
+    iconColor: 'text-info-600 dark:text-info-400',
+    button: 'bg-info-600 hover:bg-info-700'
   }
 }))
 
@@ -134,49 +96,13 @@ const iconMap = {
   info: Info
 }
 
-const bgGradientClass = computed(() => typeConfig.value[props.type].bgGradient)
+const iconComponent = computed(() => iconMap[props.type])
 const iconBgClass = computed(() => typeConfig.value[props.type].iconBg)
 const iconColorClass = computed(() => typeConfig.value[props.type].iconColor)
 const buttonClass = computed(() => typeConfig.value[props.type].button)
-const iconComponent = computed(() => iconMap[props.type])
 
 function close() {
   emit('update:modelValue', false)
   emit('close')
 }
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-active > div:last-child,
-.modal-leave-active > div:last-child {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from > div:last-child {
-  transform: scale(0.85) translateY(30px);
-  opacity: 0;
-}
-
-.modal-leave-to > div:last-child {
-  transform: scale(0.9) translateY(20px);
-  opacity: 0;
-}
-
-.delay-100 {
-  animation-delay: 100ms;
-}
-
-.delay-200 {
-  animation-delay: 200ms;
-}
-</style>

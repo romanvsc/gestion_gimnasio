@@ -1,22 +1,23 @@
-import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
+import { BRAND, COLOR_SCALES } from '@/config/brand'
+import { formatCurrency } from '@/utils/formatters'
+import { downloadExcelWorkbook } from '@/utils/excelExport'
+import { reportClientError } from '@/lib/observability'
+
+function hexToRgb(hex) {
+    const normalized = hex.replace('#', '')
+    return [
+        parseInt(normalized.slice(0, 2), 16),
+        parseInt(normalized.slice(2, 4), 16),
+        parseInt(normalized.slice(4, 6), 16)
+    ]
+}
 
 /**
  * Composable para exportar datos del Dashboard a Excel y PDF
  */
 export function useExport() {
-
-    /**
-     * Formatea un número como moneda
-     */
-    function formatCurrency(value) {
-        return new Intl.NumberFormat('es-AR', {
-            style: 'decimal',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(value)
-    }
 
     /**
      * Formatea fecha para nombre de archivo
@@ -33,10 +34,8 @@ export function useExport() {
      * @param {string} options.gymName - Nombre del gimnasio
      * @param {string} options.periodLabel - Etiqueta del periodo seleccionado
      */
-    function exportToExcel({ stats, checkIns, gymName, periodLabel }) {
+    async function exportToExcel({ stats, checkIns, gymName, periodLabel }) {
         try {
-            const wb = XLSX.utils.book_new()
-
             // Hoja 1: Resumen de estadísticas
             const statsData = [
                 ['Dashboard - ' + gymName],
@@ -51,12 +50,7 @@ export function useExport() {
                 ['Total Miembros', stats.totalMembers]
             ]
 
-            const ws1 = XLSX.utils.aoa_to_sheet(statsData)
-
-            // Ajustar ancho de columnas
-            ws1['!cols'] = [{ wch: 25 }, { wch: 20 }]
-
-            XLSX.utils.book_append_sheet(wb, ws1, 'Resumen')
+            const sheets = [{ name: 'Resumen', data: statsData, widths: [25, 20] }]
 
             // Hoja 2: Check-ins recientes
             if (checkIns && checkIns.length > 0) {
@@ -70,19 +64,20 @@ export function useExport() {
                     checkInsData.push([c.name, c.dni, c.time, c.statusLabel])
                 })
 
-                const ws2 = XLSX.utils.aoa_to_sheet(checkInsData)
-                ws2['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 12 }]
-
-                XLSX.utils.book_append_sheet(wb, ws2, 'Check-Ins')
+                sheets.push({
+                    name: 'Check-Ins',
+                    data: checkInsData,
+                    widths: [30, 15, 15, 12]
+                })
             }
 
             // Descargar archivo
             const filename = `dashboard_${gymName.replace(/\s+/g, '_')}_${formatDateForFilename()}.xlsx`
-            XLSX.writeFile(wb, filename)
+            await downloadExcelWorkbook(sheets, filename)
 
             return { success: true, filename }
         } catch (error) {
-            console.error('Error exportando a Excel:', error)
+            reportClientError('report.export_excel', error)
             return { success: false, error: error.message }
         }
     }
@@ -101,8 +96,8 @@ export function useExport() {
             const doc = new jsPDF()
 
             // Colores del tema
-            const primaryColor = [37, 99, 235] // primary-600
-            const grayColor = [107, 114, 128] // gray-500
+            const primaryColor = hexToRgb(BRAND.colors.primary)
+            const grayColor = hexToRgb(COLOR_SCALES.neutral[500])
 
             // Título
             doc.setFontSize(22)
@@ -207,7 +202,7 @@ export function useExport() {
 
             return { success: true, filename }
         } catch (error) {
-            console.error('Error exportando a PDF:', error)
+            reportClientError('report.export_pdf', error)
             return { success: false, error: error.message }
         }
     }

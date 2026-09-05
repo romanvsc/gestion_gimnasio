@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (import.meta.env.DEV && (!supabaseUrl || !supabaseAnonKey)) {
     console.error('ADVERTENCIA: ¡Faltan las credenciales de Supabase en el archivo .env!')
 }
 
@@ -44,7 +44,9 @@ const fetchWithRetry = async (url, options = {}) => {
         throw error;
       }
       
-      console.warn(`[Supabase Fetch] Fallo temporal de red. Intento ${attempt}/${maxRetries}. Reintentando en ${baseDelay * attempt}ms...`, error.message);
+      if (import.meta.env.DEV) {
+        console.warn(`[Supabase Fetch] Fallo temporal de red. Intento ${attempt}/${maxRetries}. Reintentando en ${baseDelay * attempt}ms...`)
+      }
       await new Promise(resolve => setTimeout(resolve, baseDelay * attempt));
     }
   }

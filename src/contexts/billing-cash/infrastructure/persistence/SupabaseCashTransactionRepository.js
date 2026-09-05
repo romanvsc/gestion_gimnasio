@@ -1,5 +1,7 @@
 import { CashTransaction } from '../../domain/entities/CashTransaction.js'
 
+const TRANSACTION_FIELDS = 'id, created_at, tipo, categoria, descripcion, monto, created_by, payment_id'
+
 function toStartOfDay(date) {
   return `${date}T00:00:00`
 }
@@ -33,7 +35,7 @@ export function createSupabaseCashTransactionRepository({ client, executeQuery }
       const data = await executeQuery(() =>
         client
           .from('transactions')
-          .select('*')
+          .select(TRANSACTION_FIELDS)
           .gte('created_at', toStartOfDay(startDate))
           .lte('created_at', toEndOfDay(endDate))
           .order('created_at', { ascending: false })
@@ -47,7 +49,7 @@ export function createSupabaseCashTransactionRepository({ client, executeQuery }
         client
           .from('transactions')
           .insert(transaction.toPersistence())
-          .select('*')
+          .select(TRANSACTION_FIELDS)
           .single()
       )
 

@@ -57,7 +57,9 @@ export class Payment {
     monto,
     metodo_pago,
     fecha_inicio,
-    fecha_fin
+    fecha_fin,
+    plan_nombre = null,
+    plans = null
   }) {
     const normalizedStartDate = normalizeIsoDate(fecha_inicio, 'La fecha de inicio')
     const normalizedEndDate = normalizeIsoDate(fecha_fin, 'La fecha de fin')
@@ -74,6 +76,7 @@ export class Payment {
     this.metodo_pago = requireText(metodo_pago, 'El método de pago')
     this.fecha_inicio = normalizedStartDate
     this.fecha_fin = normalizedEndDate
+    this.plan_nombre = plan_nombre || plans?.nombre || null
 
     Object.freeze(this)
   }
@@ -101,7 +104,8 @@ export class Payment {
     return {
       id: this.id,
       created_at: this.created_at,
-      ...this.toPersistence()
+      ...this.toPersistence(),
+      plan_nombre: this.plan_nombre
     }
   }
 }

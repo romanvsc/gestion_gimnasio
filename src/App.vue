@@ -53,9 +53,10 @@ const { isDark } = useTheme()
 // Inicializar la sesión al cargar la app
 onMounted(async () => {
   await userStore.initSession()
-  
-  // Cargar configuración global del gimnasio
-  await fetchSettings()
+
+  // La identidad tiene fallback local: no bloquear la aplicación completa si
+  // la red o Supabase tardan al volver del modo suspendido/PWA.
+  void fetchSettings()
 })
 </script>
 

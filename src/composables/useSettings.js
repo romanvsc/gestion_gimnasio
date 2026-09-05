@@ -3,7 +3,9 @@ import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 import { toast } from 'vue-sonner'
 import { BRAND } from '@/config/brand'
-import { getLogoUploadInfo, validateLogoFile } from '@/utils/logoUpload'
+import { getLogoUploadInfo, sanitizeSvgFile, validateLogoFile } from '@/utils/logoUpload'
+import { normalizeGymName } from '@/contexts/gym-identity-config/domain/services/normalizeGymName.js'
+import { reportClientError } from '@/lib/observability'
 
 // Estado reactivo global compartido (Singleton)
 const state = reactive({
@@ -19,6 +21,19 @@ const state = reactive({
   error: null
 })
 
+const PUBLIC_CONFIG_FIELDS = 'id, nombre_gimnasio, logo_url'
+const AUTHENTICATED_CONFIG_FIELDS = 'id, nombre_gimnasio, email_contacto, whatsapp, horarios_apertura, direccion, created_at, logo_url'
+const SETTINGS_FETCH_TIMEOUT_MS = 8000
+
+function withTimeout(promise, timeoutMs, message) {
+  let timeoutId
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs)
+  })
+
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId))
+}
+
 export function useSettings() {
   /**
    * Obtiene la configuración global del gimnasio
@@ -29,28 +44,43 @@ export function useSettings() {
       state.loading = true
       state.error = null
 
-      const { data, error } = await supabase
-        .from('config')
-        .select('*')
-        .eq('id', 1)
-        .single()
+      // Antes de autenticarse, LoginView solo necesita identidad visual. Pedir
+      // las columnas públicas explícitas evita depender de privilegios de
+      // tabla demasiado amplios para el rol anon.
+      const { data: { session } = {} } = await withTimeout(
+        supabase.auth.getSession(),
+        SETTINGS_FETCH_TIMEOUT_MS,
+        'La configuración tardó demasiado en responder.'
+      )
+      const configFields = session
+        ? AUTHENTICATED_CONFIG_FIELDS
+        : PUBLIC_CONFIG_FIELDS
+
+      const { data, error } = await withTimeout(
+        supabase
+          .from('config')
+          .select(configFields)
+          .eq('id', 1)
+          .single(),
+        SETTINGS_FETCH_TIMEOUT_MS,
+        'La configuración tardó demasiado en responder.'
+      )
 
       if (error) throw error
 
       if (data) {
-        const configuredName = data.nombre_gimnasio?.trim()
-        // Mantener la identidad de marca si la configuración aún conserva el placeholder inicial.
         Object.assign(state.settings, {
           ...data,
-          nombre_gimnasio: !configuredName || configuredName.toLowerCase() === 'gimnasio'
-            ? BRAND.name
-            : configuredName
+          // Mantener la identidad de marca si la configuración aún conserva
+          // un placeholder heredado. La migración persistente se ejecuta por
+          // separado para no mezclar lectura con escritura de configuración.
+          nombre_gimnasio: normalizeGymName(data.nombre_gimnasio, BRAND.name)
         })
       }
 
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener configuración:', err)
+      reportClientError('settings.fetch', err)
       state.error = err.message
       return { success: false, error: err.message }
     } finally {
@@ -76,7 +106,7 @@ export function useSettings() {
           horarios_apertura: formData.horarios_apertura
         })
         .eq('id', 1)
-        .select()
+        .select(AUTHENTICATED_CONFIG_FIELDS)
         .single()
 
       if (error) throw error
@@ -86,7 +116,7 @@ export function useSettings() {
 
       return { success: true, data }
     } catch (err) {
-      console.error('Error al actualizar configuración:', err)
+      reportClientError('settings.update', err)
       state.error = err.message
       throw err
     } finally {
@@ -109,7 +139,7 @@ export function useSettings() {
       const uploadInfo = getLogoUploadInfo(file)
       // Los SVG se conservan intactos; las imágenes raster siguen optimizándose.
       const fileToUpload = uploadInfo.isVector
-        ? file
+        ? await sanitizeSvgFile(file)
         : await imageCompression(file, {
             maxSizeMB: 0.2,
             maxWidthOrHeight: 800,
@@ -130,10 +160,10 @@ export function useSettings() {
             .remove([oldFileName])
           
           if (deleteError) {
-            console.warn('Error al borrar logo anterior:', deleteError)
+            reportClientError('settings.logo_cleanup', deleteError)
           }
         } catch (err) {
-          console.warn('Error al procesar eliminación de logo anterior:', err)
+          reportClientError('settings.logo_cleanup', err)
         }
       }
 
@@ -158,7 +188,7 @@ export function useSettings() {
         .from('config')
         .update({ logo_url: publicUrl })
         .eq('id', 1)
-        .select()
+        .select(AUTHENTICATED_CONFIG_FIELDS)
         .single()
 
       if (updateError) throw updateError
@@ -168,7 +198,7 @@ export function useSettings() {
 
       return { success: true, data }
     } catch (err) {
-      console.error('Error al subir logo:', err)
+      reportClientError('settings.logo_upload', err)
       state.error = err.message
       throw err
     } finally {
@@ -211,7 +241,7 @@ export function useSettings() {
 
       return { success: true }
     } catch (err) {
-      console.error('Error al eliminar logo:', err)
+      reportClientError('settings.logo_delete', err)
       state.error = err.message
       throw err
     } finally {

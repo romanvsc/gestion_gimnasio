@@ -1,6 +1,11 @@
 import { ref, reactive } from 'vue'
 import { supabase } from '@/lib/supabase'
-import * as XLSX from 'xlsx'
+import { reportClientError } from '@/lib/observability'
+import { downloadExcelWorkbook, objectsToExcelRows } from '@/utils/excelExport'
+
+const OVERDUE_MEMBER_FIELDS = 'id, nombre, apellido, dni, email, telefono, fecha_fin_cuota, dias_vencido, activo, estado_cuota, estado_apto_fisico, es_socio_club, plan_id, foto_url'
+const REVENUE_FIELDS = 'created_at, monto'
+const ATTENDANCE_ACTIVITY_FIELDS = 'created_at'
 
 export function useReports() {
   const financeData = ref([])
@@ -41,7 +46,7 @@ export function useReports() {
       financeData.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener estadísticas financieras:', err)
+      reportClientError('reports.finance', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -71,7 +76,7 @@ export function useReports() {
       dailyData.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener actividad diaria:', err)
+      reportClientError('reports.daily_activity', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -101,11 +106,43 @@ export function useReports() {
       hourlyData.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener actividad horaria:', err)
+      reportClientError('reports.hourly_activity', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
       loading.hourly = false
+    }
+  }
+
+  async function fetchRevenueByRange(startDate, endDate) {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('payments')
+        .select(REVENUE_FIELDS)
+        .gte('created_at', startDate)
+        .lt('created_at', endDate)
+
+      if (fetchError) throw fetchError
+      return { success: true, data: data || [] }
+    } catch (err) {
+      reportClientError('reports.revenue_range', err)
+      return { success: false, error: err.message, data: [] }
+    }
+  }
+
+  async function fetchAttendanceByRange(startDate, endDate) {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('attendance')
+        .select(ATTENDANCE_ACTIVITY_FIELDS)
+        .gte('created_at', startDate)
+        .lt('created_at', endDate)
+
+      if (fetchError) throw fetchError
+      return { success: true, data: data || [] }
+    } catch (err) {
+      reportClientError('reports.attendance_range', err)
+      return { success: false, error: err.message, data: [] }
     }
   }
 
@@ -119,7 +156,7 @@ export function useReports() {
 
       const { data, error: fetchError } = await supabase
         .from('v_socios_estado')
-        .select('*')
+        .select(OVERDUE_MEMBER_FIELDS)
         .eq('estado_cuota', 'vencido')
         .eq('activo', true)
         .order('apellido', { ascending: true })
@@ -129,7 +166,7 @@ export function useReports() {
       overdueMembers.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener socios vencidos:', err)
+      reportClientError('reports.overdue_members', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -156,7 +193,7 @@ export function useReports() {
       inactiveMembers.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener socios inactivos:', err)
+      reportClientError('reports.inactive_members', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -169,27 +206,23 @@ export function useReports() {
    * @param {Array} data - Datos a exportar
    * @param {String} filename - Nombre del archivo (sin extensión)
    */
-  function exportToExcel(data, filename = 'reporte') {
+  async function exportToExcel(data, filename = 'reporte') {
     try {
       if (!data || data.length === 0) {
         throw new Error('No hay datos para exportar')
       }
 
-      // Crear worksheet desde los datos
-      const worksheet = XLSX.utils.json_to_sheet(data)
-
-      // Crear workbook
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos')
-
       // Generar archivo y descargar
       const today = new Date().toISOString().split('T')[0]
       const fullFilename = `${filename}-${today}.xlsx`
-      XLSX.writeFile(workbook, fullFilename)
+      await downloadExcelWorkbook([{
+        name: 'Datos',
+        data: objectsToExcelRows(data)
+      }], fullFilename)
 
       return { success: true }
     } catch (err) {
-      console.error('Error al exportar Excel:', err)
+      reportClientError('reports.export_excel', err)
       return { success: false, error: err.message }
     }
   }
@@ -227,17 +260,17 @@ export function useReports() {
   /**
    * Exporta socios vencidos a Excel
    */
-  function exportOverdueMembers() {
+  async function exportOverdueMembers() {
     const formattedData = formatOverdueForExcel()
-    return exportToExcel(formattedData, 'socios-vencidos')
+    return await exportToExcel(formattedData, 'socios-vencidos')
   }
 
   /**
    * Exporta socios inactivos a Excel
    */
-  function exportInactiveMembers() {
+  async function exportInactiveMembers() {
     const formattedData = formatInactiveForExcel()
-    return exportToExcel(formattedData, 'socios-inactivos')
+    return await exportToExcel(formattedData, 'socios-inactivos')
   }
 
   return {
@@ -254,6 +287,8 @@ export function useReports() {
     fetchFinanceStats,
     fetchDailyActivity,
     fetchHourlyActivity,
+    fetchRevenueByRange,
+    fetchAttendanceByRange,
     fetchOverdueMembers,
     fetchInactiveMembers,
     

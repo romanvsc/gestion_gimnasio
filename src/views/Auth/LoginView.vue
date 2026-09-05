@@ -86,6 +86,8 @@
                 placeholder="tucorreo@ejemplo.com"
                 autocomplete="email"
                 required
+                :aria-invalid="emailError ? 'true' : undefined"
+                :aria-describedby="emailError ? 'email-error' : undefined"
                 @input="validateEmailRealTime"
                 @focus="clearFieldError('email')"
                 class="w-full pl-10 pr-4 py-3 text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-200"
@@ -99,7 +101,7 @@
                 <CheckCircle2 class="h-5 w-5 text-green-500" />
               </div>
             </div>
-            <p v-if="emailError" class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+            <p v-if="emailError" id="email-error" role="alert" class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
               <AlertCircle class="h-3.5 w-3.5" />
               {{ emailError }}
             </p>
@@ -121,6 +123,8 @@
                 placeholder="••••••"
                 autocomplete="current-password"
                 required
+                :aria-invalid="passwordError ? 'true' : undefined"
+                :aria-describedby="passwordError ? 'password-error' : capsLockOn ? 'password-caps-lock' : undefined"
                 @input="validatePasswordRealTime"
                 @focus="clearFieldError('password')"
                 @keydown="checkCapsLock"
@@ -142,11 +146,11 @@
               </button>
             </div>
             <!-- Indicador de Caps Lock -->
-            <p v-if="capsLockOn" class="mt-1.5 text-sm text-amber-600 flex items-center gap-1">
+            <p v-if="capsLockOn" id="password-caps-lock" role="status" class="mt-1.5 text-sm text-amber-600 flex items-center gap-1">
               <AlertTriangle class="h-3.5 w-3.5" />
               Bloq Mayús está activado
             </p>
-            <p v-else-if="passwordError" class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
+            <p v-else-if="passwordError" id="password-error" role="alert" class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
               <AlertCircle class="h-3.5 w-3.5" />
               {{ passwordError }}
             </p>
@@ -170,6 +174,8 @@
           <Transition name="shake">
             <div 
               v-if="generalError" 
+              role="alert"
+              aria-live="assertive"
               class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-sm flex items-center"
             >
               <AlertCircle class="h-5 w-5 mr-2 flex-shrink-0" />
@@ -272,14 +278,11 @@ const isFormValid = computed(() => {
 // Cargar email guardado y autofocus
 onMounted(async () => {
   // Cargar configuración del gimnasio primero
-  const result = await fetchSettings()
-  console.log('fetchSettings result:', result)
-  console.log('settings después de fetch:', settings.nombre_gimnasio, settings.logo_url)
+  await fetchSettings()
   settingsReady.value = true
   
   // Actualizar el texto del typewriter con el nombre real
   fullText.value = `Bienvenido a ${settings.nombre_gimnasio || BRAND.name}`
-  console.log('fullText set to:', fullText.value)
   
   // Cargar email guardado
   const savedEmail = localStorage.getItem('rememberedEmail')

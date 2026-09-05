@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery, runCountQuery } from '@/lib/asyncHandler'
+import { reportClientError } from '@/lib/observability'
 
 export const useGymStore = defineStore('gym', () => {
   // Estado
@@ -63,7 +64,7 @@ export const useGymStore = defineStore('gym', () => {
       const totalMembers = await runCountQuery(() =>
         supabase
           .from('members')
-          .select('*', { count: 'exact', head: true })
+          .select('id', { count: 'exact', head: true })
       )
 
       // Obtener miembros activos y vencidos desde la vista
@@ -81,7 +82,7 @@ export const useGymStore = defineStore('gym', () => {
       const todayAttendance = await runCountQuery(() =>
         supabase
           .from('attendance')
-          .select('*', { count: 'exact', head: true })
+          .select('id', { count: 'exact', head: true })
           .gte('created_at', today)
       )
 
@@ -89,7 +90,7 @@ export const useGymStore = defineStore('gym', () => {
       const periodAttendance = await runCountQuery(() =>
         supabase
           .from('attendance')
-          .select('*', { count: 'exact', head: true })
+          .select('id', { count: 'exact', head: true })
           .gte('created_at', rangeStart)
           .lte('created_at', rangeEnd)
       )
@@ -117,7 +118,7 @@ export const useGymStore = defineStore('gym', () => {
 
       return { success: true, data: stats.value }
     } catch (err) {
-      console.error('Error al obtener estadísticas:', err)
+      reportClientError('dashboard.stats', err)
       error.value = err.message
       
       // Resetear stats en caso de error crítico
@@ -149,7 +150,7 @@ export const useGymStore = defineStore('gym', () => {
     const attendance = await runCountQuery(() =>
       supabase
         .from('attendance')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .gte('created_at', rangeStart)
         .lte('created_at', rangeEnd)
     )
@@ -211,7 +212,7 @@ export const useGymStore = defineStore('gym', () => {
 
       return { success: true, data: statsComparison.value }
     } catch (err) {
-      console.error('Error al obtener comparación de estadísticas:', err)
+      reportClientError('dashboard.stats_comparison', err)
       statsComparison.value = {
         revenueChange: 0,
         attendanceChange: 0

@@ -38,6 +38,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
+import { COLOR_SCALES, colorToRgba } from '@/config/brand'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -97,13 +98,13 @@ const chartData = computed(() => {
         data: activityByHour,
         backgroundColor: activityByHour.map(value => 
           value >= peakThreshold 
-            ? 'rgba(16, 185, 129, 0.8)'  // Verde para horarios pico
-            : 'rgba(59, 130, 246, 0.8)'   // Azul para horarios normales
+            ? colorToRgba(COLOR_SCALES.success[500], 0.8)
+            : colorToRgba(COLOR_SCALES.info[500], 0.8)
         ),
         borderColor: activityByHour.map(value => 
           value >= peakThreshold 
-            ? 'rgb(16, 185, 129)' 
-            : 'rgb(59, 130, 246)'
+            ? COLOR_SCALES.success[500]
+            : COLOR_SCALES.info[500]
         ),
         borderWidth: 1,
         borderRadius: 4,
@@ -125,7 +126,7 @@ const chartOptions = {
       display: false
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: colorToRgba(COLOR_SCALES.neutral[950], 0.8),
       padding: 12,
       titleFont: {
         size: 14,
@@ -176,7 +177,7 @@ const chartOptions = {
     y: {
       beginAtZero: true,
       grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
+        color: colorToRgba(COLOR_SCALES.neutral[950], 0.05)
       },
       ticks: {
         font: {

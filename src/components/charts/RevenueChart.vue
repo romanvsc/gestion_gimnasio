@@ -19,9 +19,10 @@ import {
   Legend,
   Filler
 } from 'chart.js'
-import { supabase } from '@/lib/supabase'
 import { formatCurrencyFull } from '@/utils/formatters'
-import { BRAND } from '@/config/brand'
+import { BRAND, COLOR_SCALES, colorToRgba } from '@/config/brand'
+import { useReports } from '@/composables/useReports'
+import { reportClientError } from '@/lib/observability'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -43,6 +44,7 @@ const monthsData = ref([
   { month: 'May', amount: 0 },
   { month: 'Jun', amount: 0 }
 ])
+const { fetchRevenueByRange } = useReports()
 
 const chartData = computed(() => ({
   labels: monthsData.value.map(m => m.month),
@@ -51,13 +53,13 @@ const chartData = computed(() => ({
       label: 'Ingresos',
       data: monthsData.value.map(m => m.amount),
       borderColor: BRAND.colors.primary,
-      backgroundColor: `rgba(${BRAND.colors.primaryRgb}, 0.1)`,
+      backgroundColor: colorToRgba(BRAND.colors.primary, 0.1),
       borderWidth: 3,
       fill: true,
       tension: 0.4, // Línea curva
       pointRadius: 5,
       pointBackgroundColor: BRAND.colors.primary,
-      pointBorderColor: '#fff',
+      pointBorderColor: COLOR_SCALES.neutral[50],
       pointBorderWidth: 2,
       pointHoverRadius: 7,
       pointHoverBorderWidth: 3
@@ -74,7 +76,7 @@ const chartOptions = {
       display: false
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: colorToRgba(COLOR_SCALES.neutral[950], 0.8),
       padding: 12,
       borderRadius: 8,
       displayColors: false,
@@ -100,7 +102,7 @@ const chartOptions = {
         font: {
           size: 12
         },
-        color: '#6b7280' // gray-500
+          color: COLOR_SCALES.neutral[500]
       },
       border: {
         display: false
@@ -114,10 +116,9 @@ const chartOptions = {
         font: {
           size: 12
         },
-        color: '#6b7280', // gray-500
+        color: COLOR_SCALES.neutral[500],
         callback: (value) => {
-          if (value === 0) return '$0'
-          return `$${(value / 1000).toFixed(0)}k`
+          return formatCurrencyFull(value)
         }
       },
       border: {
@@ -137,13 +138,6 @@ const averageRevenue = computed(() => {
   return total / monthsData.value.length
 })
 
-function formatNumber(value) {
-  return new Intl.NumberFormat('es-AR', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(value)
-}
-
 async function loadRevenueData() {
   try {
     // Obtener pagos de los últimos 6 meses
@@ -151,26 +145,26 @@ async function loadRevenueData() {
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     const amounts = [0, 0, 0, 0, 0, 0]
 
-    for (let i = 5; i >= 0; i--) {
-      const date = new Date(today.getFullYear(), today.getMonth() - i, 1)
-      const nextMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 1)
+    const startDate = new Date(today.getFullYear(), today.getMonth() - 5, 1)
+    const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+    const result = await fetchRevenueByRange(startDate.toISOString(), endDate.toISOString())
 
-      const { data } = await supabase
-        .from('payments')
-        .select('monto')
-        .gte('created_at', date.toISOString())
-        .lt('created_at', nextMonth.toISOString())
-
-      if (data) {
-        amounts[5 - i] = data.reduce((sum, p) => sum + Number(p.monto), 0)
-        monthsData.value[5 - i] = {
-          month: monthNames[date.getMonth()],
-          amount: amounts[5 - i]
-        }
+    for (let index = 0; index < 6; index++) {
+      const date = new Date(today.getFullYear(), today.getMonth() - 5 + index, 1)
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`
+      amounts[index] = (result.data || [])
+        .filter(payment => {
+          const paymentDate = new Date(payment.created_at)
+          return `${paymentDate.getFullYear()}-${paymentDate.getMonth()}` === monthKey
+        })
+        .reduce((sum, payment) => sum + Number(payment.monto), 0)
+      monthsData.value[index] = {
+        month: monthNames[date.getMonth()],
+        amount: amounts[index]
       }
     }
   } catch (error) {
-    console.error('Error cargando datos de ingresos:', error)
+    reportClientError('reports.revenue_chart', error)
   }
 }
 

@@ -1,12 +1,12 @@
 import Swal from 'sweetalert2'
-import { BRAND } from '@/config/brand'
+import { BRAND, COLOR_SCALES } from '@/config/brand'
 
 /**
  * Configuración global de SweetAlert2 con estilos Tailwind
  */
 const swalConfig = {
   confirmButtonColor: BRAND.colors.primary,
-  cancelButtonColor: '#e5e7eb', // gray-200
+  cancelButtonColor: COLOR_SCALES.neutral[200],
   cancelButtonText: 'Cancelar',
   confirmButtonText: 'Confirmar',
   customClass: {

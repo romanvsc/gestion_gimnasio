@@ -56,7 +56,7 @@ const routes = [
         path: 'caja',
         name: 'Cash',
         component: () => import('@/views/Cash/CashView.vue'),
-        meta: { role: 'admin' }
+        meta: { roles: ['admin', 'recepcion'] }
       },
       {
         path: 'staff',
@@ -95,18 +95,8 @@ router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   const requiresAuth = to.meta.requiresAuth
 
-  // Verificar sesión directamente con Supabase si el store está vacío
-  if (!userStore.session) {
-    const { supabase } = await import('@/lib/supabase')
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (session) {
-      // Si Supabase tiene sesión pero el store no, actualizar el store
-      userStore.session = session
-      userStore.user = session.user
-      await userStore.checkUserRole(session.user.id)
-    }
-  }
+  // Reutilizar la inicialización acotada del store antes de decidir la ruta.
+  if (!userStore.initialized) await userStore.initSession()
 
   // Si la ruta requiere autenticación y no hay sesión, redirigir a login
   if (requiresAuth && !userStore.isAuthenticated) {
@@ -117,7 +107,10 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'Dashboard' })
   }
   // Verificar Roles (RBAC)
-  else if (to.meta.role && userStore.userRole !== to.meta.role) {
+  else if (
+    (to.meta.role && userStore.userRole !== to.meta.role) ||
+    (to.meta.roles && !to.meta.roles.includes(userStore.userRole))
+  ) {
     toast.error('No tienes permisos para acceder a esta sección.')
     next({ name: 'Dashboard' })
   }

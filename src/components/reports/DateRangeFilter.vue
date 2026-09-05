@@ -12,8 +12,8 @@
         <button
           v-for="range in dateRanges"
           :key="range.value"
-          @click="selectRange(range.value)"
           type="button"
+          @click="selectRange(range.value)"
           :aria-pressed="selectedRange === range.value"
           :class="[
             'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',

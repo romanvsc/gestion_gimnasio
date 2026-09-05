@@ -254,6 +254,7 @@ import { useGymStore } from '@/stores/gymStore'
 import { useSettings } from '@/composables/useSettings'
 import { useAppResume } from '@/composables/useAppResume'
 import { errorAlert } from '@/lib/alerts'
+import { reportClientError } from '@/lib/observability'
 import { formatCurrencyFull, formatDateTime } from '@/utils/formatters'
 import { useAttendance } from '@/composables/useAttendance'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
@@ -299,7 +300,7 @@ async function loadStats() {
     stats.value = gymStore.stats
     statsUpdatedAt.value = new Date()
   } catch (err) {
-    console.error('Error cargando estadísticas:', err)
+    reportClientError('dashboard.stats_fetch', err)
     errorAlert('Error', 'No se pudieron cargar las estadísticas')
   } finally {
     loading.value = false

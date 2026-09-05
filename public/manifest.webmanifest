@@ -1,0 +1,20 @@
+{
+  "name": "Gestión de gimnasio Yacyretá",
+  "short_name": "Yacyretá",
+  "description": "Sistema de gestión para el Club Social y Deportivo Yacyretá",
+  "lang": "es-AR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b0b0c",
+  "theme_color": "#ef3f0a",
+  "icons": [
+    {
+      "src": "/brand/yacyreta-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

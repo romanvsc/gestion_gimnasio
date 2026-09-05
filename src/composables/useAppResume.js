@@ -1,6 +1,7 @@
 import { watch, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { toast } from 'vue-sonner'
+import { reportClientError } from '@/lib/observability'
 
 /**
  * Registra un callback que se ejecuta cuando la app vuelve a foreground.
@@ -31,7 +32,7 @@ export function useAppResume(callback, options = {}) {
       try {
         await callback()
       } catch (err) {
-        console.error('Error en callback de reanudacion de app:', err)
+        reportClientError('app_resume_failed', err)
       } finally {
         inFlight = false
       }

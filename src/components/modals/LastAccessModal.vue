@@ -30,14 +30,14 @@
             <div class="flex min-w-0 items-center gap-3">
               <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-400/10">
                 <span class="text-sm font-semibold text-primary-700 dark:text-primary-300">
-                  {{ getInitials(access.members?.nombre, access.members?.apellido) }}
+                  {{ getInitials(access.name) }}
                 </span>
               </div>
               <div class="min-w-0">
                 <p class="truncate text-sm font-semibold text-page-title">
-                  {{ access.members?.nombre }} {{ access.members?.apellido }}
+                {{ access.name }}
                 </p>
-                <p class="text-xs text-page-muted">DNI: {{ access.members?.dni || '-' }}</p>
+                <p class="text-xs text-page-muted">DNI: {{ access.dni || '-' }}</p>
               </div>
             </div>
             <StatusBadge
@@ -67,15 +67,15 @@
                 <div class="flex items-center gap-3">
                   <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 dark:bg-primary-400/10">
                     <span class="text-sm font-semibold text-primary-700 dark:text-primary-300">
-                      {{ getInitials(access.members?.nombre, access.members?.apellido) }}
+                    {{ getInitials(access.name) }}
                     </span>
                   </div>
                   <span class="text-sm font-medium text-page-title">
-                    {{ access.members?.nombre }} {{ access.members?.apellido }}
+                    {{ access.name }}
                   </span>
                 </div>
               </td>
-              <td class="px-4 py-3 text-sm text-page-subtitle">{{ access.members?.dni || '-' }}</td>
+              <td class="px-4 py-3 text-sm text-page-subtitle">{{ access.dni || '-' }}</td>
               <td class="px-4 py-3 text-sm text-page-subtitle">{{ formatDateTime(access.created_at) }}</td>
               <td class="px-4 py-3">
                 <StatusBadge
@@ -97,22 +97,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { supabase } from '@/lib/supabase'
+import { onMounted } from 'vue'
 import { ListChecks } from 'lucide-vue-next'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { useAttendance } from '@/composables/useAttendance'
 
 const emit = defineEmits(['close'])
 
-const accesses = ref([])
-const loading = ref(false)
-const error = ref(null)
+const {
+  recentCheckIns: accesses,
+  loadingRecent: loading,
+  errorRecent: error,
+  loadRecentCheckIns
+} = useAttendance({ recentLimit: 20 })
 
-function getInitials(nombre, apellido) {
-  const firstInitial = nombre ? nombre.charAt(0).toUpperCase() : ''
-  const lastInitial = apellido ? apellido.charAt(0).toUpperCase() : ''
-  return firstInitial + lastInitial
+function getInitials(name) {
+  return String(name || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part.charAt(0).toUpperCase())
+    .join('')
 }
 
 function formatDateTime(timestamp) {
@@ -127,29 +133,7 @@ function formatDateTime(timestamp) {
 }
 
 async function loadLastAccesses() {
-  try {
-    loading.value = true
-    error.value = null
-
-    const { data, error: fetchError } = await supabase
-      .from('attendance')
-      .select('*, members(nombre, apellido, dni, foto_url)')
-      .order('created_at', { ascending: false })
-      .limit(20)
-
-    if (fetchError) {
-      console.error('Error en query attendance:', fetchError)
-      throw new Error(`Error al consultar accesos: ${fetchError.message}`)
-    }
-
-    accesses.value = data || []
-  } catch (err) {
-    console.error('Error cargando accesos:', err)
-    error.value = err.message || 'Error al cargar los accesos'
-    accesses.value = []
-  } finally {
-    loading.value = false
-  }
+  await loadRecentCheckIns(20)
 }
 
 onMounted(() => {

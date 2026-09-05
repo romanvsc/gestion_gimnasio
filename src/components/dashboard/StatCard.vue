@@ -1,9 +1,12 @@
 <template>
-  <div 
-    @click="handleClick"
+  <component
+    :is="route ? 'button' : 'div'"
+    :type="route ? 'button' : undefined"
+    :aria-label="route ? `${title}: abrir detalle` : undefined"
+    @click="route && handleClick()"
     :class="[
       'rounded-xl border p-5 md:p-6 transition-all duration-200 hover:shadow-md',
-      route ? 'cursor-pointer' : '',
+      route ? 'w-full cursor-pointer text-left' : '',
       badgeVariant === 'urgent'
         ? 'bg-red-50 border-red-200 hover:border-red-300 dark:bg-red-950/40 dark:border-red-500/30 dark:hover:border-red-500/50'
         : 'bg-page-card border-page-border hover:bg-page-card-hover'
@@ -18,6 +21,7 @@
       >
         <component 
           :is="icon" 
+          aria-hidden="true"
           :class="[
             'w-6 h-6',
             darkIconColor
@@ -48,6 +52,7 @@
     <div v-if="showComparison" class="flex items-center gap-1.5 mt-2">
       <component 
         :is="comparisonIcon" 
+        aria-hidden="true"
         :class="[
           'w-4 h-4',
           comparisonIsPositive ? 'text-emerald-500' : 'text-red-500'
@@ -76,7 +81,7 @@
       </span>
       <span class="text-gray-500 text-xs">vs mes anterior</span>
     </div>
-  </div>
+  </component>
 </template>
 
 <script setup>

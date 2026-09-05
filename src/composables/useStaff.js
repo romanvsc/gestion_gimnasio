@@ -1,6 +1,9 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { supabaseGhost } from '@/lib/supabaseGhost'
+import { reportClientError } from '@/lib/observability'
+
+const STAFF_FIELDS = 'id, usuario, email, rol, activo, created_at'
 
 export function useStaff() {
   const staffList = ref([])
@@ -16,14 +19,14 @@ export function useStaff() {
     try {
       const { data, error: err } = await supabase
         .from('staff')
-        .select('*')
+        .select(STAFF_FIELDS)
         .order('created_at', { ascending: false })
 
       if (err) throw err
       staffList.value = data || []
     } catch (err) {
       error.value = err.message
-      console.error('Error cargando staff:', err)
+      reportClientError('staff.list', err)
     } finally {
       loading.value = false
     }
@@ -73,7 +76,7 @@ export function useStaff() {
       return { success: true }
     } catch (err) {
       error.value = err.message
-      console.error('Error creando staff:', err)
+      reportClientError('staff.create', err)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -101,7 +104,7 @@ export function useStaff() {
       return { success: true }
     } catch (err) {
       error.value = err.message
-      console.error('Error actualizando staff:', err)
+      reportClientError('staff.update', err)
       return { success: false, error: err.message }
     } finally {
       loading.value = false
@@ -128,7 +131,7 @@ export function useStaff() {
       return { success: true }
     } catch (err) {
       error.value = err.message
-      console.error('Error cambiando estado de staff:', err)
+      reportClientError('staff.toggle_status', err)
       return { success: false, error: err.message }
     } finally {
       loading.value = false

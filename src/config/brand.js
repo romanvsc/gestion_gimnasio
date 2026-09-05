@@ -1,5 +1,6 @@
 export const COLOR_SCALES = Object.freeze({
   neutral: {
+    0: '#ffffff',
     50: '#f8fafc',
     100: '#f1f5f9',
     200: '#e2e8f0',
@@ -92,6 +93,18 @@ export const COLOR_SCALES = Object.freeze({
   }
 })
 
+export function colorToRgba(hex, alpha = 1) {
+  const normalized = String(hex).replace('#', '')
+  const expanded = normalized.length === 3
+    ? normalized.split('').map(value => value + value).join('')
+    : normalized
+  const red = Number.parseInt(expanded.slice(0, 2), 16)
+  const green = Number.parseInt(expanded.slice(2, 4), 16)
+  const blue = Number.parseInt(expanded.slice(4, 6), 16)
+
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
+}
+
 export const BRAND = Object.freeze({
   name: 'Yacyretá',
   displayName: 'YACYRETA',
@@ -102,7 +115,11 @@ export const BRAND = Object.freeze({
     primary: COLOR_SCALES.primary[600],
     primaryRgb: '239, 63, 10',
     primaryStrong: COLOR_SCALES.primary[700],
-    dark: '#0b0b0c',
-    light: '#fff8f2'
+    success: COLOR_SCALES.success[600],
+    danger: COLOR_SCALES.danger[600],
+    warning: COLOR_SCALES.warning[600],
+    info: COLOR_SCALES.info[600],
+    dark: COLOR_SCALES.secondary[950],
+    light: COLOR_SCALES.primary[50]
   })
 })

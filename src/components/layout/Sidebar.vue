@@ -99,6 +99,7 @@
           <div class="px-4 pt-3 pb-1">
             <button
               @click="toggleTheme"
+              type="button"
               class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-page-subtitle hover:bg-page-card-hover hover:text-page-title transition-colors"
               :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
             >
@@ -121,11 +122,12 @@
               <div class="ml-3 min-w-0 flex-1">
                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{{ userStore.userEmail }}</p>
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-500 truncate">
-                  {{ userStore.isAdmin ? 'Administrador' : 'Staff' }}
+                  {{ roleLabel }}
                 </p>
               </div>
-              <button
-                @click="handleLogout"
+            <button
+              @click="handleLogout"
+              type="button"
                 class="ml-2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 rounded-md transition-colors"
                 aria-label="Cerrar sesión"
                 title="Cerrar sesión"
@@ -163,19 +165,28 @@ const navigationItems = [
   { name: 'Check-In', to: '/checkin', icon: CheckCircle },
   { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign },
   { name: 'Reportes', to: '/reports', icon: BarChart3, adminOnly: true },
-  { name: 'Caja', to: '/caja', icon: Wallet, adminOnly: true },
+  { name: 'Caja', to: '/caja', icon: Wallet, roles: ['admin', 'recepcion'] },
   { name: 'Usuarios', to: '/staff', icon: Settings, adminOnly: true },
   { name: 'Configuración', to: '/settings', icon: Settings, adminOnly: true }
 ]
 
 const navigation = computed(() => {
   return navigationItems.filter(item => {
+    if (item.roles) {
+      return item.roles.includes(userStore.userRole)
+    }
     if (item.adminOnly) {
       return userStore.userRole === 'admin'
     }
     return true
   })
 })
+
+const roleLabel = computed(() => ({
+  admin: 'Administrador',
+  recepcion: 'Recepci\u00f3n',
+  staff: 'Staff'
+}[userStore.userRole] || 'Usuario'))
 
 function isActive(path) {
   if (path === '/') {

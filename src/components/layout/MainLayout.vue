@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-[100dvh] overflow-hidden bg-page-bg transition-colors duration-200">
     <!-- Sidebar para desktop -->
-    <Sidebar />
+    <Sidebar v-if="!isKioskMode" />
 
     <!-- Contenido principal -->
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -13,22 +13,25 @@
       </a>
       <!-- Main content -->
       <main id="main-content" class="flex-1 relative overflow-y-auto focus:outline-none mobile-main-content" tabindex="-1">
-        <router-view :key="activeViewKey" />
+        <router-view :key="route.fullPath" />
       </main>
 
       <!-- Bottom navigation para mobile -->
-      <BottomNav />
+      <BottomNav v-if="!isKioskMode" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import Sidebar from './Sidebar.vue'
 import BottomNav from './BottomNav.vue'
 
 const userStore = useUserStore()
+const route = useRoute()
+const isKioskMode = computed(() => route.name === 'CheckIn' && route.query.kiosk === '1')
 const RESUME_DEBOUNCE_MS = 350
 const RESUME_COOLDOWN_MS = 1200
 const HEARTBEAT_INTERVAL_MS = 1000
@@ -104,8 +107,8 @@ onUnmounted(() => {
   z-index: 100;
   transform: translateY(-150%);
   border-radius: 0.75rem;
-  background: #171717;
-  color: #fff7ed;
+  background: theme('colors.secondary.900');
+  color: theme('colors.primary.50');
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   font-weight: 700;

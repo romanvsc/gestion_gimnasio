@@ -1,5 +1,8 @@
 import { ref, computed } from 'vue'
 import { billingCash, calculateCashSummary } from '@/contexts/billing-cash'
+import { formatCurrencyFull } from '@/utils/formatters'
+import { downloadExcelWorkbook } from '@/utils/excelExport'
+import { reportClientError } from '@/lib/observability'
 
 export function useCashRegister() {
   const transactions = ref([])
@@ -41,7 +44,7 @@ export function useCashRegister() {
 
       return { success: true }
     } catch (err) {
-      console.error('Error cargando datos de caja:', err)
+      reportClientError('cash.range_fetch', err)
       error.value = err.message
       
       // Resetear valores en caso de error
@@ -71,7 +74,7 @@ export function useCashRegister() {
 
       return { success: true, data }
     } catch (err) {
-      console.error('Error registrando transacción:', err)
+      reportClientError('cash.transaction_create', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -91,23 +94,16 @@ export function useCashRegister() {
       })
     }
 
-    const formatMoney = (amount) => {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: 'ARS'
-      }).format(amount)
-    }
-
     const startDateFormatted = formatDate(startDate)
     const endDateFormatted = formatDate(endDate)
 
     let report = `📅 REPORTE FINANCIERO: ${startDateFormatted} al ${endDateFormatted}\n`
     report += `${'='.repeat(50)}\n\n`
-    report += `💰 Saldo Inicial del Período: ${formatMoney(balanceAnterior.value)}\n`
-    report += `📈 Ingresos del período: ${formatMoney(ingresosDia.value)}\n`
-    report += `📉 Egresos del período: ${formatMoney(egresosDia.value)}\n`
+    report += `💰 Saldo Inicial del Período: ${formatCurrencyFull(balanceAnterior.value)}\n`
+    report += `📈 Ingresos del período: ${formatCurrencyFull(ingresosDia.value)}\n`
+    report += `📉 Egresos del período: ${formatCurrencyFull(egresosDia.value)}\n`
     report += `${'-'.repeat(50)}\n`
-    report += `💵 SALDO FINAL: ${formatMoney(saldoFinal.value)}\n\n`
+    report += `💵 SALDO FINAL: ${formatCurrencyFull(saldoFinal.value)}\n\n`
 
     // Detalle de movimientos
     if (transactions.value.length > 0) {
@@ -120,7 +116,7 @@ export function useCashRegister() {
           minute: '2-digit'
         })
         const tipo = t.tipo === 'INGRESO' ? '✅' : '❌'
-        const monto = formatMoney(t.monto)
+        const monto = formatCurrencyFull(t.monto)
         
         report += `${time} | ${tipo} ${t.categoria}\n`
         if (t.descripcion) {
@@ -143,8 +139,6 @@ export function useCashRegister() {
         throw new Error('No hay movimientos para exportar en este período')
       }
 
-      // Importar la librería xlsx
-      const XLSX = await import('xlsx')
 
       // Formatear fechas para el nombre del archivo
       const formatDateForFile = (date) => {
@@ -170,8 +164,6 @@ export function useCashRegister() {
         ['Saldo Final', saldoFinal.value]
       ]
 
-      const wsResumen = XLSX.utils.aoa_to_sheet(resumenData)
-
       // Crear hoja de Movimientos
       const movimientosData = transactions.value.map(t => {
         const fecha = new Date(t.created_at)
@@ -191,20 +183,23 @@ export function useCashRegister() {
         }
       })
 
-      const wsMovimientos = XLSX.utils.json_to_sheet(movimientosData)
-
-      // Crear libro de trabajo
-      const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen')
-      XLSX.utils.book_append_sheet(wb, wsMovimientos, 'Movimientos')
-
       // Generar y descargar archivo
       const fileName = `Caja_Gym_${startFormatted}_al_${endFormatted}.xlsx`
-      XLSX.writeFile(wb, fileName)
+      await downloadExcelWorkbook([
+        { name: 'Resumen', data: resumenData, widths: [32, 24] },
+        {
+          name: 'Movimientos',
+          data: [
+            ['Fecha y Hora', 'Tipo', 'CategorÃ­a', 'DescripciÃ³n', 'Monto', 'Usuario'],
+            ...movimientosData.map((movement) => Object.values(movement))
+          ],
+          widths: [22, 12, 20, 36, 16, 14]
+        }
+      ], fileName)
 
       return { success: true }
     } catch (err) {
-      console.error('Error exportando a Excel:', err)
+      reportClientError('cash.export_excel', err)
       return { success: false, error: err.message }
     }
   }

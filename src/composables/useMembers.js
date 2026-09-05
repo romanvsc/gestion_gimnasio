@@ -1,8 +1,12 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery } from '@/lib/asyncHandler'
+import { reportClientError } from '@/lib/observability'
 import imageCompression from 'browser-image-compression'
 import { toast } from 'vue-sonner'
+
+const MEMBER_LIST_FIELDS = 'id, nombre, apellido, dni, email, telefono, foto_url, es_socio_club, plan_id, activo, estado_cuota, estado_apto_fisico, fecha_fin_cuota, dias_vencido'
+const MEMBER_FIELDS = 'id, nombre, apellido, dni, fecha_nacimiento, fecha_alta, fecha_baja, email, telefono, peso, altura, apto_fisico, es_socio_club, plan_id, activo, foto_url'
 
 export function useMembers() {
   const members = ref([])
@@ -71,9 +75,42 @@ export function useMembers() {
 
       return { exists: !!data, member: data }
     } catch (err) {
-      console.error('Error verificando DNI duplicado:', err)
+      reportClientError('members.duplicate_dni', err)
       return { exists: false, error: err.message }
     }
+  }
+
+  /**
+   * Busca socios activos para flujos operativos como registrar un pago.
+   * La vista de estado es la fuente de lectura y la consulta queda detrás de
+   * esta fachada para no filtrar Supabase hacia la presentación.
+   */
+  async function searchMembersByTerm(searchTerm, { activeOnly = true } = {}) {
+    const normalizedTerm = String(searchTerm ?? '')
+      .trim()
+      .replace(/[(),*]/g, ' ')
+
+    if (normalizedTerm.length < 2) return []
+
+    const pattern = `%${normalizedTerm}%`
+    return runQuery(() => {
+      let query = supabase
+        .from('v_socios_estado')
+        .select('id, nombre, apellido, dni, es_socio_club, plan_id, activo, estado_cuota, estado_apto_fisico')
+        .or(`nombre.ilike.${pattern},apellido.ilike.${pattern},dni.ilike.${pattern}`)
+        .limit(5)
+
+      if (activeOnly) query = query.eq('activo', true)
+      return query
+    })
+  }
+
+  async function searchActiveMembers(searchTerm) {
+    return searchMembersByTerm(searchTerm, { activeOnly: true })
+  }
+
+  async function searchMembersForAccess(searchTerm) {
+    return searchMembersByTerm(searchTerm, { activeOnly: false })
   }
 
   /**
@@ -101,7 +138,7 @@ export function useMembers() {
 
       return { exists: !!data, member: data }
     } catch (err) {
-      console.error('Error verificando email duplicado:', err)
+      reportClientError('members.duplicate_email', err)
       return { exists: false, error: err.message }
     }
   }
@@ -133,7 +170,7 @@ export function useMembers() {
 
       return { exists: !!data, member: data }
     } catch (err) {
-      console.error('Error verificando nombre duplicado:', err)
+      reportClientError('members.duplicate_name', err)
       return { exists: false, error: err.message }
     }
   }
@@ -184,7 +221,7 @@ export function useMembers() {
       const data = await runQuery(() => {
         let query = supabase
           .from('v_socios_estado')
-          .select('*')
+          .select(MEMBER_LIST_FIELDS)
 
         // Filtrar solo activos si includeInactive es false
         if (!includeInactive) {
@@ -199,7 +236,7 @@ export function useMembers() {
       members.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener socios:', err)
+      reportClientError('members.list', err)
       error.value = err.message
       toast.error('Error al cargar lista de socios: ' + err.message)
       return { success: false, error: err.message }
@@ -219,7 +256,7 @@ export function useMembers() {
       const data = await runQuery(() =>
         supabase
           .from('members')
-          .select('*')
+          .select(MEMBER_FIELDS)
           .eq('id', id)
           .single()
       )
@@ -227,7 +264,7 @@ export function useMembers() {
       currentMember.value = data
       return { success: true, data }
     } catch (err) {
-      console.error('Error al obtener socio:', err)
+      reportClientError('members.detail', err)
       error.value = err.message
       toast.error('Error al cargar datos del socio: ' + err.message)
       return { success: false, error: err.message }
@@ -248,14 +285,14 @@ export function useMembers() {
         supabase
           .from('members')
           .insert([memberData])
-          .select()
+          .select(MEMBER_FIELDS)
           .single()
       )
 
       toast.success('Socio creado exitosamente')
       return { success: true, data }
     } catch (err) {
-      console.error('Error al crear socio:', err)
+      reportClientError('members.create', err)
       const friendlyError = translatePostgresError(err)
       error.value = friendlyError
       toast.error('Error al crear socio: ' + friendlyError)
@@ -277,7 +314,7 @@ export function useMembers() {
         .from('members')
         .update(memberData)
         .eq('id', id)
-        .select()
+        .select(MEMBER_FIELDS)
         .single()
 
       if (updateError) throw updateError
@@ -286,7 +323,7 @@ export function useMembers() {
       toast.success('Datos actualizados correctamente')
       return { success: true, data }
     } catch (err) {
-      console.error('Error al actualizar socio:', err)
+      reportClientError('members.update', err)
       const friendlyError = translatePostgresError(err)
       error.value = friendlyError
       toast.error('Error al actualizar socio: ' + friendlyError)
@@ -314,7 +351,7 @@ export function useMembers() {
       toast.success('Socio eliminado correctamente')
       return { success: true }
     } catch (err) {
-      console.error('Error al eliminar socio:', err)
+      reportClientError('members.delete', err)
       error.value = err.message
       toast.error('Error al eliminar socio: ' + err.message)
       return { success: false, error: err.message }
@@ -366,7 +403,7 @@ export function useMembers() {
 
       return { success: true, url: publicUrl }
     } catch (err) {
-      console.error('Error al subir avatar:', err)
+      reportClientError('members.avatar_upload', err)
       toast.error('Error al subir imagen: ' + err.message)
       return { success: false, error: err.message }
     }
@@ -391,13 +428,13 @@ export function useMembers() {
         .remove([fileName])
 
       if (deleteError) {
-        console.error('Error al eliminar avatar:', deleteError)
+        reportClientError('members.avatar_delete_previous', deleteError)
         // No lanzar error, solo log (puede que el archivo ya no exista)
       }
 
       return { success: true }
     } catch (err) {
-      console.error('Error al eliminar avatar:', err)
+      reportClientError('members.avatar_delete', err)
       toast.error('Error al borrar imagen anterior: ' + err.message)
       return { success: false, error: err.message }
     }
@@ -429,6 +466,8 @@ export function useMembers() {
     checkDuplicateDNI,
     checkDuplicateEmail,
     checkDuplicateName,
+    searchActiveMembers,
+    searchMembersForAccess,
     validateNoDuplicates
   }
 }

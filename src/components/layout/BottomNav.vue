@@ -100,6 +100,7 @@
           <!-- Cerrar Sesión -->
           <button
             @click="handleLogout"
+            type="button"
             class="flex items-center gap-4 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors w-full touch-manipulation"
           >
             <LogoutIcon class="w-6 h-6" />
@@ -285,7 +286,7 @@ const navigationItems = [
   { name: 'Socios', to: '/miembros', icon: UsersIcon },
   { name: 'Check-In', to: '/checkin', icon: CheckIcon },
   { name: 'Pagos', to: '/pagos/nuevo', icon: PaymentIcon },
-  { name: 'Caja', to: '/caja', icon: CashIcon, adminOnly: true }
+  { name: 'Caja', to: '/caja', icon: CashIcon, roles: ['admin', 'recepcion'] }
 ]
 
 // Items del menú "Más"
@@ -297,6 +298,9 @@ const moreMenuItemsList = [
 
 const navigation = computed(() => {
   return navigationItems.filter(item => {
+    if (item.roles) {
+      return item.roles.includes(userStore.userRole)
+    }
     if (item.adminOnly) {
       return userStore.userRole === 'admin'
     }
@@ -306,6 +310,9 @@ const navigation = computed(() => {
 
 const moreMenuItems = computed(() => {
   return moreMenuItemsList.filter(item => {
+    if (item.roles) {
+      return item.roles.includes(userStore.userRole)
+    }
     if (item.adminOnly) {
       return userStore.userRole === 'admin'
     }

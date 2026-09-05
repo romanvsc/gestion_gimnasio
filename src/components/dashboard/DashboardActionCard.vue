@@ -11,7 +11,7 @@
       class="p-2.5 md:p-3 rounded-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
       :class="[darkIconBg, darkIconText]"
     >
-      <component :is="icon" class="w-5 h-5 md:w-6 md:h-6" />
+      <component :is="icon" aria-hidden="true" class="w-5 h-5 md:w-6 md:h-6" />
     </div>
 
     <div class="flex-1 min-w-0">
@@ -26,7 +26,7 @@
       </span>
     </div>
 
-    <ChevronRight class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+    <ChevronRight aria-hidden="true" class="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
   </BaseButton>
 </template>
 

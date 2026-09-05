@@ -263,13 +263,14 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { ArrowLeft } from 'lucide-vue-next'
-import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
+import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
 import { resolvePlanPrice } from '@/contexts/plans-catalog'
 import { calculatePaymentEndDate } from '@/contexts/billing-cash'
 import { formatCurrencyFull } from '@/utils/formatters'
+import { reportClientError } from '@/lib/observability'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import PaymentSummaryCard from '@/components/payments/PaymentSummaryCard.vue'
@@ -277,6 +278,7 @@ import SuccessModal from '@/components/ui/SuccessModal.vue'
 
 const router = useRouter()
 const { createPayment } = usePayments()
+const { searchActiveMembers } = useMembers()
 const { plans, paymentMethods, loading, error, fetchParameters } = useParameters()
 
 const memberSearch = ref('')
@@ -391,17 +393,9 @@ async function searchMembers() {
 
   searchTimeout = setTimeout(async () => {
     try {
-      const query = memberSearch.value.toLowerCase()
-      const { data } = await supabase
-        .from('v_socios_estado')
-        .select('id, nombre, apellido, dni, es_socio_club, plan_id')
-        .eq('activo', true)
-        .or(`nombre.ilike.%${query}%,apellido.ilike.%${query}%,dni.ilike.%${query}%`)
-        .limit(5)
-
-      memberSearchResults.value = data || []
+      memberSearchResults.value = await searchActiveMembers(memberSearch.value)
     } catch (err) {
-      console.error('Error buscando socios:', err)
+      reportClientError('payments.member_search', err)
     }
   }, 300)
 }

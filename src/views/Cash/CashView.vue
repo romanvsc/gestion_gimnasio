@@ -321,20 +321,26 @@
     />
 
     <!-- Modal de Éxito -->
-    <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-end justify-center bg-gray-600 bg-opacity-50 p-0 sm:items-center sm:p-4">
-      <div class="w-full max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] overflow-y-auto rounded-t-2xl bg-white p-6 shadow-xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[90vh] sm:max-w-md sm:rounded-lg sm:p-8" role="dialog" aria-modal="true" aria-labelledby="cash-success-title">
-        <div class="text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
-            <CheckCircle class="h-6 w-6 text-emerald-600" />
-          </div>
-          <h3 id="cash-success-title" class="text-xl font-bold dark:text-gray-100 mb-2">Movimiento Registrado</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">El movimiento se ha guardado correctamente</p>
-          <BaseButton variant="primary" full-width @click="showSuccessModal = false">
-            Aceptar
-          </BaseButton>
+    <BaseModal
+      v-if="showSuccessModal"
+      :model-value="showSuccessModal"
+      title="Movimiento registrado"
+      size="sm"
+      @close="showSuccessModal = false"
+    >
+      <div class="py-2 text-center">
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+          <CheckCircle class="h-6 w-6 text-emerald-600" aria-hidden="true" />
         </div>
+        <p class="text-page-subtitle">El movimiento se ha guardado correctamente.</p>
       </div>
-    </div>
+
+      <template #footer>
+        <BaseButton variant="primary" full-width @click="showSuccessModal = false">
+          Aceptar
+        </BaseButton>
+      </template>
+    </BaseModal>
   </div>
 </template>
 
@@ -345,9 +351,11 @@ import { useCashRegister } from '@/composables/useCashRegister'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
 import { formatCurrencyFull } from '@/utils/formatters'
+import { reportClientError } from '@/lib/observability'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
 import TransactionModal from './TransactionModal.vue'
 import {
   Calendar,
@@ -531,7 +539,7 @@ const handleExportExcel = async () => {
       error: (err) => `Error al exportar: ${err.message || 'Error desconocido'}`
     })
   } catch (err) {
-    console.error('Error al exportar:', err)
+    reportClientError('cash.export', err)
   } finally {
     exportingExcel.value = false
   }

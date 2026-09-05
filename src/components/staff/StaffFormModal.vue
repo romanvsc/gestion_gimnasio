@@ -1,15 +1,17 @@
 <template>
-  <div class="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50 p-0 sm:items-center sm:p-4">
-    <div class="max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[90vh] sm:rounded-lg sm:max-w-md" role="dialog" aria-modal="true" aria-labelledby="staff-modal-title">
+  <BaseModal
+    :model-value="true"
+    :title="dialogTitle"
+    size="md"
+    :max-body-height="'calc(100dvh - var(--mobile-nav-height) - 5rem)'"
+    @close="closeModal"
+  >
       <!-- Success Screen -->
       <div v-if="showSuccess" class="p-4 sm:p-6">
         <div class="text-center mb-6">
           <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
             <CheckCircle class="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
-          <h3 id="staff-modal-title" class="text-lg font-semibold text-page-title mb-2">
-            ¡Usuario creado exitosamente!
-          </h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Guarda esta contraseña, solo se mostrará una vez:
           </p>
@@ -45,16 +47,6 @@
 
       <!-- Form Screen -->
       <div v-else class="p-4 sm:p-6">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-          <h3 id="staff-modal-title" class="text-lg font-semibold text-page-title">
-            {{ isEditing ? 'Editar Usuario' : 'Nuevo Usuario' }}
-          </h3>
-          <button type="button" aria-label="Cerrar diálogo de usuario" @click="closeModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-            <X class="w-5 h-5" />
-          </button>
-        </div>
-
         <!-- Form -->
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Usuario -->
@@ -184,17 +176,18 @@
           </div>
         </form>
       </div>
-    </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { toast } from 'vue-sonner'
-import { X, Eye, EyeOff, RefreshCw, CheckCircle, Copy, AlertCircle } from 'lucide-vue-next'
+import { Eye, EyeOff, RefreshCw, CheckCircle, Copy, AlertCircle } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
 import { useStaff } from '@/composables/useStaff'
+import { reportClientError } from '@/lib/observability'
 
 const props = defineProps({
   staff: {
@@ -225,6 +218,11 @@ const loading = ref(false)
 const showPassword = ref(false)
 const showSuccess = ref(false)
 const generatedPassword = ref('')
+
+const dialogTitle = computed(() => {
+  if (showSuccess.value) return '¡Usuario creado exitosamente!'
+  return isEditing.value ? 'Editar Usuario' : 'Nuevo Usuario'
+})
 
 // Inicializar form si está editando
 watch(() => props.staff, (newStaff) => {
@@ -322,7 +320,7 @@ const copyPassword = async () => {
     await navigator.clipboard.writeText(generatedPassword.value)
     toast.success('Contraseña copiada al portapapeles', { duration: 2000 })
   } catch (err) {
-    console.error('Error copiando:', err)
+    reportClientError('staff.copy_password', err)
     toast.error('Error al copiar la contraseña', { duration: 3000 })
   }
 }

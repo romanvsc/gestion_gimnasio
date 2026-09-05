@@ -61,7 +61,7 @@
               {{ formatDateLong(payment.created_at) }}
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-sm text-page-title">
-              {{ payment.plans?.nombre || 'Plan' }}
+              {{ payment.plan_nombre || 'Plan' }}
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
               {{ formatDateLong(payment.fecha_inicio) }} - {{ formatDateLong(payment.fecha_fin) }}

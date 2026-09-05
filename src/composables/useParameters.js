@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery } from '@/lib/asyncHandler'
+import { reportClientError } from '@/lib/observability'
 import { planCatalog } from '@/contexts/plans-catalog'
 
 function parseOptionalPrice(value) {
@@ -40,7 +41,7 @@ export function useParameters() {
 
       return { success: true, data: memberPageSizes.value }
     } catch (err) {
-      console.warn('No se pudieron cargar tamanos de pagina de socios:', err.message)
+      reportClientError('parameters.member_page_sizes', err)
       memberPageSizes.value = []
       return { success: false, error: err.message }
     }
@@ -60,7 +61,7 @@ export function useParameters() {
         runQuery(() =>
           supabase
             .from('concepts')
-            .select('*')
+            .select('id, nombre, tipo, activo')
             .eq('activo', true)
             .order('nombre')
         ),
@@ -72,7 +73,7 @@ export function useParameters() {
         runQuery(() =>
           supabase
             .from('payment_methods')
-            .select('*')
+            .select('id, nombre, activo')
             .eq('activo', true)
             .order('nombre')
         )
@@ -87,7 +88,7 @@ export function useParameters() {
 
       return { success: true }
     } catch (err) {
-      console.error('Error cargando parámetros:', err)
+      reportClientError('parameters.fetch', err)
       error.value = err.message
       return { success: false, error: err.message }
     } finally {
@@ -117,7 +118,7 @@ export function useParameters() {
       plans.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error cargando planes:', err)
+      reportClientError('parameters.fetch_plans', err)
       return { success: false, error: err.message }
     }
   }
@@ -130,13 +131,13 @@ export function useParameters() {
       const data = await runQuery(() =>
         supabase
           .from('payment_methods')
-          .select('*')
+          .select('id, nombre, activo')
           .order('nombre')
       )
       paymentMethods.value = data || []
       return { success: true, data }
     } catch (err) {
-      console.error('Error cargando métodos de pago:', err)
+      reportClientError('parameters.fetch_payment_methods', err)
       return { success: false, error: err.message }
     }
   }
@@ -155,14 +156,10 @@ export function useParameters() {
         activo: planData.activo !== false
       }
 
-      console.log('📦 Creando plan con datos:', cleanData)
-
       const data = await planCatalog.create(cleanData)
-
-      console.log('✅ Plan creado exitosamente:', data)
       return { success: true, data }
     } catch (err) {
-      console.error('❌ Error creando plan:', err)
+      reportClientError('parameters.create_plan', err)
 
       // Traducir errores de Postgres
       const message = err.message || ''
@@ -199,7 +196,7 @@ export function useParameters() {
       const data = await planCatalog.update(id, cleanData)
       return { success: true, data }
     } catch (err) {
-      console.error('❌ Error actualizando plan:', err)
+      reportClientError('parameters.update_plan', err)
 
       const message = err.message || ''
       const code = err.code || ''
@@ -226,12 +223,12 @@ export function useParameters() {
           .from('payment_methods')
           .update(methodData)
           .eq('id', id)
-          .select()
+          .select('id, nombre, activo')
           .single()
       )
       return { success: true, data }
     } catch (err) {
-      console.error('Error actualizando método de pago:', err)
+      reportClientError('parameters.update_payment_method', err)
       return { success: false, error: err.message }
     }
   }

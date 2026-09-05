@@ -85,6 +85,7 @@
             <div class="flex-shrink-0">
               <button
                 @click="goToEdit"
+                type="button"
                 class="px-6 py-2 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-lg shadow-md transition-colors border-2 border-white"
               >
                 Editar Perfil
@@ -208,11 +209,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { supabase } from '@/lib/supabase'
 import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
+import { billingCash } from '@/contexts/billing-cash'
 import { formatDateLong } from '@/utils/formatters'
+import { reportClientError } from '@/lib/observability'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 
@@ -346,16 +348,9 @@ const planName = computed(() => {
 async function loadPayments() {
   try {
     loadingPayments.value = true
-    const { data, error: paymentError } = await supabase
-      .from('payments')
-      .select('*, plans(nombre)')
-      .eq('member_id', route.params.id)
-      .order('created_at', { ascending: false })
-
-    if (paymentError) throw paymentError
-    payments.value = data || []
+    payments.value = await billingCash.listMemberPayments(route.params.id)
   } catch (err) {
-    console.error('Error al cargar historial de pagos:', err)
+    reportClientError('member_detail.payments_fetch', err)
   } finally {
     loadingPayments.value = false
   }

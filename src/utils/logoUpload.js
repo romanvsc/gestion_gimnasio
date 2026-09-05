@@ -54,3 +54,33 @@ export function getLogoUploadInfo(file) {
     isVector: false
   }
 }
+
+// Los logos se sirven desde un bucket publico. Un SVG puede contener HTML,
+// JavaScript o referencias externas, por lo que no alcanza con validar solo
+// la extension y el MIME declarado por el navegador.
+const UNSAFE_SVG_PATTERN = /<!doctype|<!entity|<script\b|<foreignObject\b|<iframe\b|<object\b|<embed\b|<audio\b|<video\b|\bon[a-z]+\s*=|(?:javascript|vbscript)\s*:|(?:href|xlink:href)\s*=\s*["']\s*(?:https?:|\/\/|data:)|@import\b|url\s*\(\s*(?:https?:|\/\/|data:)/i
+
+export function validateSvgContent(source) {
+  const markup = String(source || '').trim()
+
+  if (!/<svg(?:\s|>)/i.test(markup)) {
+    return { valid: false, message: 'El SVG no contiene una raiz valida' }
+  }
+
+  if (UNSAFE_SVG_PATTERN.test(markup)) {
+    return { valid: false, message: 'El SVG contiene contenido no permitido' }
+  }
+
+  return { valid: true }
+}
+
+export async function sanitizeSvgFile(file) {
+  const content = await file.text()
+  const validation = validateSvgContent(content)
+
+  if (!validation.valid) {
+    throw new Error(validation.message)
+  }
+
+  return new Blob([content], { type: 'image/svg+xml' })
+}

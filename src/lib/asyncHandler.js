@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { reportClientError } from '@/lib/observability'
 
 /**
  * Wrapper Maestro para Queries de Supabase
@@ -22,7 +23,7 @@ export async function runQuery(queryFn, retries = 3, delay = 500) {
     // Esto "despierta" la conexión interna de Auth que puede estar dormida
     const { data: sessionData, error: authError } = await supabase.auth.getSession()
     if (authError || !sessionData?.session) {
-      console.warn('⚠️ Sesión no disponible, intentando refrescar token...')
+      if (import.meta.env.DEV) console.warn('Sesión no disponible, intentando refrescar token...')
       const { data: refreshedData, error: refreshError } = await supabase.auth.refreshSession()
       if (refreshError || !refreshedData?.session) {
         throw refreshError || new Error('Sesion expirada o invalida')
@@ -42,14 +43,14 @@ export async function runQuery(queryFn, retries = 3, delay = 500) {
   } catch (err) {
     // 6. REINTENTAR si quedan intentos
     if (retries > 0) {
-      console.warn(`♻️ Reintentando petición... Quedan ${retries} intentos. Esperando ${delay}ms`)
+      if (import.meta.env.DEV) console.warn(`Reintentando petición... Quedan ${retries} intentos. Esperando ${delay}ms`)
       await new Promise(r => setTimeout(r, delay))
       // BACKOFF EXPONENCIAL: Duplicar delay en cada intento
       return runQuery(queryFn, retries - 1, delay * 2)
     }
     
     // 7. SI SE ACABARON LOS REINTENTOS, tirar error final
-    console.error('❌ Falló la petición después de todos los reintentos:', err)
+    reportClientError('supabase.query_failed', err)
     throw err
   }
 }
@@ -82,12 +83,12 @@ export async function runCountQuery(queryFn, retries = 3, delay = 500) {
     return result.count
   } catch (err) {
     if (retries > 0) {
-      console.warn(`♻️ Reintentando count query... Quedan ${retries} intentos. Esperando ${delay}ms`)
+      if (import.meta.env.DEV) console.warn(`Reintentando count query... Quedan ${retries} intentos. Esperando ${delay}ms`)
       await new Promise(r => setTimeout(r, delay))
       return runCountQuery(queryFn, retries - 1, delay * 2)
     }
     
-    console.error('❌ Falló la count query después de todos los reintentos:', err)
+    reportClientError('supabase.count_query_failed', err)
     throw err
   }
 }

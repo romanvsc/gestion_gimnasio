@@ -2,15 +2,31 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'vue-sonner'
+import { reportClientError } from '@/lib/observability'
 
 export const useUserStore = defineStore('user', () => {
+  const AUTH_BOOT_TIMEOUT_MS = 10000
+  const ROLE_CHECK_TIMEOUT_MS = 8000
+
+  function withTimeout(promise, timeoutMs, message) {
+    let timeoutId
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs)
+    })
+
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId))
+  }
+
   // Estado
   const user = ref(null)
   const session = ref(null)
   const loading = ref(false)
   const error = ref(null)
-  const userRole = ref(null) // 'admin', 'staff', o null
+  const userRole = ref(null) // 'admin', 'staff', 'recepcion' o null
+  const initialized = ref(false)
   let authSubscription = null
+  let roleRequestId = 0
+  let initSessionPromise = null
 
   // Timestamp reactivo para señalizar que la app volvió al frente
   const lastResumeAt = ref(0)
@@ -23,7 +39,7 @@ export const useUserStore = defineStore('user', () => {
   const isAuthenticated = computed(() => !!session.value)
   const userEmail = computed(() => user.value?.email || '')
   const isAdmin = computed(() => userRole.value === 'admin')
-  const isStaff = computed(() => userRole.value === 'staff' || userRole.value === 'admin')
+  const isStaff = computed(() => ['admin', 'staff', 'recepcion'].includes(userRole.value))
 
   // Acciones
 
@@ -31,6 +47,8 @@ export const useUserStore = defineStore('user', () => {
    * Verifica el rol del usuario en la tabla staff
    */
   async function checkUserRole(userId) {
+    const requestId = ++roleRequestId
+
     try {
       const { data: staffData } = await supabase
         .from('staff')
@@ -38,20 +56,16 @@ export const useUserStore = defineStore('user', () => {
         .eq('id', userId)
         .single()
 
+      if (requestId !== roleRequestId) return
+
       if (staffData?.rol) {
         userRole.value = staffData.rol
-        console.log(`Usuario con rol: ${staffData.rol}`)
-        if (staffData.rol === 'admin') {
-          console.log('Bienvenido Jefe')
-        } else {
-          console.log('Usuario normal o empleado')
-        }
       } else {
         userRole.value = null
-        console.log('Usuario sin rol asignado')
       }
     } catch (err) {
-      console.error('Error al verificar rol:', err)
+      if (requestId !== roleRequestId) return
+      reportClientError('auth.role_check', err)
       userRole.value = null
     }
   }
@@ -60,15 +74,19 @@ export const useUserStore = defineStore('user', () => {
    * Inicializa la sesión desde Supabase
    * Se llama al cargar la app para restaurar la sesión
    */
-  async function initSession() {
+  async function initializeSession() {
     try {
       loading.value = true
       error.value = null
 
-      const { data, error: sessionError } = await supabase.auth.getSession()
+      const { data, error: sessionError } = await withTimeout(
+        supabase.auth.getSession(),
+        AUTH_BOOT_TIMEOUT_MS,
+        'No se pudo verificar la sesión a tiempo. Revisá la conexión e intentá nuevamente.'
+      )
 
       if (sessionError) {
-        console.error('Error obteniendo sesión:', sessionError)
+        reportClientError('auth.session_restore', sessionError)
         // Resetear todo si hay error
         session.value = null
         user.value = null
@@ -82,7 +100,11 @@ export const useUserStore = defineStore('user', () => {
         session.value = currentSession
         user.value = currentSession.user
         // Verificar el rol del usuario
-        await checkUserRole(currentSession.user.id)
+        await withTimeout(
+          checkUserRole(currentSession.user.id),
+          ROLE_CHECK_TIMEOUT_MS,
+          'No se pudo verificar el rol del usuario a tiempo.'
+        )
       } else {
         // No hay sesión, resetear todo
         session.value = null
@@ -93,8 +115,6 @@ export const useUserStore = defineStore('user', () => {
       // Escuchar cambios de auth una sola vez para evitar listeners duplicados.
       if (!authSubscription) {
         const { data } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-          console.log('Auth state changed:', event)
-
           session.value = newSession
           user.value = newSession?.user || null
 
@@ -105,10 +125,6 @@ export const useUserStore = defineStore('user', () => {
           }
 
           // Si el token se refrescó, actualizar la sesión
-          if (event === 'TOKEN_REFRESHED') {
-            console.log('Token refrescado automáticamente')
-          }
-
           // Si la sesión expiró, limpiar todo
           if (event === 'SIGNED_OUT') {
             session.value = null
@@ -120,7 +136,8 @@ export const useUserStore = defineStore('user', () => {
         authSubscription = data?.subscription || null
       }
     } catch (err) {
-      console.error('Error al inicializar sesión:', err)
+      reportClientError('auth.session_init', err)
+      roleRequestId += 1
       error.value = err.message
       // IMPORTANTE: Resetear todo en caso de error crítico
       session.value = null
@@ -128,6 +145,27 @@ export const useUserStore = defineStore('user', () => {
       userRole.value = null
     } finally {
       loading.value = false
+      initialized.value = true
+    }
+  }
+
+  /**
+   * Comparte una unica inicializacion entre App y el guard del router.
+   * Asi la navegacion inicial no queda bloqueada por una segunda consulta
+   * directa a Supabase sin timeout.
+   */
+  async function initSession() {
+    if (initSessionPromise) return initSessionPromise
+    if (initialized.value) {
+      return { success: true, data: { session: session.value } }
+    }
+
+    initSessionPromise = initializeSession()
+
+    try {
+      return await initSessionPromise
+    } finally {
+      initSessionPromise = null
     }
   }
 
@@ -154,7 +192,7 @@ export const useUserStore = defineStore('user', () => {
 
       return { success: true }
     } catch (err) {
-      console.error('Error en login:', err)
+      reportClientError('auth.login', err)
       error.value = err.message
       toast.error('Error al iniciar sesión: ' + err.message)
       return { success: false, error: err.message }
@@ -180,7 +218,7 @@ export const useUserStore = defineStore('user', () => {
 
       return { success: true }
     } catch (err) {
-      console.error('Error en logout:', err)
+      reportClientError('auth.logout', err)
       error.value = err.message
       toast.error('Error al cerrar sesión: ' + err.message)
       return { success: false, error: err.message }
@@ -206,7 +244,7 @@ export const useUserStore = defineStore('user', () => {
 
       return { success: true, data }
     } catch (err) {
-      console.error('Error en registro:', err)
+      reportClientError('auth.register', err)
       error.value = err.message
       toast.error('Error al registrar usuario: ' + err.message)
       return { success: false, error: err.message }
@@ -229,6 +267,7 @@ export const useUserStore = defineStore('user', () => {
     loading,
     error,
     userRole,
+    initialized,
     lastResumeAt,
     // Computed
     isAuthenticated,

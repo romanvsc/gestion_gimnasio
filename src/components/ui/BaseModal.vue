@@ -8,6 +8,7 @@
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+          aria-hidden="true"
           @click="closeOnBackdrop && handleClose()"
         />
         
@@ -21,6 +22,7 @@
             role="dialog"
             aria-modal="true"
             :aria-labelledby="title ? titleId : undefined"
+            :aria-describedby="bodyId"
             :aria-label="title ? undefined : 'Diálogo'"
             tabindex="-1"
           >
@@ -39,11 +41,12 @@
               </h3>
               <button 
                 v-if="showClose"
+                type="button"
                 @click="handleClose"
                 class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors touch-manipulation"
                 aria-label="Cerrar"
               >
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -51,6 +54,7 @@
 
             <!-- Body -->
             <div 
+              :id="bodyId"
               class="overflow-y-auto px-4 py-4 sm:px-6"
               :class="bodyClass"
               :style="{ maxHeight: maxBodyHeight }"
@@ -118,6 +122,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'close'])
 const panelRef = ref(null)
 const titleId = `modal-title-${Math.random().toString(36).slice(2, 10)}`
+const bodyId = `modal-body-${Math.random().toString(36).slice(2, 10)}`
 let previouslyFocusedElement = null
 let previousBodyOverflow = ''
 

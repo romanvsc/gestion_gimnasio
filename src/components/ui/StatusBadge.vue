@@ -6,6 +6,7 @@
 
 <script setup>
 import { computed, useSlots } from 'vue'
+import { UI_TOKENS } from '@/config/uiTokens'
 
 const props = defineProps({
   status: {
@@ -40,36 +41,36 @@ const badgeClasses = computed(() => {
   
   // Mapeo de status para estados de cuota
   const cuotaStatusClasses = {
-    'activo': 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
-    'al_dia': 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
-    'vencido': 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
-    'por_vencer': 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
-    'sin_pagos': 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+    'activo': UI_TOKENS.tones.success,
+    'al_dia': UI_TOKENS.tones.success,
+    'vencido': UI_TOKENS.tones.danger,
+    'por_vencer': UI_TOKENS.tones.warning,
+    'sin_pagos': UI_TOKENS.tones.neutral
   }
   
   // Mapeo de status para estados de apto físico
   const aptoStatusClasses = {
-    'vigente': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-    'vencido': 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
-    'por_vencer': 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
-    'sin_apto': 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
-    '': 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+    'vigente': UI_TOKENS.tones.info,
+    'vencido': UI_TOKENS.tones.warning,
+    'por_vencer': UI_TOKENS.tones.warning,
+    'sin_apto': UI_TOKENS.tones.neutral,
+    '': UI_TOKENS.tones.neutral
   }
   
   // Mapeo de type (para uso general)
   const typeClasses = {
-    'success': 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
-    'danger': 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
-    'warning': 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
-    'info': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-    'secondary': 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
-    'cuota': cuotaStatusClasses[props.status] || 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
-    'apto': aptoStatusClasses[props.status] || 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
-    'estado': props.status === 'activo' ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+    'success': UI_TOKENS.tones.success,
+    'danger': UI_TOKENS.tones.danger,
+    'warning': UI_TOKENS.tones.warning,
+    'info': UI_TOKENS.tones.info,
+    'secondary': UI_TOKENS.tones.neutral,
+    'cuota': cuotaStatusClasses[props.status] || UI_TOKENS.tones.neutral,
+    'apto': aptoStatusClasses[props.status] || UI_TOKENS.tones.neutral,
+    'estado': props.status === 'activo' ? UI_TOKENS.tones.success : UI_TOKENS.tones.neutral
   }
   
   // Usar type si existe y está definido en typeClasses, sino status, sino default
-  const colorClass = typeClasses[props.type] || cuotaStatusClasses[props.status] || 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+  const colorClass = typeClasses[props.type] || cuotaStatusClasses[props.status] || UI_TOKENS.tones.neutral
   
   return `${baseClasses} ${colorClass}`
 })
