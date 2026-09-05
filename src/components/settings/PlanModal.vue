@@ -4,19 +4,23 @@
       <div 
         v-if="show" 
         class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+        tabindex="-1"
+        @keydown.esc="handleClose"
         @click.self="handleClose"
       >
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="handleClose" />
         
         <!-- Modal Content -->
-        <div class="relative bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
+        <div class="relative bg-white dark:bg-page-card dark:ring-1 dark:ring-white/10 rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="plan-modal-title">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-page-border">
-            <h3 class="text-lg font-semibold text-page-title">
+            <h3 id="plan-modal-title" class="text-lg font-semibold text-page-title">
               {{ isEditing ? 'Editar Plan' : 'Nuevo Plan' }}
             </h3>
             <button 
+              type="button"
+              aria-label="Cerrar diálogo de plan"
               @click="handleClose"
               class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-colors touch-manipulation"
             >
@@ -81,6 +85,8 @@
               <button
                 type="button"
                 @click="form.activo = !form.activo"
+                :aria-pressed="form.activo"
+                :aria-label="form.activo ? 'Desactivar plan' : 'Activar plan'"
                 class="relative w-14 h-8 rounded-full transition-colors duration-200 touch-manipulation"
                 :class="form.activo ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'"
               >

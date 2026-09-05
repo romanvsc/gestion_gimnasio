@@ -1,12 +1,14 @@
 <template>
-  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+  <div class="fixed inset-0 z-50 flex items-end justify-center bg-gray-600 bg-opacity-50 p-0 sm:items-center sm:p-4">
+    <div class="max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[80vh] sm:rounded-xl" role="dialog" aria-modal="true" aria-labelledby="member-history-modal-title">
       <!-- Header -->
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <h3 class="text-xl font-bold text-page-title">
+      <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700 sm:px-6 sm:py-4">
+        <h3 id="member-history-modal-title" class="text-xl font-bold text-page-title">
           Historial de {{ memberName }}
         </h3>
         <button
+          type="button"
+          aria-label="Cerrar historial del socio"
           @click="$emit('close')"
           class="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
         >
@@ -45,7 +47,7 @@
       </div>
 
       <!-- Content -->
-      <div class="p-6 overflow-y-auto max-h-[calc(80vh-160px)]">
+      <div class="max-h-[calc(100dvh-var(--mobile-nav-height)-10rem)] overflow-y-auto p-4 sm:max-h-[calc(80vh-160px)] sm:p-6">
         <!-- Loading -->
         <div v-if="loading" class="text-center py-8">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-700 border-t-primary-600"></div>

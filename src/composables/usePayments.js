@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import { supabase } from '@/lib/supabase'
+import { planCatalog } from '@/contexts/plans-catalog'
+import { billingCash } from '@/contexts/billing-cash'
 
 export function usePayments() {
   const payments = ref([])
@@ -15,13 +16,8 @@ export function usePayments() {
       loading.value = true
       error.value = null
 
-      const { data, error: fetchError } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('activo', true)
-        .order('precio', { ascending: true })
-
-      if (fetchError) throw fetchError
+      const data = (await planCatalog.listActive())
+        .sort((first, second) => Number(first.precio) - Number(second.precio))
 
       plans.value = data || []
       return { success: true, data }
@@ -37,18 +33,12 @@ export function usePayments() {
   /**
    * Crea un nuevo pago
    */
-  async function createPayment(paymentData) {
+  async function createPayment(paymentData, options = {}) {
     try {
       loading.value = true
       error.value = null
 
-      const { data, error: createError } = await supabase
-        .from('payments')
-        .insert([paymentData])
-        .select()
-        .single()
-
-      if (createError) throw createError
+      const data = await billingCash.registerPayment(paymentData, options)
 
       return { success: true, data }
     } catch (err) {
@@ -68,20 +58,7 @@ export function usePayments() {
       loading.value = true
       error.value = null
 
-      const { data, error: fetchError } = await supabase
-        .from('payments')
-        .select(`
-          *,
-          plans (
-            nombre,
-            precio,
-            dias_duracion
-          )
-        `)
-        .eq('member_id', memberId)
-        .order('created_at', { ascending: false })
-
-      if (fetchError) throw fetchError
+      const data = await billingCash.listMemberPayments(memberId)
 
       payments.value = data || []
       return { success: true, data }

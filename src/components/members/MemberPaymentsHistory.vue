@@ -68,7 +68,7 @@
             </td>
             <td class="px-4 py-4 whitespace-nowrap">
               <span class="text-sm font-semibold text-emerald-600">
-                ${{ formatCurrency(payment.monto) }}
+                {{ formatCurrencyFull(payment.monto) }}
               </span>
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-sm text-page-title">
@@ -84,7 +84,7 @@
           Total de pagos: <span class="font-semibold">{{ payments.length }}</span>
         </span>
         <span class="text-lg font-bold text-page-title">
-          Total recaudado: <span class="text-emerald-600">${{ formatCurrency(totalAmount) }}</span>
+          Total recaudado: <span class="text-emerald-600">{{ formatCurrencyFull(totalAmount) }}</span>
         </span>
       </div>
     </div>
@@ -94,7 +94,7 @@
 <script setup>
 import { computed } from 'vue'
 import { History } from 'lucide-vue-next'
-import { formatDateLong, formatCurrency } from '@/utils/formatters'
+import { formatDateLong, formatCurrencyFull } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
 const props = defineProps({

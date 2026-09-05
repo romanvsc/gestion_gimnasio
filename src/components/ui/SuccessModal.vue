@@ -3,14 +3,14 @@
     <Transition name="modal">
       <div 
         v-if="modelValue" 
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
         @click.self="close"
       >
         <!-- Backdrop con blur -->
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" />
         
         <!-- Modal Card -->
-        <div class="relative bg-white dark:bg-[#151f32] rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform dark:ring-1 dark:ring-white/10">
+        <div class="relative max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full max-w-sm transform overflow-y-auto rounded-t-3xl bg-white shadow-2xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[95vh] sm:rounded-3xl" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
           <!-- Fondo decorativo superior con degradado -->
           <div 
             class="absolute top-0 left-0 right-0 h-36"
@@ -39,7 +39,7 @@
             </div>
             
             <!-- Título -->
-            <h3 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-2">
+            <h3 id="success-modal-title" class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-2">
               {{ title }}
             </h3>
             
@@ -55,6 +55,7 @@
             
             <!-- Botón con degradado -->
             <button
+              type="button"
               @click="close"
               class="w-full py-4 rounded-2xl font-semibold text-white transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
               :class="buttonClass"

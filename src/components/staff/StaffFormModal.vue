@@ -1,13 +1,13 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+  <div class="fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-50 p-0 sm:items-center sm:p-4">
+    <div class="max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[90vh] sm:rounded-lg sm:max-w-md" role="dialog" aria-modal="true" aria-labelledby="staff-modal-title">
       <!-- Success Screen -->
-      <div v-if="showSuccess" class="p-6">
+      <div v-if="showSuccess" class="p-4 sm:p-6">
         <div class="text-center mb-6">
           <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
             <CheckCircle class="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
-          <h3 class="text-lg font-semibold text-page-title mb-2">
+          <h3 id="staff-modal-title" class="text-lg font-semibold text-page-title mb-2">
             ¡Usuario creado exitosamente!
           </h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -44,13 +44,13 @@
       </div>
 
       <!-- Form Screen -->
-      <div v-else class="p-6">
+      <div v-else class="p-4 sm:p-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-semibold text-page-title">
+          <h3 id="staff-modal-title" class="text-lg font-semibold text-page-title">
             {{ isEditing ? 'Editar Usuario' : 'Nuevo Usuario' }}
           </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+          <button type="button" aria-label="Cerrar diálogo de usuario" @click="closeModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
             <X class="w-5 h-5" />
           </button>
         </div>
@@ -59,11 +59,12 @@
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Usuario -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label for="staff-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Nombre de Usuario *
             </label>
             <BaseInput
               v-model="form.usuario"
+              id="staff-username"
               placeholder="usuario123"
               :disabled="loading"
               required
@@ -74,11 +75,12 @@
 
           <!-- Email (solo en crear) -->
           <div v-if="!isEditing">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label for="staff-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email *
             </label>
             <BaseInput
               v-model="form.email"
+              id="staff-email"
               type="email"
               placeholder="usuario@ejemplo.com"
               :disabled="loading"
@@ -88,12 +90,13 @@
 
           <!-- Contraseña (solo en crear) -->
           <div v-if="!isEditing">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label for="staff-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Contraseña *
             </label>
             <div class="relative">
               <BaseInput
                 v-model="form.password"
+                id="staff-password"
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Mínimo 6 caracteres"
                 :disabled="loading"
@@ -103,6 +106,7 @@
               <button
                 type="button"
                 @click="showPassword = !showPassword"
+                :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 <component :is="showPassword ? EyeOff : Eye" class="w-5 h-5" />
@@ -122,10 +126,11 @@
 
           <!-- Rol -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label for="staff-role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Rol *
             </label>
             <select
+              id="staff-role"
               v-model="form.rol"
               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200"
               :disabled="loading"

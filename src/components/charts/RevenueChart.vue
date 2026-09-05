@@ -20,6 +20,8 @@ import {
   Filler
 } from 'chart.js'
 import { supabase } from '@/lib/supabase'
+import { formatCurrencyFull } from '@/utils/formatters'
+import { BRAND } from '@/config/brand'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -48,13 +50,13 @@ const chartData = computed(() => ({
     {
       label: 'Ingresos',
       data: monthsData.value.map(m => m.amount),
-      borderColor: '#5F388C', // primary-600
-      backgroundColor: 'rgba(95, 56, 140, 0.1)', // primary-600 con transparencia
+      borderColor: BRAND.colors.primary,
+      backgroundColor: `rgba(${BRAND.colors.primaryRgb}, 0.1)`,
       borderWidth: 3,
       fill: true,
       tension: 0.4, // Línea curva
       pointRadius: 5,
-      pointBackgroundColor: '#5F388C',
+      pointBackgroundColor: BRAND.colors.primary,
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
       pointHoverRadius: 7,
@@ -84,7 +86,7 @@ const chartOptions = {
       },
       callbacks: {
         label: (context) => {
-          return `$${context.parsed.y.toLocaleString('es-AR')}`
+          return formatCurrencyFull(context.parsed.y)
         }
       }
     }

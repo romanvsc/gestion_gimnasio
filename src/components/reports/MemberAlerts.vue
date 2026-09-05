@@ -8,7 +8,7 @@
         <div class="flex items-start justify-between mb-4">
           <div>
             <h3 class="text-lg font-semibold text-page-title mb-1">Cuotas Vencidas</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Socios con pagos pendientes</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Socios activos con pagos pendientes</p>
           </div>
           <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
             <AlertCircle class="w-6 h-6 text-red-600" />
@@ -23,8 +23,28 @@
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Socios activos con deuda</p>
         </div>
 
+        <div v-if="overdueMembers.length > 0" class="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="rounded-lg bg-red-50 px-2 py-2 text-red-800 dark:bg-red-900/20 dark:text-red-300">
+            <strong class="block text-base">{{ overdueBuckets.recent }}</strong>
+            Hasta 7 días
+          </div>
+          <div class="rounded-lg bg-orange-50 px-2 py-2 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300">
+            <strong class="block text-base">{{ overdueBuckets.medium }}</strong>
+            8 a 30 días
+          </div>
+          <div class="rounded-lg bg-gray-100 px-2 py-2 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+            <strong class="block text-base">{{ overdueBuckets.old }}</strong>
+            Más de 30 días
+          </div>
+        </div>
+
+        <p v-if="lastUpdatedAt && overdueMembers.length > 0" class="mb-4 text-xs text-gray-500 dark:text-gray-400">
+          Actualizado: {{ formatDateTime(lastUpdatedAt) }} · Revisá la fecha de vencimiento en el listado.
+        </p>
+
         <!-- Botón Ver Listado -->
         <BaseButton
+          v-if="loading.overdue || overdueMembers.length > 0"
           variant="danger"
           @click="handleShowOverdue"
           class="w-full"
@@ -33,6 +53,9 @@
           <FileText class="w-4 h-4 mr-2" />
           Ver Listado Completo
         </BaseButton>
+        <p v-else class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300" role="status">
+          No hay socios activos con cuotas vencidas.
+        </p>
       </div>
 
       <!-- Tarjeta B: Socios Inactivos -->
@@ -57,6 +80,7 @@
 
         <!-- Botón Ver Listado -->
         <BaseButton
+          v-if="loading.inactive || inactiveMembers.length > 0"
           variant="secondary"
           @click="handleShowInactive"
           class="w-full"
@@ -65,6 +89,9 @@
           <FileText class="w-4 h-4 mr-2" />
           Ver Listado Completo
         </BaseButton>
+        <p v-else class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300" role="status">
+          No hay bajas registradas en el período.
+        </p>
       </div>
 
     </div>
@@ -87,13 +114,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { useReports } from '@/composables/useReports'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import OverdueMembersModal from '@/components/modals/OverdueMembersModal.vue'
 import InactiveMembersModal from '@/components/modals/InactiveMembersModal.vue'
 import { AlertCircle, UserX, FileText } from 'lucide-vue-next'
+import { formatDateTime } from '@/utils/formatters'
 
 const {
   overdueMembers,
@@ -107,12 +135,24 @@ const {
 
 const showOverdueModal = ref(false)
 const showInactiveModal = ref(false)
+const lastUpdatedAt = ref(null)
+
+const overdueBuckets = computed(() => {
+  return overdueMembers.value.reduce((buckets, member) => {
+    const daysOverdue = Number(member.dias_vencido) || 0
+    if (daysOverdue <= 7) buckets.recent += 1
+    else if (daysOverdue <= 30) buckets.medium += 1
+    else buckets.old += 1
+    return buckets
+  }, { recent: 0, medium: 0, old: 0 })
+})
 
 onMounted(async () => {
   await Promise.all([
     fetchOverdueMembers(),
     fetchInactiveMembers()
   ])
+  lastUpdatedAt.value = new Date()
 })
 
 function handleShowOverdue() {

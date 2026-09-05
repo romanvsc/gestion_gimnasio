@@ -1,6 +1,13 @@
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery } from '@/lib/asyncHandler'
+import { planCatalog } from '@/contexts/plans-catalog'
+
+function parseOptionalPrice(value) {
+  return value === null || value === undefined || value === ''
+    ? null
+    : parseFloat(value)
+}
 
 export function useParameters() {
   const concepts = ref([])
@@ -58,14 +65,8 @@ export function useParameters() {
             .order('nombre')
         ),
 
-        // Cargar planes activos
-        runQuery(() =>
-          supabase
-            .from('plans')
-            .select('id, nombre, dias_duracion, precio, precio_socio, activo')
-            .eq('activo', true)
-            .order('nombre')
-        ),
+        // Cargar planes activos mediante el contexto Plans & Catalog
+        planCatalog.listActive(),
 
         // Cargar métodos de pago activos
         runQuery(() =>
@@ -112,12 +113,7 @@ export function useParameters() {
    */
   async function fetchAllPlans() {
     try {
-      const data = await runQuery(() =>
-        supabase
-          .from('plans')
-          .select('id, nombre, dias_duracion, precio, precio_socio, activo')
-          .order('nombre')
-      )
+      const data = await planCatalog.listAll()
       plans.value = data || []
       return { success: true, data }
     } catch (err) {
@@ -155,19 +151,13 @@ export function useParameters() {
         nombre: planData.nombre?.trim(),
         dias_duracion: parseInt(planData.dias_duracion, 10),
         precio: parseFloat(planData.precio),
-        precio_socio: planData.precio_socio ? parseFloat(planData.precio_socio) : null,
+        precio_socio: parseOptionalPrice(planData.precio_socio),
         activo: planData.activo !== false
       }
 
       console.log('📦 Creando plan con datos:', cleanData)
 
-      const data = await runQuery(() =>
-        supabase
-          .from('plans')
-          .insert([cleanData])
-          .select()
-          .single()
-      )
+      const data = await planCatalog.create(cleanData)
 
       console.log('✅ Plan creado exitosamente:', data)
       return { success: true, data }
@@ -202,18 +192,11 @@ export function useParameters() {
         nombre: planData.nombre?.trim(),
         dias_duracion: parseInt(planData.dias_duracion, 10),
         precio: parseFloat(planData.precio),
-        precio_socio: planData.precio_socio ? parseFloat(planData.precio_socio) : null,
+        precio_socio: parseOptionalPrice(planData.precio_socio),
         activo: planData.activo !== false
       }
 
-      const data = await runQuery(() =>
-        supabase
-          .from('plans')
-          .update(cleanData)
-          .eq('id', id)
-          .select()
-          .single()
-      )
+      const data = await planCatalog.update(id, cleanData)
       return { success: true, data }
     } catch (err) {
       console.error('❌ Error actualizando plan:', err)

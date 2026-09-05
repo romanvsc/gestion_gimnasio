@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-full">
+  <div class="relative h-full" role="img" aria-label="Gráfico de ingresos y egresos por mes">
     <!-- Loading State -->
     <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-page-card/75">
       <div class="text-center">
@@ -13,6 +13,14 @@
       <div class="text-center text-gray-500 dark:text-gray-400">
         <p class="text-lg font-medium">No hay datos disponibles</p>
         <p class="text-sm">Aún no se registraron transacciones</p>
+      </div>
+    </div>
+
+    <div v-else-if="chartData.labels.length === 1" class="flex h-full items-center justify-center">
+      <div class="max-w-sm text-center">
+        <p class="text-sm font-semibold uppercase tracking-wide text-page-muted">Un solo período disponible</p>
+        <p class="mt-2 text-3xl font-bold text-page-title">{{ formatCurrencyFull(singlePeriodTotal) }}</p>
+        <p class="mt-2 text-sm text-page-subtitle">Amplía el rango para comparar la evolución de ingresos y egresos.</p>
       </div>
     </div>
 
@@ -40,6 +48,7 @@ import {
   Legend,
   Filler
 } from 'chart.js'
+import { formatCurrencyFull } from '@/utils/formatters'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -121,6 +130,11 @@ const chartData = computed(() => {
       }
     ]
   }
+})
+
+const singlePeriodTotal = computed(() => {
+  const period = props.data?.[0]
+  return Number(period?.ingresos || 0) + Number(period?.egresos || 0)
 })
 
 /**

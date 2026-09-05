@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+      <div class="flex min-h-[100dvh] items-end justify-center px-0 pt-0 pb-0 text-center sm:items-center sm:px-4 sm:pt-4 sm:pb-20 sm:p-0">
         <!-- Overlay -->
         <div 
           class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
@@ -9,15 +9,17 @@
         ></div>
 
         <!-- Modal Panel -->
-        <div class="relative inline-block align-bottom bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+        <div class="relative inline-block max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full align-bottom overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transform transition-all dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:my-8 sm:max-h-[90vh] sm:align-middle sm:max-w-4xl sm:rounded-lg" role="dialog" aria-modal="true" aria-labelledby="inactive-members-modal-title">
           <!-- Header -->
-          <div class="bg-gray-50 dark:bg-white/5 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-white/5 sm:px-6 sm:py-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-page-title flex items-center gap-2">
+              <h3 id="inactive-members-modal-title" class="text-lg font-semibold text-page-title flex items-center gap-2">
                 <UserX class="w-5 h-5" />
                 Socios Inactivos ({{ members.length }})
               </h3>
               <button 
+                type="button"
+                aria-label="Cerrar socios inactivos"
                 @click="$emit('close')"
                 class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
               >
@@ -26,8 +28,26 @@
             </div>
           </div>
 
+          <!-- Tarjetas para pantallas compactas -->
+          <div class="max-h-[calc(100dvh-var(--mobile-nav-height)-12rem)] space-y-3 overflow-y-auto p-4 xl:hidden">
+            <article v-for="member in members" :key="member.id" class="rounded-xl border border-page-border bg-page-card p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="font-semibold text-page-title">{{ member.apellido }}, {{ member.nombre }}</p>
+                  <p class="mt-1 text-xs text-page-muted">DNI: {{ member.dni }}</p>
+                </div>
+                <span class="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">Inactivo</span>
+              </div>
+              <dl class="mt-3 grid grid-cols-1 gap-2 border-t border-page-border pt-3 text-sm sm:grid-cols-2">
+                <div><dt class="text-xs text-page-muted">Email</dt><dd class="break-words text-page-subtitle">{{ member.email || '-' }}</dd></div>
+                <div><dt class="text-xs text-page-muted">Teléfono</dt><dd class="text-page-subtitle">{{ member.telefono || '-' }}</dd></div>
+                <div><dt class="text-xs text-page-muted">Fecha de baja</dt><dd class="text-page-subtitle">{{ formatDate(member.fecha_baja) }}</dd></div>
+              </dl>
+            </article>
+          </div>
+
           <!-- Tabla -->
-          <div class="px-6 py-4 max-h-96 overflow-y-auto">
+          <div class="hidden max-h-96 overflow-x-auto overflow-y-auto px-6 py-4 xl:block">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700/50">
               <thead class="bg-gray-50 dark:bg-white/5 sticky top-0">
                 <tr>
@@ -55,11 +75,11 @@
           </div>
 
           <!-- Footer -->
-          <div class="bg-gray-50 dark:bg-white/5 px-6 py-4 flex justify-between items-center">
+          <div class="flex flex-col items-start justify-between gap-3 bg-gray-50 px-4 py-3 dark:bg-white/5 sm:flex-row sm:items-center sm:px-6 sm:py-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">
               Total: {{ members.length }} socios
             </p>
-            <div class="flex gap-3">
+            <div class="flex w-full gap-3 sm:w-auto">
               <BaseButton variant="secondary" @click="$emit('close')">
                 Cerrar
               </BaseButton>

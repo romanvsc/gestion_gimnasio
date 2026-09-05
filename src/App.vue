@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="min-h-screen">
     <!-- Mostrar loading mientras se inicializa la sesión -->
-    <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-page-bg transition-colors duration-200">
       <div class="text-center">
         <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
         <p class="text-gray-600 dark:text-gray-400">Cargando...</p>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted } from 'vue'
 import { Toaster } from 'vue-sonner'
 import { useUserStore } from './stores/userStore'
 import { useSettings } from './composables/useSettings'
@@ -50,39 +50,12 @@ const { fetchSettings } = useSettings()
 // Inicializar tema (lee localStorage y aplica clase dark en <html>)
 const { isDark } = useTheme()
 
-// Recarga la página cuando el usuario vuelve a la app después de estar en segundo plano.
-// Se ignora si la página recién cargó (primeros 5 segundos) para evitar loops.
-const APP_START_TIME = Date.now()
-const RELOAD_MIN_HIDDEN_MS = 3_000 // recargar si estuvo oculta al menos 3 segundos (cambio de app real)
-
-let hiddenAt = 0
-
-const handleVisibilityChange = () => {
-  if (document.visibilityState === 'hidden') {
-    hiddenAt = Date.now()
-  } else if (document.visibilityState === 'visible') {
-    const hiddenDuration = hiddenAt > 0 ? Date.now() - hiddenAt : 0
-    const appAge = Date.now() - APP_START_TIME
-    if (appAge > 5000 && hiddenDuration >= RELOAD_MIN_HIDDEN_MS) {
-      window.location.reload()
-    }
-  }
-}
-
 // Inicializar la sesión al cargar la app
 onMounted(async () => {
   await userStore.initSession()
   
   // Cargar configuración global del gimnasio
   await fetchSettings()
-  
-  // Detectar cuando la app pasa a segundo plano / vuelve a foreground
-  document.addEventListener('visibilitychange', handleVisibilityChange)
-})
-
-// Cleanup
-onUnmounted(() => {
-  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 

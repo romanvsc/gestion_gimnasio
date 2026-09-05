@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+  <div class="min-h-screen bg-page-bg transition-colors duration-200">
     <div class="max-w-5xl mx-auto px-4 py-6 md:py-8">
       <!-- Header con botón volver -->
       <div class="mb-6">
@@ -14,6 +14,15 @@
         <p class="text-page-subtitle">
           {{ isEditing ? 'Actualiza la información del socio' : 'Completa el formulario para agregar un nuevo socio' }}
         </p>
+        <nav class="mt-5 overflow-x-auto" aria-label="Secciones del formulario">
+          <ol class="flex min-w-max items-center gap-2 text-sm">
+            <li><a href="#datos-personales" class="rounded-full bg-primary-50 px-3 py-1.5 font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-300">1. Datos personales</a></li>
+            <li aria-hidden="true" class="text-page-muted">→</li>
+            <li><a href="#salud" class="rounded-full bg-page-card px-3 py-1.5 font-medium text-page-subtitle hover:bg-page-card-hover">2. Salud</a></li>
+            <li aria-hidden="true" class="text-page-muted">→</li>
+            <li><a href="#membresia" class="rounded-full bg-page-card px-3 py-1.5 font-medium text-page-subtitle hover:bg-page-card-hover">3. Membresía</a></li>
+          </ol>
+        </nav>
       </div>
 
       <!-- Loading -->
@@ -29,7 +38,7 @@
       <form v-else @submit.prevent="handleSubmit" class="space-y-6">
         
         <!-- SECCIÓN 1: Datos Personales & Foto -->
-        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+        <div id="datos-personales" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <User class="w-5 h-5 text-primary-500" />
             Datos Personales & Foto
@@ -54,6 +63,7 @@
                       v-if="!uploadingPhoto"
                       type="button"
                       @click="removePhoto"
+                      aria-label="Quitar foto de perfil"
                       class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors shadow-md touch-manipulation"
                     >
                       <X class="w-4 h-4" />
@@ -95,14 +105,14 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <BaseInput
                   v-model="formData.nombre"
-                  label="Nombre *"
+                  label="Nombre"
                   placeholder="Juan"
                   size="lg"
                   required
                 />
                 <BaseInput
                   v-model="formData.apellido"
-                  label="Apellido *"
+                  label="Apellido"
                   placeholder="Pérez"
                   size="lg"
                   required
@@ -157,11 +167,14 @@
         </div>
 
         <!-- SECCIÓN 2: Salud (Datos Físicos) -->
-        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+        <div id="salud" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <Heart class="w-5 h-5 text-red-500" />
             Salud & Datos Físicos
           </h2>
+          <p class="-mt-3 mb-6 text-sm text-page-subtitle">
+            Estos datos ayudan a orientar el entrenamiento y solo se usan dentro de la gestión del gimnasio.
+          </p>
           
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <!-- Peso -->
@@ -224,7 +237,7 @@
         </div>
 
         <!-- SECCIÓN 3: Membresía y Estado -->
-        <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
+        <div id="membresia" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <CreditCard class="w-5 h-5 text-primary-500" />
             Membresía y Estado
@@ -235,6 +248,8 @@
             <button
               type="button"
               @click="formData.es_socio_club = !formData.es_socio_club"
+              :aria-pressed="formData.es_socio_club"
+              aria-label="Alternar tarifa de Socio del Club"
               :class="[
                 'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all touch-manipulation',
                 formData.es_socio_club 
@@ -278,6 +293,8 @@
                 <button
                   type="button"
                   @click="formData.plan_id = null"
+                  :aria-pressed="formData.plan_id === null"
+                  aria-label="Seleccionar sin plan fijo"
                   :class="[
                     'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
                     formData.plan_id === null
@@ -295,6 +312,8 @@
                   :key="plan.id"
                   type="button"
                   @click="formData.plan_id = plan.id"
+                  :aria-pressed="formData.plan_id === plan.id"
+                  :aria-label="`${plan.nombre}, ${formatCurrencyFull(resolvePlanPrice(plan, formData.es_socio_club))}`"
                   :class="[
                     'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
                     formData.plan_id === plan.id
@@ -305,7 +324,7 @@
                   <p class="font-semibold text-page-title">{{ plan.nombre }}</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">{{ plan.dias_duracion }} días</p>
                   <p class="text-lg font-bold text-primary-600 mt-1">
-                    ${{ formatPrice(formData.es_socio_club && plan.precio_socio ? plan.precio_socio : plan.precio) }}
+                    {{ formatCurrencyFull(resolvePlanPrice(plan, formData.es_socio_club)) }}
                   </p>
                 </button>
               </div>
@@ -318,6 +337,8 @@
             <button
               type="button"
               @click="formData.activo = !formData.activo"
+              :aria-pressed="formData.activo"
+              aria-label="Alternar estado activo del socio"
               :class="[
                 'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all touch-manipulation',
                 formData.activo 
@@ -382,6 +403,7 @@
                 <button 
                   type="button"
                   @click="duplicateErrors = []"
+                  aria-label="Cerrar aviso de socio duplicado"
                   class="flex-shrink-0 p-1.5 text-amber-500 hover:text-amber-700 hover:bg-amber-100 rounded-lg transition-colors"
                 >
                   <X class="w-5 h-5" />
@@ -423,7 +445,7 @@
         </Transition>
 
         <!-- Botones de acción -->
-        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <div class="mobile-save-bar sticky z-10 -mx-2 flex flex-col gap-3 rounded-xl border border-page-border bg-page-bg/95 p-2 pt-3 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-page-bg/80 sm:flex-row">
           <BaseButton
             type="submit"
             variant="primary"
@@ -462,6 +484,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
+import { resolvePlanPrice } from '@/contexts/plans-catalog'
+import { formatCurrencyFull } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -510,12 +534,6 @@ const uploadingPhoto = ref(false)
 const fileInput = ref(null)
 const previousPhotoUrl = ref('')
 const duplicateErrors = ref([])
-
-// Formatear precio con separador de miles
-function formatPrice(price) {
-  if (!price) return '0'
-  return new Intl.NumberFormat('es-AR').format(price)
-}
 
 // Calcular IMC
 const imc = computed(() => {

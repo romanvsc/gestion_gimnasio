@@ -18,21 +18,27 @@
       :disabled="disabled"
       :autocomplete="autocomplete"
       :autofocus="autofocus"
+      :aria-invalid="error ? 'true' : undefined"
+      :aria-describedby="hasDescription ? descriptionId : undefined"
       :class="inputClasses"
       @input="handleInput"
+      @change="$emit('change', $event)"
       @blur="$emit('blur', $event)"
       @focus="$emit('focus', $event)"
     />
     
     <p 
-      v-if="error" 
+      v-if="error"
+      :id="descriptionId"
+      role="alert"
       class="mt-1 text-sm text-red-600 dark:text-red-400"
     >
       {{ error }}
     </p>
     
     <p 
-      v-if="hint && !error" 
+      v-if="hint && !error"
+      :id="descriptionId"
       class="mt-1 text-sm text-gray-500 dark:text-gray-400"
     >
       {{ hint }}
@@ -95,9 +101,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'blur', 'focus'])
+const emit = defineEmits(['update:modelValue', 'input', 'change', 'blur', 'focus'])
 
 const inputId = computed(() => props.id || `input-${Math.random().toString(36).substr(2, 9)}`)
+const descriptionId = computed(() => `${inputId.value}-description`)
+const hasDescription = computed(() => Boolean(props.error || props.hint))
 
 const inputClasses = computed(() => {
   // Size classes
@@ -128,5 +136,6 @@ const inputClasses = computed(() => {
 
 function handleInput(event) {
   emit('update:modelValue', event.target.value)
+  emit('input', event)
 }
 </script>

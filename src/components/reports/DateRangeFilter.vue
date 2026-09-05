@@ -13,6 +13,8 @@
           v-for="range in dateRanges"
           :key="range.value"
           @click="selectRange(range.value)"
+          type="button"
+          :aria-pressed="selectedRange === range.value"
           :class="[
             'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
             selectedRange === range.value
@@ -22,8 +24,32 @@
         >
           {{ range.label }}
         </button>
+        <button
+          type="button"
+          :aria-pressed="selectedRange === 'custom'"
+          @click="selectRange('custom')"
+          :class="[
+            'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+            selectedRange === 'custom'
+              ? 'bg-primary-600 text-white shadow-md'
+              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+          ]"
+        >
+          Rango personalizado
+        </button>
       </div>
     </div>
+
+    <div v-if="selectedRange === 'custom'" class="mt-4 grid grid-cols-1 gap-3 border-t border-page-border pt-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+      <BaseInput v-model="customStartDate" type="date" label="Desde" id="report-custom-start" />
+      <BaseInput v-model="customEndDate" type="date" label="Hasta" id="report-custom-end" :min="customStartDate" />
+      <BaseButton variant="primary" :disabled="!isCustomRangeValid" @click="applyCustomRange">
+        Aplicar rango
+      </BaseButton>
+    </div>
+    <p v-if="customRangeError" class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
+      {{ customRangeError }}
+    </p>
 
     <!-- Información del rango seleccionado -->
     <div v-if="dateInfo" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
@@ -41,6 +67,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Calendar } from 'lucide-vue-next'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
 const emit = defineEmits(['change'])
 
@@ -52,12 +80,32 @@ const dateRanges = [
 ]
 
 const selectedRange = ref('1month')
+const customStartDate = ref('')
+const customEndDate = ref('')
+const customRangeError = ref('')
+
+const isCustomRangeValid = computed(() => {
+  return Boolean(customStartDate.value && customEndDate.value && customStartDate.value <= customEndDate.value)
+})
 
 /**
  * Calcula las fechas de inicio y fin según el rango seleccionado
  */
 const dateInfo = computed(() => {
   if (!selectedRange.value) return null
+
+  if (selectedRange.value === 'custom') {
+    if (!isCustomRangeValid.value) return null
+
+    const startDate = new Date(`${customStartDate.value}T00:00:00`)
+    const endDate = new Date(`${customEndDate.value}T23:59:59.999`)
+    return {
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
+      startDateISO: startDate.toISOString(),
+      endDateISO: endDate.toISOString()
+    }
+  }
 
   const today = new Date()
   const endDate = new Date(today)
@@ -95,6 +143,11 @@ const dateInfo = computed(() => {
  */
 function selectRange(value) {
   selectedRange.value = value
+
+  if (value === 'custom') {
+    customRangeError.value = ''
+    return
+  }
   
   if (dateInfo.value) {
     emit('change', {
@@ -103,6 +156,25 @@ function selectRange(value) {
       endDate: dateInfo.value.endDateISO
     })
   }
+}
+
+function applyCustomRange() {
+  if (!customStartDate.value || !customEndDate.value) {
+    customRangeError.value = 'Seleccioná una fecha de inicio y una fecha de fin.'
+    return
+  }
+
+  if (customStartDate.value > customEndDate.value) {
+    customRangeError.value = 'La fecha de inicio no puede ser posterior a la fecha de fin.'
+    return
+  }
+
+  customRangeError.value = ''
+  emit('change', {
+    range: 'custom',
+    startDate: dateInfo.value.startDateISO,
+    endDate: dateInfo.value.endDateISO
+  })
 }
 
 /**

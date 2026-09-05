@@ -1,6 +1,9 @@
 <template>
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-[#0d1526] border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom transition-colors duration-200">
-    <div class="flex justify-around items-center h-20 px-1">
+  <nav
+    class="md:hidden fixed bottom-0 left-0 right-0 bg-page-card/95 backdrop-blur border-t border-page-border z-50 safe-area-bottom transition-colors duration-200"
+    aria-label="Navegación principal"
+  >
+    <div class="relative z-20 flex justify-around items-center h-20 px-1 bg-page-card/95">
       <!-- Items de navegación principales -->
       <router-link
         v-for="item in navigation"
@@ -9,7 +12,7 @@
         :class="[
           isActive(item.to)
             ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/30'
-            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/5',
+            : 'text-page-subtitle hover:text-page-title hover:bg-page-card-hover',
           'flex flex-col items-center justify-center flex-1 h-full py-2 px-1 rounded-xl transition-all duration-200 min-w-0 touch-manipulation'
         ]"
       >
@@ -31,11 +34,16 @@
 
       <!-- Botón "Más" -->
       <button
+        type="button"
         @click="showMoreMenu = !showMoreMenu"
+        :aria-expanded="showMoreMenu"
+        aria-controls="mobile-more-menu"
+        aria-haspopup="true"
+        aria-label="Más opciones de navegación"
         :class="[
           showMoreMenu || isMoreActive
             ? 'text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/20'
-            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-white/5',
+            : 'text-page-subtitle hover:text-page-title hover:bg-page-card-hover',
           'flex flex-col items-center justify-center flex-1 h-full py-2 px-1 rounded-xl transition-all duration-200 min-w-0 touch-manipulation'
         ]"
       >
@@ -61,9 +69,12 @@
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 translate-y-4"
     >
-      <div 
-        v-if="showMoreMenu" 
-        class="absolute bottom-full left-0 right-0 bg-white dark:bg-[#0d1526] border-t border-gray-200 dark:border-gray-800 shadow-lg rounded-t-2xl overflow-hidden"
+      <div
+        v-if="showMoreMenu"
+        id="mobile-more-menu"
+        aria-label="Más opciones"
+        class="absolute bottom-full left-0 right-0 z-10 bg-page-card border-t border-page-border shadow-xl rounded-t-2xl overflow-hidden"
+        @keydown.esc="showMoreMenu = false"
       >
         <div class="p-4 space-y-1">
           <!-- Items del menú "Más" -->
@@ -75,7 +86,7 @@
             :class="[
               isActive(item.to)
                 ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
-                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5',
+                : 'text-page-subtitle hover:bg-page-card-hover hover:text-page-title',
               'flex items-center gap-4 px-4 py-3 rounded-xl transition-colors touch-manipulation'
             ]"
           >
@@ -99,10 +110,11 @@
     </Transition>
 
     <!-- Overlay para cerrar el menú -->
-    <div 
-      v-if="showMoreMenu" 
-      class="fixed inset-0 -z-10"
+    <div
+      v-if="showMoreMenu"
+      class="fixed inset-0 z-0 bg-black/40 backdrop-blur-[1px]"
       @click="showMoreMenu = false"
+      aria-hidden="true"
     ></div>
   </nav>
 </template>

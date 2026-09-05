@@ -1,4 +1,5 @@
 import { ref, watch, readonly } from 'vue'
+import { BRAND } from '@/config/brand'
 
 const STORAGE_KEY = 'gym-theme'
 
@@ -67,7 +68,7 @@ export function useTheme() {
     // Actualizar meta theme-color para la barra del navegador/PWA
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', isDark.value ? '#0b1120' : '#5F388C')
+      metaThemeColor.setAttribute('content', isDark.value ? BRAND.colors.dark : BRAND.colors.primary)
     }
   }
 

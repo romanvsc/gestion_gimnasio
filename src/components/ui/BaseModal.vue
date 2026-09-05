@@ -3,8 +3,7 @@
     <Transition name="modal-backdrop" appear>
       <div 
         v-if="modelValue" 
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        @keydown.esc="handleClose"
+        class="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
       >
         <!-- Backdrop -->
         <div 
@@ -16,11 +15,14 @@
         <Transition name="modal-panel" appear>
           <div 
             v-if="modelValue"
-            class="relative w-full bg-white dark:bg-[#151f32] rounded-2xl shadow-2xl overflow-hidden dark:ring-1 dark:ring-white/10"
+            ref="panelRef"
+            class="relative max-h-[calc(100dvh-var(--mobile-nav-height)-0.5rem)] w-full overflow-hidden rounded-t-2xl bg-white shadow-2xl dark:bg-page-card dark:ring-1 dark:ring-white/10 sm:max-h-[95vh] sm:rounded-2xl"
             :class="sizeClasses"
             role="dialog"
             aria-modal="true"
-            :aria-label="title"
+            :aria-labelledby="title ? titleId : undefined"
+            :aria-label="title ? undefined : 'Diálogo'"
+            tabindex="-1"
           >
             <!-- Header -->
             <div 
@@ -31,7 +33,7 @@
               <div v-if="$slots.header" class="flex-1">
                 <slot name="header" />
               </div>
-              <h3 v-else-if="title" class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <h3 v-else-if="title" :id="titleId" class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <slot name="icon" />
                 {{ title }}
               </h3>
@@ -49,7 +51,7 @@
 
             <!-- Body -->
             <div 
-              class="px-6 py-4 overflow-y-auto"
+              class="overflow-y-auto px-4 py-4 sm:px-6"
               :class="bodyClass"
               :style="{ maxHeight: maxBodyHeight }"
             >
@@ -71,7 +73,7 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted, onUnmounted } from 'vue'
+import { computed, nextTick, ref, watch, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -114,13 +116,17 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'close'])
+const panelRef = ref(null)
+const titleId = `modal-title-${Math.random().toString(36).slice(2, 10)}`
+let previouslyFocusedElement = null
+let previousBodyOverflow = ''
 
 const sizeClasses = computed(() => ({
   'max-w-sm': props.size === 'sm',
   'max-w-lg': props.size === 'md',
   'max-w-2xl': props.size === 'lg',
   'max-w-4xl': props.size === 'xl',
-  'max-w-[95vw] max-h-[95vh]': props.size === 'full'
+  'max-w-[95vw]': props.size === 'full'
 }))
 
 function handleClose() {
@@ -128,12 +134,60 @@ function handleClose() {
   emit('close')
 }
 
+function getFocusableElements() {
+  if (!panelRef.value) return []
+
+  return [...panelRef.value.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )].filter(element => element.offsetParent !== null)
+}
+
+function focusFirstElement() {
+  nextTick(() => {
+    const [firstFocusable] = getFocusableElements()
+    ;(firstFocusable || panelRef.value)?.focus()
+  })
+}
+
+function restoreFocus() {
+  if (previouslyFocusedElement?.isConnected) {
+    previouslyFocusedElement.focus()
+  }
+  previouslyFocusedElement = null
+}
+
+function handleTabKey(e) {
+  if (!props.modelValue || e.key !== 'Tab') return
+
+  const focusableElements = getFocusableElements()
+  if (focusableElements.length === 0) {
+    e.preventDefault()
+    panelRef.value?.focus()
+    return
+  }
+
+  const first = focusableElements[0]
+  const last = focusableElements[focusableElements.length - 1]
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault()
+    last.focus()
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault()
+    first.focus()
+  }
+}
+
 // Bloquear scroll del body cuando el modal está abierto
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
+    previouslyFocusedElement = document.activeElement
+    previousBodyOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    focusFirstElement()
   } else {
-    document.body.style.overflow = ''
+    document.body.style.overflow = previousBodyOverflow
+    restoreFocus()
   }
 })
 
@@ -142,15 +196,24 @@ function handleEscKey(e) {
   if (e.key === 'Escape' && props.modelValue && props.closeOnEsc) {
     handleClose()
   }
+
+  handleTabKey(e)
 }
 
 onMounted(() => {
   document.addEventListener('keydown', handleEscKey)
+  if (props.modelValue) {
+    previouslyFocusedElement = document.activeElement
+    previousBodyOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    focusFirstElement()
+  }
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscKey)
-  document.body.style.overflow = ''
+  document.body.style.overflow = previousBodyOverflow
+  restoreFocus()
 })
 </script>
 

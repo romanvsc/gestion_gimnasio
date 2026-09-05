@@ -13,25 +13,40 @@
     --color-page-subtitle: #64748b;
     --color-page-muted: #94a3b8;
     --color-page-card: #ffffff;
+    --color-page-elevated: #ffffff;
     --color-page-card-hover: #f8fafc;
-    --color-page-border: #f1f5f9;
+    --color-page-border: #e2e8f0;
+    --color-brand-primary: #ef3f0a;
+    --mobile-nav-height: 5rem;
   }
 
   /* ============================
      CSS Variables - Dark Mode (DEFAULT)
      ============================ */
   .dark {
-    --color-page-bg: #0b1120;
+    --color-page-bg: #0b0b0c;
     --color-page-title: #f1f5f9;
-    --color-page-subtitle: #94a3b8;
-    --color-page-muted: #64748b;
-    --color-page-card: #151f32;
-    --color-page-card-hover: #1a2740;
-    --color-page-border: #1e293b;
+    --color-page-subtitle: #cbd5e1;
+    --color-page-muted: #94a3b8;
+    --color-page-card: #171717;
+    --color-page-elevated: #242424;
+    --color-page-card-hover: #242424;
+    --color-page-border: #333333;
+    --color-brand-primary: #ff6a00;
   }
 
   body {
     @apply bg-page-bg text-gray-900 dark:text-gray-100 transition-colors duration-200;
+    min-width: 320px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 3px;
+  }
+
+  :target {
+    scroll-margin-top: 8rem;
   }
 
   /* Scrollbar styling para dark mode */
@@ -40,7 +55,7 @@
     height: 8px;
   }
   .dark ::-webkit-scrollbar-track {
-    background: #0b1120;
+    background: #171717;
   }
   .dark ::-webkit-scrollbar-thumb {
     background: #475569;
@@ -48,6 +63,24 @@
   }
   .dark ::-webkit-scrollbar-thumb:hover {
     background: #64748b;
+  }
+}
+
+@layer utilities {
+  .mobile-save-bar {
+    bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-main-content {
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    scroll-padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (min-width: 768px) {
+    .mobile-main-content {
+      padding-bottom: 0;
+      scroll-padding-bottom: 0;
+    }
   }
 }
 
@@ -193,6 +226,17 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

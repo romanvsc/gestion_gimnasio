@@ -15,6 +15,8 @@
         :value="modelValue"
         :required="required"
         :disabled="disabled"
+        :aria-invalid="error ? 'true' : undefined"
+        :aria-describedby="hasDescription ? descriptionId : undefined"
         :class="selectClasses"
         @change="handleChange"
       >
@@ -39,11 +41,11 @@
       </div>
     </div>
     
-    <p v-if="error" class="mt-1 text-sm text-red-600 dark:text-red-400">
+    <p v-if="error" :id="descriptionId" role="alert" class="mt-1 text-sm text-red-600 dark:text-red-400">
       {{ error }}
     </p>
     
-    <p v-if="hint && !error" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    <p v-if="hint && !error" :id="descriptionId" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
       {{ hint }}
     </p>
   </div>
@@ -110,6 +112,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const selectId = computed(() => props.id || `select-${Math.random().toString(36).substr(2, 9)}`)
+const descriptionId = computed(() => `${selectId.value}-description`)
+const hasDescription = computed(() => Boolean(props.error || props.hint))
 
 /**
  * Normaliza las opciones a formato { value, label, disabled }

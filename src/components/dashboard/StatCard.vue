@@ -5,7 +5,7 @@
       'rounded-xl border p-5 md:p-6 transition-all duration-200 hover:shadow-md',
       route ? 'cursor-pointer' : '',
       badgeVariant === 'urgent'
-        ? 'bg-red-950/40 border-red-500/30 hover:border-red-500/50'
+        ? 'bg-red-50 border-red-200 hover:border-red-300 dark:bg-red-950/40 dark:border-red-500/30 dark:hover:border-red-500/50'
         : 'bg-page-card border-page-border hover:bg-page-card-hover'
     ]"
   >
@@ -35,8 +35,14 @@
       </span>
     </div>
 
-    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1.5">{{ title }}</p>
-    <p class="text-page-title text-3xl md:text-4xl font-extrabold tracking-tight">{{ value }}</p>
+    <p
+      class="text-xs font-semibold uppercase tracking-wider mb-1.5"
+      :class="badgeVariant === 'urgent' ? 'text-red-700 dark:text-red-300' : 'text-gray-500 dark:text-gray-400'"
+    >{{ title }}</p>
+    <p
+      class="text-3xl md:text-4xl font-extrabold tracking-tight"
+      :class="badgeVariant === 'urgent' ? 'text-red-950 dark:text-red-50' : 'text-page-title'"
+    >{{ value }}</p>
     
     <!-- Comparison with previous period -->
     <div v-if="showComparison" class="flex items-center gap-1.5 mt-2">
@@ -154,9 +160,9 @@ const darkIconColor = computed(() => iconColorDarkMap[props.iconColor] || props.
 // Badge variant classes
 const badgeClasses = computed(() => {
   const map = {
-    default: 'bg-primary-400/10 text-primary-400 border border-primary-400/20',
-    live: 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20',
-    urgent: 'bg-red-400/15 text-red-400 border border-red-400/20',
+    default: 'bg-primary-100 text-primary-800 border border-primary-200 dark:bg-primary-400/10 dark:text-primary-300 dark:border-primary-400/20',
+    live: 'bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-300 dark:border-emerald-400/20',
+    urgent: 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-400/15 dark:text-red-300 dark:border-red-400/20',
   }
   return map[props.badgeVariant] || map.default
 })

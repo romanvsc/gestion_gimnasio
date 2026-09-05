@@ -1,12 +1,18 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-page-bg transition-colors duration-200">
+  <div class="flex h-[100dvh] overflow-hidden bg-page-bg transition-colors duration-200">
     <!-- Sidebar para desktop -->
     <Sidebar />
 
     <!-- Contenido principal -->
-    <div class="flex flex-col w-0 flex-1 overflow-hidden">
+    <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <a
+        href="#main-content"
+        class="skip-link"
+      >
+        Ir al contenido principal
+      </a>
       <!-- Main content -->
-      <main class="flex-1 relative overflow-y-auto focus:outline-none pb-16 md:pb-0">
+      <main id="main-content" class="flex-1 relative overflow-y-auto focus:outline-none mobile-main-content" tabindex="-1">
         <router-view :key="activeViewKey" />
       </main>
 
@@ -17,14 +23,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import Sidebar from './Sidebar.vue'
 import BottomNav from './BottomNav.vue'
 
 const userStore = useUserStore()
-const activeViewKey = ref(0)
-
 const RESUME_DEBOUNCE_MS = 350
 const RESUME_COOLDOWN_MS = 1200
 const HEARTBEAT_INTERVAL_MS = 1000
@@ -40,9 +44,7 @@ function refreshActiveView() {
   if (now - lastRefreshAt < RESUME_COOLDOWN_MS) return
 
   lastRefreshAt = now
-  // Incrementar la key fuerza el re-mount de la vista activa (dispara onMounted)
-  activeViewKey.value += 1
-  // Ademas actualizamos el store reactivo para los watchers de useAppResume
+  // Las vistas actualizan sus datos mediante useAppResume sin desmontar formularios.
   userStore.triggerResume()
 }
 
@@ -93,3 +95,25 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  border-radius: 0.75rem;
+  background: #171717;
+  color: #fff7ed;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgb(0 0 0 / 25%);
+  transition: transform 150ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+</style>

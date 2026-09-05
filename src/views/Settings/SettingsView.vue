@@ -5,7 +5,9 @@
       <div class="max-w-4xl mx-auto px-4 py-4">
         <div class="flex items-center gap-3">
           <button 
-            @click="router.push({ name: 'Dashboard' })"
+            @click="goToDashboard"
+            type="button"
+            aria-label="Volver al dashboard"
             class="p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-colors touch-manipulation"
           >
             <ArrowLeft class="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -14,7 +16,26 @@
             <h1 class="text-xl font-bold text-page-title">Configuración</h1>
             <p class="text-sm text-page-subtitle">Personaliza tu gimnasio</p>
           </div>
+          <div class="ml-auto flex items-center gap-3">
+            <span class="text-xs font-medium" :class="hasUnsavedChanges ? 'text-amber-600 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-300'" aria-live="polite">
+              {{ saving ? 'Guardando...' : (hasUnsavedChanges ? 'Cambios sin guardar' : 'Guardado') }}
+            </span>
+            <BaseButton
+              v-if="hasUnsavedChanges"
+              variant="primary"
+              size="sm"
+              :loading="saving"
+              @click="handleSave"
+            >
+              Guardar
+            </BaseButton>
+          </div>
         </div>
+        <nav class="mt-4 -mx-1 flex gap-2 overflow-x-auto pb-1" aria-label="Secciones de configuración">
+          <a v-for="section in settingSections" :key="section.id" :href="`#${section.id}`" class="shrink-0 rounded-full bg-page-bg px-3 py-1.5 text-xs font-medium text-page-subtitle hover:text-primary-600 dark:hover:text-primary-300">
+            {{ section.label }}
+          </a>
+        </nav>
       </div>
     </div>
 
@@ -30,7 +51,7 @@
     <div v-else class="max-w-4xl mx-auto px-4 py-6 space-y-6">
       
       <!-- SECCIÓN 1: Identidad Visual -->
-      <section class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
+      <section id="identidad" class="scroll-mt-32 bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
         <div class="p-4 border-b border-page-border flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
             <ImageIcon class="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -48,13 +69,11 @@
               class="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden bg-gray-50"
               :class="{ 'border-solid border-gray-200': formData.logo_url }"
             >
-              <img 
-                v-if="formData.logo_url" 
-                :src="formData.logo_url" 
+              <GymLogo
+                :src="formData.logo_url"
                 :alt="formData.nombre_gimnasio"
                 class="w-full h-full object-contain p-2"
-              >
-              <Building2 v-else class="w-10 h-10 text-gray-300" />
+              />
             </div>
 
             <!-- Actions -->
@@ -77,6 +96,7 @@
                 v-if="formData.logo_url"
                 type="button"
                 @click="handleDeleteLogo"
+                aria-label="Eliminar logo del gimnasio"
                 class="flex items-center gap-2 px-4 py-2.5 text-red-600 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors touch-manipulation"
               >
                 <Trash2 class="w-4 h-4" />
@@ -94,7 +114,7 @@
       </section>
 
       <!-- SECCIÓN 2: Información del Gimnasio -->
-      <section class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
+      <section id="informacion" class="scroll-mt-32 bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
         <div class="p-4 border-b border-page-border flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-secondary-100 dark:bg-secondary-900/30 flex items-center justify-center">
             <Building2 class="w-5 h-5 text-secondary-600 dark:text-secondary-400" />
@@ -140,7 +160,7 @@
       </section>
 
       <!-- SECCIÓN 3: Horarios -->
-      <section class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
+      <section id="horarios" class="scroll-mt-32 bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
         <div class="p-4 border-b border-page-border flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
             <Clock class="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -163,7 +183,7 @@
       </section>
 
       <!-- SECCIÓN 4: Planes -->
-      <section class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
+      <section id="planes" class="scroll-mt-32 bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
         <div class="p-4 border-b border-page-border flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
@@ -222,9 +242,9 @@
                 </div>
                 <p class="text-sm text-page-subtitle">
                   {{ plan.dias_duracion }} días · 
-                  <span class="font-medium text-emerald-600">${{ formatPrice(plan.precio) }}</span>
+                  <span class="font-medium text-emerald-600">{{ formatCurrencyFull(plan.precio) }}</span>
                   <span v-if="plan.precio_socio" class="text-page-muted">
-                    · Socio: ${{ formatPrice(plan.precio_socio) }}
+                    · Socio: {{ formatCurrencyFull(plan.precio_socio) }}
                   </span>
                 </p>
               </div>
@@ -232,6 +252,8 @@
             
             <button 
               @click="openPlanModal(plan)"
+              type="button"
+              :aria-label="`Editar plan ${plan.nombre}`"
               class="p-2 rounded-xl hover:bg-gray-100 transition-colors touch-manipulation"
             >
               <Pencil class="w-5 h-5 text-gray-400" />
@@ -241,7 +263,7 @@
       </section>
 
       <!-- SECCIÓN 5: Métodos de Pago -->
-      <section class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
+      <section id="medios-pago" class="scroll-mt-32 bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
         <div class="p-4 border-b border-page-border flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
             <Wallet class="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -258,6 +280,9 @@
               v-for="method in paymentMethods"
               :key="method.id"
               @click="togglePaymentMethod(method)"
+              type="button"
+              :aria-pressed="method.activo"
+              :aria-label="`${method.activo ? 'Desactivar' : 'Activar'} medio de pago ${method.nombre}`"
               class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all touch-manipulation"
               :class="method.activo 
                 ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500 dark:bg-primary-900/30 dark:text-primary-300' 
@@ -276,16 +301,17 @@
       </section>
 
       <!-- Botón Guardar (Flotante en móvil) -->
-      <div class="fixed bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-page-bg via-page-bg to-transparent md:relative md:bottom-auto md:p-0 md:bg-transparent">
+      <div class="mobile-save-bar fixed left-0 right-0 p-4 bg-gradient-to-t from-page-bg via-page-bg to-transparent md:relative md:bottom-auto md:p-0 md:bg-transparent">
         <BaseButton
           variant="primary"
           size="lg"
           class="w-full"
           :loading="saving"
+          :disabled="!hasUnsavedChanges"
           @click="handleSave"
         >
           <Save class="w-5 h-5 mr-2" />
-          Guardar Cambios
+          {{ hasUnsavedChanges ? 'Guardar cambios' : 'Sin cambios' }}
         </BaseButton>
       </div>
     </div>
@@ -310,17 +336,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useSettings } from '@/composables/useSettings'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
+import { formatCurrencyFull } from '@/utils/formatters'
 import { confirmAlert } from '@/lib/alerts'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import PlanModal from '@/components/settings/PlanModal.vue'
 import SuccessModal from '@/components/ui/SuccessModal.vue'
+import GymLogo from '@/components/brand/GymLogo.vue'
+import { BRAND } from '@/config/brand'
 import { 
   ArrowLeft, 
   ImageIcon, 
@@ -348,9 +377,17 @@ const {
   updatePaymentMethod 
 } = useParameters()
 
+const settingSections = [
+  { id: 'identidad', label: 'Identidad' },
+  { id: 'informacion', label: 'Información' },
+  { id: 'horarios', label: 'Horarios' },
+  { id: 'planes', label: 'Planes y precios' },
+  { id: 'medios-pago', label: 'Medios de pago' }
+]
+
 // Form state
 const formData = reactive({
-  nombre_gimnasio: '',
+  nombre_gimnasio: BRAND.name,
   email_contacto: '',
   whatsapp: '',
   direccion: '',
@@ -360,6 +397,18 @@ const formData = reactive({
 
 const saving = ref(false)
 const uploadingLogo = ref(false)
+const savedSnapshot = ref('')
+
+const formSnapshot = computed(() => JSON.stringify({
+  nombre_gimnasio: formData.nombre_gimnasio,
+  email_contacto: formData.email_contacto,
+  whatsapp: formData.whatsapp,
+  direccion: formData.direccion,
+  horarios_apertura: formData.horarios_apertura,
+  logo_url: formData.logo_url
+}))
+
+const hasUnsavedChanges = computed(() => Boolean(savedSnapshot.value) && formSnapshot.value !== savedSnapshot.value)
 
 // Plan modal state
 const showPlanModal = ref(false)
@@ -383,6 +432,7 @@ function syncFormDataFromSettings() {
     horarios_apertura: settings.horarios_apertura || '',
     logo_url: settings.logo_url || null
   })
+  savedSnapshot.value = formSnapshot.value
 }
 
 async function loadSettingsData() {
@@ -400,11 +450,39 @@ async function loadSettingsData() {
 // ==================
 onMounted(async () => {
   await loadSettingsData()
+  window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
 useAppResume(async () => {
+  if (hasUnsavedChanges.value) {
+    toast.warning('Hay cambios sin guardar. No se actualizaron automáticamente.')
+    return
+  }
   await loadSettingsData()
 }, { minIntervalMs: 1500 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+function handleBeforeUnload(event) {
+  if (!hasUnsavedChanges.value) return
+
+  event.preventDefault()
+  event.returnValue = ''
+}
+
+async function goToDashboard() {
+  if (hasUnsavedChanges.value) {
+    const confirmed = await confirmAlert(
+      'Cambios sin guardar',
+      'Tenés cambios sin guardar. ¿Querés salir de todas formas?'
+    )
+    if (!confirmed) return
+  }
+
+  router.push({ name: 'Dashboard' })
+}
 
 // ==================
 // LOGO HANDLERS
@@ -576,6 +654,8 @@ async function handleSave() {
       direccion: formData.direccion?.trim() || '',
       horarios_apertura: formData.horarios_apertura?.trim() || ''
     })
+
+    savedSnapshot.value = formSnapshot.value
     
     // Mostrar modal de éxito
     successModalConfig.type = 'success'
@@ -591,11 +671,4 @@ async function handleSave() {
   }
 }
 
-// ==================
-// UTILS
-// ==================
-function formatPrice(price) {
-  if (!price) return '0'
-  return new Intl.NumberFormat('es-AR').format(price)
-}
 </script>

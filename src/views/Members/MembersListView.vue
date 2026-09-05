@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-page-bg transition-colors duration-200">
-    <div class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+    <div class="max-w-[1440px] mx-auto px-4 py-6 md:px-6 md:py-8 xl:px-8">
       
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -35,6 +35,8 @@
             <div class="flex-1">
               <BaseInput
                 v-model="searchQuery"
+                id="member-search"
+                label="Buscar socio"
                 placeholder="Buscar por nombre, apellido o DNI..."
                 size="lg"
               >
@@ -46,10 +48,12 @@
             <div class="w-full sm:w-56">
               <BaseSelect
                 v-model="pageSize"
+                id="member-page-size"
+                label="Filas por página"
                 :options="pageSizeOptions"
                 value-key="value"
                 label-key="label"
-                placeholder="Filas por pagina"
+                placeholder="Seleccionar cantidad"
                 size="lg"
                 :disabled="pageSizeOptions.length === 0"
                 @change="handlePageSizeChange"
@@ -67,6 +71,11 @@
           </div>
         </div>
 
+        <div class="mb-6 rounded-xl border border-page-border bg-page-card px-4 py-3 text-sm text-page-subtitle" role="note">
+          <span class="font-semibold text-page-title">Cómo leer los estados:</span>
+          <span class="ml-1">el registro indica si la ficha está activa; la cuota indica si puede cobrar o revisar el vencimiento; el apto físico informa su vigencia.</span>
+        </div>
+
         <!-- Empty state (cuando no hay socios) -->
         <div v-if="filteredMembers.length === 0" class="text-center py-12 bg-page-card rounded-xl shadow-sm border border-page-border">
           <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
@@ -75,11 +84,13 @@
         </div>
 
         <!-- Vista Mobile: Cards -->
-        <div v-else class="md:hidden space-y-3">
-          <div
+        <div v-else class="xl:hidden space-y-3">
+          <button
             v-for="member in paginatedMembers"
             :key="member.id"
-            class="bg-page-card rounded-xl shadow-sm border border-page-border p-4 touch-manipulation active:bg-page-card-hover transition-colors"
+            type="button"
+            :aria-label="`Ver detalle de ${member.nombre} ${member.apellido}`"
+            class="w-full text-left bg-page-card rounded-xl shadow-sm border border-page-border p-4 touch-manipulation active:bg-page-card-hover transition-colors"
             @click="goToMemberDetail(member.id)"
           >
             <div class="flex items-start gap-4">
@@ -111,27 +122,30 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">DNI: {{ member.dni }}</p>
                 
                 <!-- Badges -->
-                <div class="flex flex-wrap gap-2 mt-2">
-                  <StatusBadge :status="member.estado_cuota" type="cuota" size="sm" />
-                  <StatusBadge :status="member.estado_apto_fisico" type="apto" size="sm" />
-                  <StatusBadge 
-                    v-if="!member.activo"
-                    type="secondary"
-                    size="sm"
-                  >
-                    Inactivo
-                  </StatusBadge>
+                <div class="mt-3 space-y-1.5">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-medium text-page-muted">Cuota</span>
+                    <StatusBadge :status="member.estado_cuota" type="cuota" size="sm" />
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-medium text-page-muted">Apto físico</span>
+                    <StatusBadge :status="member.estado_apto_fisico" type="apto" size="sm" />
+                  </div>
+                  <div v-if="!member.activo" class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-medium text-page-muted">Registro</span>
+                    <StatusBadge type="secondary" size="sm">Inactivo</StatusBadge>
+                  </div>
                 </div>
               </div>
 
               <!-- Chevron -->
               <ChevronRight class="w-5 h-5 text-gray-400 flex-shrink-0" />
             </div>
-          </div>
+          </button>
         </div>
 
         <!-- Vista Desktop: Tabla -->
-        <div v-if="totalFilteredMembers > 0" class="hidden md:block bg-page-card rounded-xl shadow-sm border border-page-border overflow-hidden">
+        <div v-if="totalFilteredMembers > 0" class="hidden xl:block bg-page-card rounded-xl shadow-sm border border-page-border overflow-hidden">
           <table class="w-full">
             <thead class="bg-gray-50 dark:bg-white/5 border-b border-page-border">
               <tr>
@@ -201,6 +215,7 @@
                       size="sm"
                       @click="goToMemberDetail(member.id)"
                       title="Ver detalle"
+                      :aria-label="`Ver detalle de ${member.nombre} ${member.apellido}`"
                     >
                       <Eye class="w-5 h-5" />
                     </BaseButton>
@@ -209,6 +224,7 @@
                       size="sm"
                       @click.stop="openHistoryModal(member, 'payments')"
                       title="Historial de pagos"
+                      :aria-label="`Ver historial de pagos de ${member.nombre} ${member.apellido}`"
                     >
                       <Receipt class="w-5 h-5" />
                     </BaseButton>

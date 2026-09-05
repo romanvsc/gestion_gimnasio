@@ -13,9 +13,26 @@
         <p class="text-page-subtitle">Registra un nuevo pago de membresía</p>
       </div>
 
+      <nav class="mb-6 rounded-xl border border-page-border bg-page-card p-4" aria-label="Progreso del registro de pago">
+        <ol class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <li
+            v-for="step in paymentSteps"
+            :key="step.number"
+            class="flex items-center gap-2 text-sm"
+            :class="currentPaymentStep >= step.number ? 'text-primary-700 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'"
+            :aria-current="currentPaymentStep === step.number ? 'step' : undefined"
+          >
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold" :class="currentPaymentStep >= step.number ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30' : 'border-gray-300 dark:border-gray-700'">
+              {{ step.number }}
+            </span>
+            <span class="font-medium">{{ step.label }}</span>
+          </li>
+        </ol>
+      </nav>
+
       <form @submit.prevent="handleSubmit">
         <!-- En móvil: Resumen arriba (sticky) -->
-        <div class="lg:hidden mb-6 sticky top-0 z-10">
+        <div class="xl:hidden mb-6 sticky top-2 z-10">
           <PaymentSummaryCard
             :monto="formData.monto"
             :plan-name="selectedPlanName"
@@ -24,30 +41,31 @@
             :duracion="durationDays"
             :metodo-pago="paymentMethodLabel"
             :tarifa-badge="tarifaBadge"
+            :missing-step="nextStepHint"
             compact
           />
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
           
           <!-- Columna Izquierda: Formulario (3/5) -->
-          <div class="lg:col-span-3 bg-page-card rounded-xl shadow-sm border border-page-border p-5 md:p-6 space-y-6">
+          <div class="xl:col-span-3 bg-page-card rounded-xl shadow-sm border border-page-border p-5 md:p-6 space-y-6">
             <h2 class="text-lg font-semibold text-page-title">Datos del Pago</h2>
             
             <!-- Buscar Socio -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Buscar Socio *
-              </label>
               <BaseInput
                 v-model="memberSearch"
+                id="payment-member-search"
+                label="Buscar socio"
+                required
                 placeholder="Nombre, apellido o DNI..."
                 class="text-base md:text-lg"
                 @input="searchMembers"
               />
               
               <!-- Resultados de búsqueda -->
-              <div v-if="memberSearchResults.length > 0" class="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto">
+              <div v-if="memberSearchResults.length > 0" class="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto" aria-live="polite">
                 <button
                   v-for="member in memberSearchResults"
                   :key="member.id"
@@ -75,6 +93,7 @@
                     size="sm"
                     @click="clearMember"
                     class="flex-shrink-0"
+                    aria-label="Quitar socio seleccionado"
                   >
                     ✕
                   </BaseButton>
@@ -83,10 +102,10 @@
             </div>
 
             <!-- Seleccionar Plan -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Plan *
-              </label>
+            <fieldset>
+              <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Plan <span class="text-red-500" aria-hidden="true">*</span>
+              </legend>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   v-for="plan in plans"
@@ -98,27 +117,29 @@
                       ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 shadow-sm dark:bg-primary-900/20 dark:ring-primary-700'
                       : 'border-gray-200 hover:border-gray-300 active:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:active:bg-white/5'
                   ]"
+                  :aria-pressed="formData.plan_id === plan.id"
+                  :aria-label="`${plan.nombre}, ${formatCurrencyFull(resolvePlanPrice(plan, selectedMember?.es_socio_club))}`"
                   @click="selectPlan(plan)"
                 >
                   <p class="font-semibold text-page-title mb-1">{{ plan.nombre }}</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ plan.dias_duracion }} días</p>
                   <div class="flex items-baseline gap-2">
                     <p class="text-xl md:text-2xl font-bold text-primary-600">
-                      ${{ selectedMember?.es_socio_club ? (plan.precio_socio || plan.precio) : plan.precio }}
+                      {{ formatCurrencyFull(resolvePlanPrice(plan, selectedMember?.es_socio_club)) }}
                     </p>
-                    <p v-if="selectedMember?.es_socio_club && plan.precio_socio && plan.precio_socio !== plan.precio" class="text-sm text-gray-400 line-through">
-                      ${{ plan.precio }}
+                    <p v-if="selectedMember?.es_socio_club && plan.precio_socio !== null && plan.precio_socio !== undefined && plan.precio_socio !== plan.precio" class="text-sm text-gray-400 line-through">
+                      {{ formatCurrencyFull(plan.precio) }}
                     </p>
                   </div>
                 </button>
               </div>
-            </div>
+            </fieldset>
 
             <!-- Método de Pago -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Método de Pago *
-              </label>
+            <fieldset>
+              <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Método de pago <span class="text-red-500" aria-hidden="true">*</span>
+              </legend>
               <div class="flex flex-wrap gap-2">
                 <button
                   v-for="method in paymentMethods"
@@ -130,20 +151,21 @@
                       ? 'border-primary-500 bg-primary-50 text-primary-700 shadow-sm dark:bg-primary-900/20 dark:text-primary-300'
                       : 'border-gray-200 text-gray-700 hover:border-gray-300 active:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600'
                   ]"
+                  :aria-pressed="formData.metodo_pago === method.nombre"
+                  :aria-label="`Medio de pago ${method.nombre}`"
                   @click="formData.metodo_pago = method.nombre"
                 >
                   {{ method.nombre }}
                 </button>
               </div>
-            </div>
+            </fieldset>
 
             <!-- Fecha de Inicio -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fecha de Inicio *
-              </label>
               <BaseInput
                 v-model="formData.fecha_inicio"
+                id="payment-start-date"
+                label="Fecha de inicio"
                 type="date"
                 required
                 @change="updateDates"
@@ -159,7 +181,7 @@
             </div>
 
             <!-- Botones (móvil) -->
-            <div class="lg:hidden flex flex-col gap-3 pt-4">
+            <div class="xl:hidden flex flex-col gap-3 pt-4">
               <BaseButton
                 type="submit"
                 variant="primary"
@@ -184,7 +206,7 @@
           </div>
 
           <!-- Columna Derecha: Resumen (2/5) - Solo desktop -->
-          <div class="hidden lg:block lg:col-span-2">
+          <div class="hidden xl:block xl:col-span-2">
             <div class="sticky top-6 space-y-4">
               <PaymentSummaryCard
                 :monto="formData.monto"
@@ -194,6 +216,7 @@
                 :duracion="durationDays"
                 :metodo-pago="paymentMethodLabel"
                 :tarifa-badge="tarifaBadge"
+                :missing-step="nextStepHint"
               />
               
               <!-- Botones (desktop) -->
@@ -244,6 +267,9 @@ import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
+import { resolvePlanPrice } from '@/contexts/plans-catalog'
+import { calculatePaymentEndDate } from '@/contexts/billing-cash'
+import { formatCurrencyFull } from '@/utils/formatters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import PaymentSummaryCard from '@/components/payments/PaymentSummaryCard.vue'
@@ -257,6 +283,13 @@ const memberSearch = ref('')
 const memberSearchResults = ref([])
 const selectedMember = ref(null)
 const showSuccessModal = ref(false)
+
+const paymentSteps = [
+  { number: 1, label: 'Socio' },
+  { number: 2, label: 'Plan' },
+  { number: 3, label: 'Medio y fecha' },
+  { number: 4, label: 'Confirmar' }
+]
 
 const formData = ref({
   member_id: '',
@@ -283,7 +316,7 @@ const durationDays = computed(() => {
 })
 
 const formattedStartDate = computed(() => {
-  if (!formData.value.fecha_inicio) return null
+  if (!selectedMember.value || !formData.value.plan_id || !formData.value.fecha_inicio) return null
   const date = new Date(formData.value.fecha_inicio + 'T00:00:00')
   return date.toLocaleDateString('es-AR', { 
     day: '2-digit', 
@@ -293,7 +326,7 @@ const formattedStartDate = computed(() => {
 })
 
 const formattedEndDate = computed(() => {
-  if (!formData.value.fecha_fin) return null
+  if (!selectedMember.value || !formData.value.fecha_fin) return null
   const date = new Date(formData.value.fecha_fin + 'T00:00:00')
   return date.toLocaleDateString('es-AR', { 
     day: '2-digit', 
@@ -304,6 +337,13 @@ const formattedEndDate = computed(() => {
 
 const paymentMethodLabel = computed(() => {
   return formData.value.metodo_pago || '—'
+})
+
+const nextStepHint = computed(() => {
+  if (!selectedMember.value) return 'Falta seleccionar un socio'
+  if (!formData.value.plan_id) return 'Falta seleccionar un plan'
+  if (!formData.value.metodo_pago) return 'Falta seleccionar un medio de pago'
+  return ''
 })
 
 const tarifaBadge = computed(() => {
@@ -331,6 +371,13 @@ const isFormValid = computed(() => {
          formData.value.plan_id && 
          formData.value.metodo_pago &&
          formData.value.fecha_inicio
+})
+
+const currentPaymentStep = computed(() => {
+  if (!selectedMember.value) return 1
+  if (!formData.value.plan_id) return 2
+  if (!formData.value.metodo_pago) return 3
+  return 4
 })
 
 // Métodos
@@ -391,17 +438,16 @@ function updateDates() {
   if (!plan) return
 
   // Calcular monto según si es socio club o no
-  if (selectedMember.value && selectedMember.value.es_socio_club) {
-    formData.value.monto = plan.precio_socio || plan.precio
-  } else {
-    formData.value.monto = plan.precio
-  }
+  formData.value.monto = resolvePlanPrice(
+    plan,
+    selectedMember.value?.es_socio_club
+  )
 
   // Calcular fecha fin
-  const startDate = new Date(formData.value.fecha_inicio)
-  const endDate = new Date(startDate)
-  endDate.setDate(endDate.getDate() + plan.dias_duracion)
-  formData.value.fecha_fin = endDate.toISOString().split('T')[0]
+  formData.value.fecha_fin = calculatePaymentEndDate({
+    startDate: formData.value.fecha_inicio,
+    durationDays: plan.dias_duracion
+  })
 }
 
 async function handleSubmit() {
@@ -415,7 +461,15 @@ async function handleSubmit() {
     return
   }
 
-  const paymentPromise = createPayment(formData.value)
+  const paymentPromise = createPayment(formData.value, {
+    isClubMember: Boolean(selectedMember.value.es_socio_club)
+  }).then(result => {
+    if (!result.success) {
+      throw new Error(result.error)
+    }
+
+    return result
+  })
   
   toast.promise(paymentPromise, {
     loading: 'Registrando pago...',

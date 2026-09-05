@@ -8,23 +8,15 @@
       <div class="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-800/90 to-primary-700/85"></div>
       
       <!-- Logo como fondo completo (estilo imagen de portada) -->
-      <div 
-        v-if="settingsReady && settings.logo_url" 
-        class="absolute inset-0 pointer-events-none"
-      >
-        <img 
-          :src="settings.logo_url" 
+      <div class="absolute inset-0 pointer-events-none">
+        <GymLogo
+          :src="settings.logo_url"
           :alt="settings.nombre_gimnasio"
           class="w-full h-full object-cover opacity-[0.2] mix-blend-overlay grayscale"
         />
       </div>
       
       <!-- Patrón decorativo (mientras carga o si no hay logo) -->
-      <div 
-        v-else-if="!settingsReady || !settings.logo_url"
-        class="absolute inset-0 opacity-30" 
-        style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.1&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"
-      ></div>
       
       <!-- Contenido del hero - Typewriter effect -->
       <div class="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
@@ -54,19 +46,15 @@
     </div>
 
     <!-- Panel derecho - Formulario de login -->
-    <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white dark:bg-[#0b1120]">
+    <div class="flex-1 flex items-center justify-center px-6 py-8 lg:px-12 bg-white dark:bg-page-bg">
       <div class="w-full max-w-md animate-slide-up">
         <!-- Logo para móvil -->
         <div class="lg:hidden flex justify-center mb-6">
-          <img 
-            v-if="settingsReady && settings.logo_url" 
-            :src="settings.logo_url" 
+          <GymLogo
+            :src="settings.logo_url"
             :alt="settings.nombre_gimnasio"
-            class="h-16 w-auto object-contain"
+            class="h-20 w-auto object-contain"
           />
-          <div v-else class="h-16 w-16 rounded-2xl bg-primary-600 flex items-center justify-center">
-            <Dumbbell class="w-8 h-8 text-white" />
-          </div>
         </div>
 
         <!-- Título de bienvenida -->
@@ -231,6 +219,8 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useSettings } from '@/composables/useSettings'
+import GymLogo from '@/components/brand/GymLogo.vue'
+import { BRAND } from '@/config/brand'
 import { 
   Dumbbell, 
   Users, 
@@ -268,7 +258,7 @@ const capsLockOn = ref(false)
 // Estado del efecto typewriter
 const displayedText = ref('')
 const isTyping = ref(true)
-const fullText = ref('Bienvenido a nuestro gimnasio')
+const fullText = ref(`Bienvenido a ${BRAND.name}`)
 let typewriterInterval = null
 
 // Validación del formulario
@@ -288,7 +278,7 @@ onMounted(async () => {
   settingsReady.value = true
   
   // Actualizar el texto del typewriter con el nombre real
-  fullText.value = `Bienvenido a ${settings.nombre_gimnasio || 'nuestro gimnasio'}`
+  fullText.value = `Bienvenido a ${settings.nombre_gimnasio || BRAND.name}`
   console.log('fullText set to:', fullText.value)
   
   // Cargar email guardado
@@ -315,7 +305,7 @@ watch(() => settings.nombre_gimnasio, (newName) => {
     if (typewriterInterval) clearInterval(typewriterInterval)
     displayedText.value = ''
     isTyping.value = true
-    fullText.value = `Bienvenido a ${newName}`
+    fullText.value = `Bienvenido a ${newName || BRAND.name}`
     startTypewriter()
   }
 })
@@ -466,7 +456,7 @@ async function handleLogin() {
 /* Animación del cursor parpadeante */
 .cursor-blink {
   animation: blink 1s step-end infinite;
-  color: #5F388C; /* primary-600 */
+  color: var(--color-brand-primary);
   font-weight: 300;
 }
 

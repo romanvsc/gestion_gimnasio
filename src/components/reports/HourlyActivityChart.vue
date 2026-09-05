@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-full">
+  <div class="relative h-full" role="img" aria-label="Gráfico de asistencias por horario del día">
     <!-- Loading State -->
     <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-page-card/75">
       <div class="text-center">

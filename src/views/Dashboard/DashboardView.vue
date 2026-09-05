@@ -1,6 +1,6 @@
 <template>
   <div class="bg-page-bg min-h-screen transition-colors duration-200">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="max-w-[1440px] mx-auto px-4 py-6 md:px-6 md:py-8 xl:px-8">
       <!-- Header -->
       <div class="mb-10">
         <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-page-title leading-tight mb-3">
@@ -9,10 +9,10 @@
         <p class="text-page-subtitle text-base md:text-lg">
           Tu centro de alto rendimiento está operando al máximo nivel hoy.
           <span v-if="userStore.isAdmin" class="ml-2 inline-flex items-center px-2.5 py-0.5 bg-yellow-400/10 text-yellow-400 text-xs font-bold rounded-md border border-yellow-400/20 uppercase tracking-wider">
-            Admin
+            Administrador
           </span>
           <span v-else-if="userStore.isStaff" class="ml-2 inline-flex items-center px-2.5 py-0.5 bg-secondary-400/10 text-secondary-400 text-xs font-bold rounded-md border border-secondary-400/20 uppercase tracking-wider">
-            Staff
+            Personal
           </span>
         </p>
       </div>
@@ -20,7 +20,7 @@
       <!-- Loading Skeleton -->
       <div v-if="loading" class="space-y-8">
         <!-- Skeleton para Tarjetas de Métricas -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
           <div v-for="i in 4" :key="i" class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
             <div class="flex items-start justify-between">
               <div class="flex-1 space-y-3">
@@ -48,10 +48,10 @@
 
       <div v-else>
         <!-- Tarjetas de Métricas -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
           <StatCard
             title="Recaudación"
-            :value="'$' + formatCurrency(stats.monthlyRevenue)"
+            :value="formatCurrencyFull(stats.monthlyRevenue)"
             :icon="Wallet"
             icon-bg-color="bg-primary-50"
             icon-color="text-primary-600"
@@ -74,7 +74,7 @@
             route="/checkin"
             icon-bg-color="bg-primary-50"
             icon-color="text-primary-600"
-            badge="Live"
+            badge="En vivo"
             badge-variant="live"
           />
           
@@ -85,17 +85,17 @@
             route="/miembros"
             icon-bg-color="bg-red-50"
             icon-color="text-red-600"
-            :badge="stats.expiredMembers > 0 ? 'Urgent' : ''"
+            :badge="stats.expiredMembers > 0 ? 'Revisar' : ''"
             badge-variant="urgent"
           />
         </div>
 
         <!-- Acciones Rápidas + Gráfico -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
           <!-- Acciones Rápidas -->
           <div>
             <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Acciones Rápidas</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2.5">
               <DashboardActionCard
                 title="Nuevo Socio"
                 subtitle="Registrar nueva alta"
@@ -154,6 +154,9 @@
               <h3 class="text-xl md:text-2xl font-extrabold text-white mb-1.5 tracking-tight">
                 {{ stats.expiredMembers }} Socios con Cuota Vencida
               </h3>
+              <p v-if="statsUpdatedAt" class="mb-1 text-xs text-primary-100/70">
+                Actualizado: {{ formatDateTime(statsUpdatedAt) }}
+              </p>
               <p class="text-sm md:text-base text-primary-100/80">
                 Se requiere acción inmediata para regularizar el acceso a las instalaciones.
               </p>
@@ -251,7 +254,7 @@ import { useGymStore } from '@/stores/gymStore'
 import { useSettings } from '@/composables/useSettings'
 import { useAppResume } from '@/composables/useAppResume'
 import { errorAlert } from '@/lib/alerts'
-import { formatCurrency } from '@/utils/formatters'
+import { formatCurrencyFull, formatDateTime } from '@/utils/formatters'
 import { useAttendance } from '@/composables/useAttendance'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
@@ -269,6 +272,7 @@ const { settings } = useSettings()
 
 const loading = ref(false)
 const showLastAccessModal = ref(false)
+const statsUpdatedAt = ref(null)
 const stats = ref({
   totalMembers: 0,
   activeMembers: 0,
@@ -293,6 +297,7 @@ async function loadStats() {
   try {
     await gymStore.getStats()
     stats.value = gymStore.stats
+    statsUpdatedAt.value = new Date()
   } catch (err) {
     console.error('Error cargando estadísticas:', err)
     errorAlert('Error', 'No se pudieron cargar las estadísticas')

@@ -1,18 +1,22 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#151f32] dark:ring-1 dark:ring-white/10 rounded-lg shadow-xl max-w-md w-full p-6">
-      <h2 class="text-2xl font-bold text-page-title mb-6">Registrar Movimiento</h2>
-
+  <BaseModal
+    :model-value="true"
+    title="Registrar Movimiento"
+    size="sm"
+    :close-on-backdrop="false"
+    @close="$emit('close')"
+  >
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <!-- Tipo -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Tipo <span class="text-red-500">*</span>
-          </label>
+        <fieldset>
+          <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Tipo <span class="text-red-500" aria-hidden="true">*</span>
+          </legend>
           <div class="grid grid-cols-2 gap-4">
             <button
               type="button"
               @click="handleTipoChange('INGRESO')"
+              :aria-pressed="formData.tipo === 'INGRESO'"
               :class="[
                 'p-4 rounded-lg border-2 font-semibold transition-all',
                 formData.tipo === 'INGRESO'
@@ -26,6 +30,7 @@
             <button
               type="button"
               @click="handleTipoChange('EGRESO')"
+              :aria-pressed="formData.tipo === 'EGRESO'"
               :class="[
                 'p-4 rounded-lg border-2 font-semibold transition-all',
                 formData.tipo === 'EGRESO'
@@ -37,7 +42,7 @@
               Egreso
             </button>
           </div>
-        </div>
+        </fieldset>
 
         <!-- Categoría (Dinámico) -->
         <div>
@@ -103,8 +108,7 @@
           </BaseButton>
         </div>
       </form>
-    </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup>
@@ -112,6 +116,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useParameters } from '@/composables/useParameters'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-vue-next'
 
 const emit = defineEmits(['close', 'submit'])

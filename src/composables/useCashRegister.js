@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue'
-import { supabase } from '@/lib/supabase'
-import { runQuery } from '@/lib/asyncHandler'
+import { billingCash, calculateCashSummary } from '@/contexts/billing-cash'
 
 export function useCashRegister() {
   const transactions = ref([])
@@ -9,21 +8,14 @@ export function useCashRegister() {
   const error = ref(null)
 
   // Computed: Totales del día
-  const ingresosDia = computed(() => {
-    return transactions.value
-      .filter(t => t.tipo === 'INGRESO')
-      .reduce((sum, t) => sum + parseFloat(t.monto || 0), 0)
-  })
+  const cashSummary = computed(() => calculateCashSummary({
+    balanceAnterior: balanceAnterior.value,
+    transactions: transactions.value
+  }))
 
-  const egresosDia = computed(() => {
-    return transactions.value
-      .filter(t => t.tipo === 'EGRESO')
-      .reduce((sum, t) => sum + parseFloat(t.monto || 0), 0)
-  })
-
-  const saldoFinal = computed(() => {
-    return balanceAnterior.value + ingresosDia.value - egresosDia.value
-  })
+  const ingresosDia = computed(() => cashSummary.value.ingresos)
+  const egresosDia = computed(() => cashSummary.value.egresos)
+  const saldoFinal = computed(() => cashSummary.value.saldoFinal)
 
   /**
    * Carga los movimientos por rango de fechas y el saldo anterior
@@ -39,27 +31,13 @@ export function useCashRegister() {
       const startDateStr = startDate.toISOString().split('T')[0]
       const endDateStr = endDate.toISOString().split('T')[0]
 
-      // Consulta 1: Saldo Anterior (al inicio del rango)
-      const balanceData = await runQuery(() =>
-        supabase.rpc('get_previous_balance', { check_date: startDateStr })
-      )
+      const rangeData = await billingCash.loadCashRange({
+        startDate: startDateStr,
+        endDate: endDateStr
+      })
 
-      balanceAnterior.value = balanceData || 0
-
-      // Consulta 2: Movimientos del rango
-      const startDateTime = `${startDateStr}T00:00:00`
-      const endDateTime = `${endDateStr}T23:59:59`
-
-      const transData = await runQuery(() =>
-        supabase
-          .from('transactions')
-          .select('*')
-          .gte('created_at', startDateTime)
-          .lte('created_at', endDateTime)
-          .order('created_at', { ascending: false })
-      )
-
-      transactions.value = transData || []
+      balanceAnterior.value = rangeData.balanceAnterior
+      transactions.value = rangeData.transactions
 
       return { success: true }
     } catch (err) {
@@ -85,30 +63,7 @@ export function useCashRegister() {
       loading.value = true
       error.value = null
 
-      // Obtener usuario actual (created_by)
-      const { data: { user } } = await supabase.auth.getUser()
-
-      if (!user) {
-        throw new Error('Usuario no autenticado. Por favor, inicia sesión nuevamente.')
-      }
-
-      const { data, error: insertError } = await supabase
-        .from('transactions')
-        .insert({
-          tipo: form.tipo,
-          categoria: form.categoria,
-          descripcion: form.descripcion || null,
-          monto: parseFloat(form.monto),
-          created_by: user.id,
-          payment_id: null
-        })
-        .select()
-        .single()
-
-      if (insertError) {
-        console.error('Error insertando transacción:', insertError)
-        throw new Error(`Error al registrar transacción: ${insertError.message}`)
-      }
+      const data = await billingCash.registerManualTransaction(form)
 
       // Recargar datos del día actual
       const today = new Date()
@@ -232,7 +187,7 @@ export function useCashRegister() {
           'Categoría': t.categoria || '-',
           'Descripción': t.descripcion || '-',
           'Monto': t.tipo === 'INGRESO' ? parseFloat(t.monto) : -parseFloat(t.monto),
-          'Usuario': t.created_by ? t.created_by.substring(0, 8) : 'N/A'
+          'Usuario': t.payment_id ? 'Sistema' : 'Operador'
         }
       })
 

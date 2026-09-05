@@ -59,7 +59,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Documentation personal/temporal
-AGENTS.md
 TODO.md
 NOTES.md
 

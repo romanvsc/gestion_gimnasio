@@ -16,12 +16,12 @@
 
     <div class="flex-1 min-w-0">
       <span
-        class="font-bold text-sm md:text-base uppercase tracking-wide transition-colors block"
+        class="font-semibold text-sm md:text-base transition-colors block"
         :class="titleHoverClass"
       >
         {{ title }}
       </span>
-      <span v-if="subtitle" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 block">
+      <span v-if="subtitle" class="text-xs text-page-subtitle mt-0.5 block">
         {{ subtitle }}
       </span>
     </div>

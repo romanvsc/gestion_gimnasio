@@ -1,69 +1,44 @@
+import { COLOR_SCALES } from './src/config/brand.js'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    './src/**/*.{vue,js,ts,jsx,tsx}'
   ],
-  darkMode: 'class', // Habilita modo oscuro con clase
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        gray: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        },
-        // ============================================
-        // 🎨 PALETA WHITE LABEL - EDITAR AQUÍ PARA CAMBIAR MARCA
-        // ============================================
-        primary: {
-          50: '#f4f0fa',
-          100: '#e6def4',
-          200: '#d0bfea',
-          300: '#b499dd',
-          400: '#9571ce',
-          500: '#794ebd',
-          600: '#5F388C', // <--- Color Principal de la marca
-          700: '#562f7e',
-          800: '#492969',
-          900: '#3d2355',
-          950: '#261239',
-        },
-        // Paleta secundaria para acentos (Cyan/Teal complementario)
-        secondary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488', // <--- Color secundario principal
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
-          950: '#042f2e',
-        },
-        // ============================================
-        // Design System: Colores semánticos para páginas
-        // Usan CSS variables para soportar dark mode automático
+        // Jerarquía semántica centralizada para la identidad de Yacyretá.
+        neutral: COLOR_SCALES.neutral,
+        gray: COLOR_SCALES.neutral,
+        primary: COLOR_SCALES.primary,
+        orange: COLOR_SCALES.primary,
+        secondary: COLOR_SCALES.secondary,
+        teal: COLOR_SCALES.secondary,
+        success: COLOR_SCALES.success,
+        emerald: COLOR_SCALES.success,
+        danger: COLOR_SCALES.danger,
+        red: COLOR_SCALES.danger,
+        warning: COLOR_SCALES.warning,
+        amber: COLOR_SCALES.warning,
+        yellow: COLOR_SCALES.warning,
+        info: COLOR_SCALES.info,
+        blue: COLOR_SCALES.info,
+        indigo: COLOR_SCALES.info,
+        purple: COLOR_SCALES.secondary,
         page: {
           bg: 'var(--color-page-bg)',
           title: 'var(--color-page-title)',
           subtitle: 'var(--color-page-subtitle)',
           muted: 'var(--color-page-muted)',
           card: 'var(--color-page-card)',
+          elevated: 'var(--color-page-elevated)',
           'card-hover': 'var(--color-page-card-hover)',
-          border: 'var(--color-page-border)',
-        },
-      },
-    },
+          border: 'var(--color-page-border)'
+        }
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 }

@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="min-h-screen bg-page-bg transition-colors duration-200">
+    <div class="max-w-[1440px] mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
       <div>
@@ -20,7 +20,7 @@
     </div>
 
     <!-- Desktop Table -->
-    <div v-else class="hidden md:block bg-page-card rounded-lg shadow overflow-hidden">
+    <div v-else class="hidden xl:block bg-page-card rounded-lg shadow overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead class="bg-gray-50 dark:bg-white/5">
           <tr>
@@ -65,6 +65,7 @@
                 color="secondary" 
                 size="sm"
                 class="mr-2"
+                :aria-label="`Editar usuario ${staff.usuario}`"
               >
                 <Edit class="w-4 h-4" />
               </BaseButton>
@@ -72,6 +73,7 @@
                 @click="handleToggleStatus(staff)" 
                 :color="staff.activo ? 'danger' : 'success'" 
                 size="sm"
+                :aria-label="`${staff.activo ? 'Desactivar' : 'Activar'} usuario ${staff.usuario}`"
               >
                 <component :is="staff.activo ? XCircle : CheckCircle" class="w-4 h-4" />
               </BaseButton>
@@ -88,7 +90,7 @@
     </div>
 
     <!-- Mobile Cards -->
-    <div class="md:hidden space-y-4">
+    <div class="xl:hidden space-y-4">
       <div 
         v-for="staff in staffList" 
         :key="staff.id"
@@ -170,6 +172,7 @@ import StaffFormModal from '@/components/staff/StaffFormModal.vue'
 import { useStaff } from '@/composables/useStaff'
 import { useAppResume } from '@/composables/useAppResume'
 import { confirmAlert } from '@/lib/alerts'
+import { COLOR_SCALES } from '@/config/brand'
 
 const { staffList, loading, loadStaff, toggleStatus } = useStaff()
 
@@ -237,14 +240,14 @@ const getColorFromString = (str) => {
     hash = str.charCodeAt(i) + ((hash << 5) - hash)
   }
   const colors = [
-    '#3B82F6', // blue
-    '#10B981', // green
-    '#F59E0B', // amber
-    '#EF4444', // red
-    '#8B5CF6', // purple
-    '#EC4899', // pink
-    '#14B8A6', // teal
-    '#F97316', // orange
+    COLOR_SCALES.info[500],
+    COLOR_SCALES.success[500],
+    COLOR_SCALES.warning[500],
+    COLOR_SCALES.danger[500],
+    COLOR_SCALES.secondary[500],
+    COLOR_SCALES.secondary[400],
+    COLOR_SCALES.secondary[600],
+    COLOR_SCALES.primary[500]
   ]
   return colors[Math.abs(hash) % colors.length]
 }

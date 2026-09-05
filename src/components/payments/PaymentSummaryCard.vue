@@ -9,12 +9,14 @@
       type="button"
       class="w-full flex items-center justify-between touch-manipulation"
       @click="isExpanded = !isExpanded"
+      :aria-expanded="isExpanded"
+      aria-controls="payment-summary-details"
     >
       <div class="flex items-center gap-3">
         <h3 class="text-base font-semibold text-page-title">Resumen de Pago</h3>
         <!-- Mini resumen cuando está colapsado -->
         <div v-if="!isExpanded" class="flex items-center gap-2">
-          <span class="text-xl font-bold text-primary-600">{{ monto ? `$${monto}` : '$0' }}</span>
+          <span class="text-xl font-bold text-primary-600">{{ formatCurrencyFull(monto || 0) }}</span>
           <span v-if="planName" class="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">• {{ planName }}</span>
         </div>
       </div>
@@ -47,6 +49,7 @@
       leave-to-class="opacity-0 max-h-0"
     >
       <div 
+        id="payment-summary-details"
         v-show="!compact || isExpanded"
         :class="[
           'overflow-hidden',
@@ -63,7 +66,7 @@
             'font-bold text-primary-600',
             compact ? 'text-3xl' : 'text-4xl md:text-5xl'
           ]">
-            {{ monto ? `$${monto}` : '$0' }}
+            {{ formatCurrencyFull(monto || 0) }}
           </p>
           <!-- Badge de tarifa aplicada -->
           <div v-if="tarifaBadge" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs md:text-sm font-medium" :class="tarifaBadge.class">
@@ -71,6 +74,14 @@
             <span>{{ tarifaBadge.text }}</span>
           </div>
         </div>
+
+        <p
+          v-if="missingStep"
+          class="text-sm font-medium text-amber-700 dark:text-amber-300"
+          role="status"
+        >
+          {{ missingStep }}
+        </p>
 
         <!-- Plan Seleccionado -->
         <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm">
@@ -116,6 +127,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { formatCurrencyFull } from '@/utils/formatters'
 
 const isExpanded = ref(false)
 
@@ -147,6 +159,10 @@ defineProps({
   tarifaBadge: {
     type: Object,
     default: null
+  },
+  missingStep: {
+    type: String,
+    default: ''
   },
   compact: {
     type: Boolean,

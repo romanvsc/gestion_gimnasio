@@ -2,12 +2,13 @@ import { reactive, readonly } from 'vue'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 import { toast } from 'vue-sonner'
+import { BRAND } from '@/config/brand'
 
 // Estado reactivo global compartido (Singleton)
 const state = reactive({
   settings: {
     id: 1,
-    nombre_gimnasio: 'Gimnasio',
+    nombre_gimnasio: BRAND.name,
     email_contacto: '',
     whatsapp: '',
     horarios_apertura: '',
@@ -36,8 +37,14 @@ export function useSettings() {
       if (error) throw error
 
       if (data) {
-        // Actualizar el estado reactivo
-        Object.assign(state.settings, data)
+        const configuredName = data.nombre_gimnasio?.trim()
+        // Mantener la identidad de marca si la configuración aún conserva el placeholder inicial.
+        Object.assign(state.settings, {
+          ...data,
+          nombre_gimnasio: !configuredName || configuredName.toLowerCase() === 'gimnasio'
+            ? BRAND.name
+            : configuredName
+        })
       }
 
       return { success: true, data }

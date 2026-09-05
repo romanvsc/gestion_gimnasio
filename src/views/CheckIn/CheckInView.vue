@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#0b1120] dark:to-[#0f1729] transition-colors duration-200">
-    <div class="h-screen flex flex-col lg:flex-row">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-page-bg dark:to-page-card transition-colors duration-200">
+    <div class="min-h-[100dvh] flex flex-col xl:flex-row">
       
       <!-- Área Principal: Kiosco de Acceso -->
       <div class="flex-1 flex flex-col items-center justify-center p-6">
@@ -18,6 +18,8 @@
         <div class="w-full max-w-2xl mb-5">
           <BaseInput
             v-model="searchQuery"
+            id="checkin-search"
+            label="Buscar socio"
             size="kiosk"
             placeholder="Ingresa DNI, nombre o apellido..."
             :autofocus="true"
@@ -28,11 +30,12 @@
         <!-- Fecha de asistencia -->
         <div class="w-full max-w-2xl mb-8">
           <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-page-card p-4 shadow-sm">
-            <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Fecha de asistencia</p>
             <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
               <div class="flex-1">
                 <BaseInput
                   v-model="selectedAttendanceDate"
+                  id="attendance-date"
+                  label="Fecha de asistencia"
                   type="date"
                   size="lg"
                 />
@@ -55,11 +58,13 @@
 
         <!-- Resultados: Tarjetas de Acceso -->
         <div v-else-if="searchResults.length > 0" class="w-full max-w-2xl space-y-4">
-          <div
+          <button
             v-for="member in searchResults"
             :key="member.id"
+            type="button"
+            :aria-label="`${canCheckIn(member) ? 'Registrar acceso permitido' : 'Registrar acceso denegado'} para ${member.nombre} ${member.apellido}`"
             @click="handleCheckIn(member)"
-            class="transform transition-transform cursor-pointer hover:scale-[1.02]"
+            class="w-full text-left transform transition-transform cursor-pointer hover:scale-[1.02] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300 rounded-3xl"
           >
             <!-- ACCESO PERMITIDO -->
             <div
@@ -116,33 +121,40 @@
                     <div class="flex-1">
                       <span class="text-2xl font-bold text-red-600 block">ACCESO DENEGADO</span>
                       <span class="text-base text-red-500 font-medium">
-                        Cuota vencida o inactiva
+                        {{ accessDeniedReason(member) }}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         </div>
 
         <!-- Sin resultados -->
-        <div v-else-if="searchQuery && !loading" class="text-center text-gray-500 dark:text-gray-400 text-xl">
+        <div v-else-if="searchQuery && !loading" class="text-center text-gray-500 dark:text-gray-400 text-xl" role="status" aria-live="polite">
           <AlertCircle class="h-16 w-16 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
           <p>No se encontraron resultados</p>
+          <p class="mt-2 text-base text-gray-400 dark:text-gray-500">
+            Revisá el DNI o buscá por nombre y apellido.
+          </p>
+          <div class="mt-5 flex flex-wrap justify-center gap-3">
+            <BaseButton variant="secondary" @click="clearSearch">Limpiar búsqueda</BaseButton>
+            <BaseButton variant="primary" @click="router.push({ name: 'NewMember' })">Nuevo socio</BaseButton>
+          </div>
         </div>
 
         <!-- Mensaje Inicial -->
       </div>
 
       <!-- Aside Lateral: Live Feed de Últimos Accesos -->
-      <aside class="lg:w-80 bg-page-card lg:border-l border-gray-200 dark:border-gray-700 lg:overflow-y-auto">
-        <div class="sticky top-0 bg-page-card border-b border-page-border p-6 z-10">
+      <aside class="xl:w-80 bg-page-card xl:border-l border-gray-200 dark:border-gray-700 xl:overflow-y-auto">
+        <div class="xl:sticky xl:top-0 bg-page-card border-b border-page-border p-4 md:p-6 z-10">
           <h2 class="text-lg font-semibold text-page-title flex items-center gap-2">
             <Activity class="h-5 w-5 text-primary-600" />
             Últimos Accesos
           </h2>
-          <p class="text-xs text-gray-500 mt-1">Live Feed</p>
+          <p class="text-xs text-gray-500 mt-1">Actividad en vivo · Se actualiza automáticamente</p>
         </div>
         
         <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50 dark:divide-gray-700/50">
@@ -190,13 +202,16 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'vue-router'
 import { useAppResume } from '@/composables/useAppResume'
+import { BRAND } from '@/config/brand'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import Swal from 'sweetalert2'
 
 const searchQuery = ref('')
+const router = useRouter()
 const searchResults = ref([])
 const recentCheckIns = ref([])
 const loading = ref(false)
@@ -204,6 +219,11 @@ const selectedAttendanceDate = ref(getTodayDateValue())
 
 let searchTimeout = null
 let realtimeSubscription = null
+
+function clearSearch() {
+  searchQuery.value = ''
+  searchResults.value = []
+}
 
 async function searchMembers() {
   if (searchTimeout) clearTimeout(searchTimeout)
@@ -249,6 +269,12 @@ function canCheckIn(member) {
   return cuotaActiva
 }
 
+function accessDeniedReason(member) {
+  if (member.activo === false) return 'Ficha de socio inactiva'
+  if (member.estado_cuota === 'sin_pagos') return 'No hay pagos registrados'
+  return 'Cuota vencida'
+}
+
 function getInitials(nombre, apellido) {
   const firstInitial = nombre ? nombre.charAt(0).toUpperCase() : ''
   const lastInitial = apellido ? apellido.charAt(0).toUpperCase() : ''
@@ -284,7 +310,7 @@ async function handleCheckIn(member) {
         text: `${member.nombre} ${member.apellido} ya tiene asistencia el ${humanDate} a las ${checkInTime}.`,
         icon: 'info',
         confirmButtonText: 'Entendido',
-        confirmButtonColor: '#5F388C',
+        confirmButtonColor: BRAND.colors.primary,
         customClass: {
           popup: 'rounded-xl shadow-2xl',
           title: 'text-xl font-bold text-gray-900',
@@ -321,7 +347,7 @@ async function handleCheckIn(member) {
         text: `${member.nombre} ${member.apellido} quedó registrado con acceso denegado por cuota vencida/inactiva (${humanDate}).`,
         icon: 'error',
         confirmButtonText: 'Entendido',
-        confirmButtonColor: '#5F388C',
+        confirmButtonColor: BRAND.colors.primary,
         customClass: {
           popup: 'rounded-xl shadow-2xl',
           title: 'text-xl font-bold text-gray-900',
@@ -340,7 +366,7 @@ async function handleCheckIn(member) {
         text: `${member.nombre} ${member.apellido} registrado correctamente para el ${humanDate}.${aptoWarning}`,
         icon: 'success',
         confirmButtonText: 'Perfecto',
-        confirmButtonColor: '#5F388C',
+        confirmButtonColor: BRAND.colors.primary,
         customClass: {
           popup: 'rounded-xl shadow-2xl',
           title: 'text-xl font-bold text-gray-900',
@@ -361,7 +387,7 @@ async function handleCheckIn(member) {
       text: 'Ocurrió un problema al guardar el check-in. Intentá nuevamente.',
       icon: 'error',
       confirmButtonText: 'Entendido',
-      confirmButtonColor: '#5F388C',
+      confirmButtonColor: BRAND.colors.primary,
       customClass: {
         popup: 'rounded-xl shadow-2xl',
         title: 'text-xl font-bold text-gray-900',

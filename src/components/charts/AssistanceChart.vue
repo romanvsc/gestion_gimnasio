@@ -38,6 +38,7 @@ import {
   Legend
 } from 'chart.js'
 import { supabase } from '@/lib/supabase'
+import { BRAND } from '@/config/brand'
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -86,15 +87,15 @@ const chartData = computed(() => ({
         const today = new Date()
         const todayIndex = (today.getDay() + 6) % 7
         if (index === todayIndex) {
-          return 'rgba(95, 56, 140, 1)' // primary-600 sólido para hoy
+          return `rgba(${BRAND.colors.primaryRgb}, 1)` // primary-600 sólido para hoy
         }
-        return 'rgba(95, 56, 140, 0.6)' // primary-600 con transparencia
+        return `rgba(${BRAND.colors.primaryRgb}, 0.6)` // primary-600 con transparencia
       }),
-      borderColor: 'rgba(95, 56, 140, 1)',
+      borderColor: `rgba(${BRAND.colors.primaryRgb}, 1)`,
       borderWidth: 0,
       borderRadius: 8,
       borderSkipped: false,
-      hoverBackgroundColor: 'rgba(95, 56, 140, 0.9)',
+      hoverBackgroundColor: `rgba(${BRAND.colors.primaryRgb}, 0.9)`,
       barThickness: 'flex',
       maxBarThickness: 50
     }
