@@ -120,7 +120,11 @@ export const useUserStore = defineStore('user', () => {
           user.value = newSession?.user || null
 
           if (newSession?.user) {
-            await checkUserRole(newSession.user.id)
+            // No bloquear el lock interno de Supabase Auth con una consulta
+            // adicional mientras se procesa el evento.
+            setTimeout(() => {
+              void checkUserRole(newSession.user.id)
+            }, 0)
           } else {
             userRole.value = null
           }

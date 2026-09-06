@@ -87,6 +87,8 @@ test('el arranque de autenticacion comparte una inicializacion acotada entre App
   assert.match(userStore, /AUTH_BOOT_TIMEOUT_MS\s*=\s*10000/i)
   assert.match(userStore, /LOGIN_TIMEOUT_MS\s*=\s*10000/i)
   assert.match(userStore, /withTimeout\([\s\S]{0,180}signInWithPassword/i)
+  assert.match(userStore, /onAuthStateChange[\s\S]{0,300}setTimeout\(\(\) =>/i)
+  assert.doesNotMatch(userStore, /onAuthStateChange[\s\S]{0,300}await checkUserRole/i)
   assert.match(userStore, /initSessionPromise/i)
   assert.match(userStore, /if \(initialized\.value\)/i)
   assert.match(userStore, /initialized\.value\s*=\s*true/i)
