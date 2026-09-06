@@ -1,9 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
   <title>Pagos</title>
-  <desc>Tarjeta de pago con símbolo monetario</desc>
-  <symbol id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="5" width="18" height="14" rx="2" />
-    <path d="M3 9h18M7 14h4" />
-    <path d="M17 12v6M19 13c-.5-.7-1.5-1-2.2-.5-.9.6-.3 1.5.8 1.8 1.2.3 1.8.9 1.3 1.8-.4.8-1.7 1-2.5.3" />
-  </symbol>
+  <desc>Ilustración vectorial Yacyretá, sin fondo.</desc>
+<defs>
+<linearGradient id="orange" x2=".8" y2="1"><stop stop-color="#ffbb00"/><stop offset=".5" stop-color="#ff7900"/><stop offset="1" stop-color="#f04400"/></linearGradient>
+<linearGradient id="dark" x2=".7" y2="1"><stop stop-color="#384149"/><stop offset="1" stop-color="#101920"/></linearGradient>
+<linearGradient id="white" x2=".8" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#eae7e2"/></linearGradient>
+<linearGradient id="shine" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".65"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+  <g id="icon" stroke="#08121a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="rotate(-15 126 84)">
+    <rect x="34" y="37" width="188" height="120" rx="20" fill="url(#white)"/>
+    <path d="M39 61H217V89H39Z" fill="url(#dark)" stroke-width="3"/>
+    <path d="M46 48H208" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    </g>
+    <rect x="18" y="107" width="187" height="112" rx="20" fill="url(#orange)"/>
+    <path d="M27 139V131Q27 118 44 118H179" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    <path d="M21 145H202V167H21Z" fill="url(#dark)" stroke-width="2"/>
+    <path d="M44 188H94M44 204H69" fill="none" stroke="url(#white)" stroke-width="8"/>
+    <circle cx="190" cy="192" r="52" fill="url(#orange)"/>
+    <path d="M150 192a40 40 0 0 1 59-36" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    <path d="M205 167Q178 155 177 177Q177 187 195 190Q215 195 202 211Q191 222 174 211M190 153V162M190 217V230" fill="none" stroke-width="10"/>
+  </g>
 </svg>

@@ -1,8 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
   <title>Usuarios</title>
-  <desc>Grupo de usuarios</desc>
-  <symbol id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="9" cy="8" r="3" />
-    <path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 11a2.5 2.5 0 1 0 0-5M16 14a5 5 0 0 1 4.5 6" />
-  </symbol>
+  <desc>Ilustración vectorial Yacyretá, sin fondo.</desc>
+<defs>
+<linearGradient id="orange" x2=".8" y2="1"><stop stop-color="#ffbb00"/><stop offset=".5" stop-color="#ff7900"/><stop offset="1" stop-color="#f04400"/></linearGradient>
+<linearGradient id="dark" x2=".7" y2="1"><stop stop-color="#384149"/><stop offset="1" stop-color="#101920"/></linearGradient>
+<linearGradient id="white" x2=".8" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#eae7e2"/></linearGradient>
+<linearGradient id="shine" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".65"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+  <g id="icon" stroke="#08121a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="188" cy="87" r="29" fill="url(#white)"/>
+    <path d="M146 144Q163 116 190 117Q235 119 242 171L234 190H144Z" fill="url(#white)" />
+    <circle cx="94" cy="66" r="43" fill="url(#white)"/>
+    <path d="M15 218V192Q18 118 93 119Q161 118 177 179L169 233H35Q15 233 15 218Z" fill="url(#orange)" />
+    <path d="M26 209V187Q32 143 74 133" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    <path d="M71 122Q94 149 118 122" fill="none" stroke-width="6"/>
+    <path d="M190.0,148.6L197.2,137.5L204.2,138.9L206.6,151.9L211.7,154.4L216.5,157.5L220.7,161.3L233.6,158.5L237.6,164.5L230.1,175.4L232.0,180.8L233.1,186.3L233.4,192.0L244.5,199.2L243.1,206.2L230.1,208.6L227.6,213.7L224.5,218.5L220.7,222.7L223.5,235.6L217.5,239.6L206.6,232.1L201.2,234.0L195.7,235.1L190.0,235.4L182.8,246.5L175.8,245.1L173.4,232.1L168.3,229.6L163.5,226.5L159.3,222.7L146.4,225.5L142.4,219.5L149.9,208.6L148.0,203.2L146.9,197.7L146.6,192.0L135.5,184.8L136.9,177.8L149.9,175.4L152.4,170.3L155.5,165.5L159.3,161.3L156.5,148.4L162.5,144.4L173.4,151.9L178.8,150.0L184.3,148.9Z" fill="url(#orange)" />
+    <circle cx="190" cy="192" r="20" fill="url(#dark)"/>
+    <path d="M175 165Q197 155 213 176" fill="none" stroke="url(#shine)" stroke-width="4"/>
+  </g>
 </svg>

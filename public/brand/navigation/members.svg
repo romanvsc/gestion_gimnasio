@@ -1,11 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
   <title>Socios</title>
-  <desc>Credencial de socio</desc>
-  <symbol id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="4" width="15" height="16" rx="2" />
-    <circle cx="9" cy="9" r="2.2" />
-    <path d="M5.8 16c.7-2 2-3 3.2-3s2.5 1 3.2 3" />
-    <path d="M15 8h1.5M15 11h1.5M15 14h1.5" />
-    <path d="M20 8v12h-2" />
-  </symbol>
+  <desc>Ilustración vectorial Yacyretá, sin fondo.</desc>
+<defs>
+<linearGradient id="orange" x2=".8" y2="1"><stop stop-color="#ffbb00"/><stop offset=".5" stop-color="#ff7900"/><stop offset="1" stop-color="#f04400"/></linearGradient>
+<linearGradient id="dark" x2=".7" y2="1"><stop stop-color="#384149"/><stop offset="1" stop-color="#101920"/></linearGradient>
+<linearGradient id="white" x2=".8" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#eae7e2"/></linearGradient>
+<linearGradient id="shine" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".65"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+  <g id="icon" stroke="#08121a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="189" cy="91" r="30" fill="url(#dark)"/>
+    <path d="M167 89a23 23 0 0 1 42-11" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    <path d="M152 140Q214 122 234 160Q244 175 242 205Q240 214 228 214H148Z" fill="url(#orange)" />
+    <path d="M225 157Q240 172 237 204H220Z" fill="url(#dark)" />
+    <circle cx="94" cy="65" r="42" fill="url(#dark)"/>
+    <path d="M62 72Q53 34 92 31Q119 31 127 50" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    <path d="M11 213V194Q12 118 89 119Q173 115 180 190V217Q178 238 157 238H35Q11 238 11 213Z" fill="url(#orange)" />
+    <path d="M22 204V188Q27 137 76 131" fill="none" stroke="url(#shine)" stroke-width="4"/>
+    <path d="M142 137Q169 156 170 194V216Q170 228 155 228H55Z" fill="#ff5700" stroke="none" opacity=".3"/>
+    <path d="M70 123L89 148L111 123M89 148V161" fill="none" />
+    <rect x="57" y="161" width="79" height="58" rx="4" fill="url(#white)"/>
+    <circle cx="74" cy="180" r="5" fill="url(#dark)"/>
+    <path d="M66 199Q65 188 74 188Q83 188 83 199Z" fill="url(#dark)" stroke-width="3"/>
+    <path d="M95 179H122M95 196H120" fill="none" stroke-width="6"/>
+  </g>
 </svg>

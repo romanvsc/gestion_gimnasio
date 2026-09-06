@@ -30,7 +30,7 @@
               'group flex h-11 w-full items-center justify-center rounded-lg transition-colors'
             ]"
           >
-            <NavigationIcon :name="item.icon" class="h-5 w-5" />
+            <NavigationIcon :name="item.icon" class="h-8 w-8 object-contain" />
           </router-link>
         </div>
       </nav>
@@ -96,7 +96,7 @@
                   'group flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 ease-in-out'
                 ]"
               >
-                <NavigationIcon :name="item.icon" class="mr-3 h-5 w-5 flex-shrink-0" />
+                <NavigationIcon :name="item.icon" class="mr-3 h-8 w-8 flex-shrink-0 object-contain" />
                 {{ item.name }}
               </router-link>
             </div>

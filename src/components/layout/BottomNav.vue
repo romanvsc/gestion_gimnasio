@@ -16,7 +16,7 @@
         ]"
       >
         <div :class="[isActive(item.to) ? 'scale-110' : '', 'transition-transform duration-200']">
-          <NavigationIcon :name="item.icon" class="mb-1 h-6 w-6" />
+          <NavigationIcon :name="item.icon" class="mb-1 h-8 w-8 object-contain" />
         </div>
         <span :class="[isActive(item.to) ? 'font-semibold' : 'font-medium', 'max-w-full truncate text-xs']">
           {{ item.name }}
@@ -75,7 +75,7 @@
               'flex touch-manipulation items-center gap-4 rounded-lg px-4 py-3 transition-colors'
             ]"
           >
-            <NavigationIcon :name="item.icon" class="h-6 w-6" />
+            <NavigationIcon :name="item.icon" class="h-8 w-8 flex-shrink-0 object-contain" />
             <span class="font-medium">{{ item.name }}</span>
           </router-link>
 
