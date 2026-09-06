@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
   <title>Check-In</title>
   <desc>Puerta de acceso con confirmación</desc>
-  <g id="icon" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <symbol id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M5 21V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v17" />
     <path d="M15 21H3M15 3l3 2v14l-3 2" />
     <circle cx="10.5" cy="12" r="1" />
     <path d="m17 15 2 2 3-4" />
-  </g>
+  </symbol>
 </svg>

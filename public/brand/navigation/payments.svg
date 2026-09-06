@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
   <title>Pagos</title>
   <desc>Tarjeta de pago con símbolo monetario</desc>
-  <g id="icon" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <symbol id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="5" width="18" height="14" rx="2" />
     <path d="M3 9h18M7 14h4" />
     <path d="M17 12v6M19 13c-.5-.7-1.5-1-2.2-.5-.9.6-.3 1.5.8 1.8 1.2.3 1.8.9 1.3 1.8-.4.8-1.7 1-2.5.3" />
-  </g>
+  </symbol>
 </svg>

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery, runCountQuery } from '@/lib/asyncHandler'
 import { reportClientError } from '@/lib/observability'
+import { businessDayStart } from '@/utils/businessDate'
 
 export const useGymStore = defineStore('gym', () => {
   // Estado
@@ -38,7 +39,7 @@ export const useGymStore = defineStore('gym', () => {
    * Helper: Obtiene el inicio del día actual
    */
   function getTodayStart() {
-    return new Date().toISOString().split('T')[0]
+    return businessDayStart()
   }
 
   /**

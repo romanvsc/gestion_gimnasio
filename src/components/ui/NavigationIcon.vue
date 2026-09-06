@@ -10,7 +10,7 @@
     aria-hidden="true"
     focusable="false"
   >
-    <use :href="`${assetBasePath}/${name}.svg#icon`" />
+    <use :href="`${assetBasePath}/${name}.svg?v=2#icon`" />
   </svg>
 </template>
 

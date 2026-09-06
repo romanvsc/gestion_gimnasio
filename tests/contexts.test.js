@@ -1,4 +1,11 @@
 import assert from 'node:assert/strict'
+import { businessDate, businessDayStart } from '../src/utils/businessDate.js'
+
+test('el día del gimnasio cambia a medianoche argentina, no a medianoche UTC', () => {
+  assert.equal(businessDate(new Date('2026-09-06T02:59:59Z')), '2026-09-05')
+  assert.equal(businessDate(new Date('2026-09-06T03:00:00Z')), '2026-09-06')
+  assert.equal(new Date(businessDayStart(new Date('2026-09-06T01:00:00Z'))).toISOString(), '2026-09-05T03:00:00.000Z')
+})
 import { readdir, readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { test } from 'node:test'

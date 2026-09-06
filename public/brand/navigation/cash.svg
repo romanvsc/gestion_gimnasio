@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
   <title>Caja</title>
   <desc>Caja registradora</desc>
-  <g id="icon" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <symbol id="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 9h16v11H4zM7 9V5h10v4M7 13h10" />
     <circle cx="12" cy="16.5" r="1.2" />
     <path d="M8 20h8" />
-  </g>
+  </symbol>
 </svg>

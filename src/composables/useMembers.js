@@ -237,9 +237,9 @@ export function useMembers() {
       return { success: true, data }
     } catch (err) {
       reportClientError('members.list', err)
-      error.value = err.message
-      toast.error('Error al cargar lista de socios: ' + err.message)
-      return { success: false, error: err.message }
+      error.value = 'No se pudo cargar la lista de socios. Intentá nuevamente.'
+      toast.error(error.value)
+      return { success: false, error: error.value }
     } finally {
       loading.value = false
     }
