@@ -126,10 +126,10 @@ const navigationItems = [
 ]
 
 const moreMenuItemsList = [
-  { name: 'Banco de horas', to: '/banco-horas', icon: 'work-hours', roles: ['admin', 'recepcion'] },
   { name: 'Usuarios', to: '/staff', icon: 'staff', adminOnly: true },
   { name: 'Reportes', to: '/reports', icon: 'reports', adminOnly: true },
-  { name: 'Configuración', to: '/settings', icon: 'settings', adminOnly: true }
+  { name: 'Configuración', to: '/settings', icon: 'settings', adminOnly: true },
+  { name: 'Banco de horas', to: '/banco-horas', icon: 'work-hours', roles: ['admin', 'recepcion'] }
 ]
 
 function canSeeItem(item) {

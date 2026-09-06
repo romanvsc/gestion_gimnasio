@@ -153,8 +153,8 @@ const { settings } = useSettings()
 const { isDark, toggleTheme } = useTheme()
 
 const navigationItems = [
-  { name: 'Banco de horas', to: '/banco-horas', icon: 'work-hours', section: 'Operación', roles: ['admin', 'recepcion'] },
   { name: 'Dashboard', to: '/', icon: 'dashboard', section: 'Operación' },
+  { name: 'Banco de horas', to: '/banco-horas', icon: 'work-hours', section: 'Operación', roles: ['admin', 'recepcion'] },
   { name: 'Socios', to: '/miembros', icon: 'members', section: 'Operación' },
   { name: 'Check-In', to: '/checkin', icon: 'check-in', section: 'Operación' },
   { name: 'Pagos', to: '/pagos/nuevo', icon: 'payments', section: 'Operación' },
