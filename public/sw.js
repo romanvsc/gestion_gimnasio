@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yacyreta-shell-v2'
+const CACHE_NAME = 'yacyreta-shell-v3'
 
 const STATIC_SHELL = [
   '/',

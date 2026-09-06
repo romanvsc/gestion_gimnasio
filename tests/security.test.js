@@ -227,7 +227,7 @@ test('la configuracion de Vercel conserva los recursos PWA fuera del fallback SP
   assert.match(vercelConfig, /Strict-Transport-Security/i)
   assert.match(manifest, /yacyreta-logo\.svg/i)
   assert.match(serviceWorker, /self\.addEventListener\(['"]fetch/i)
-  assert.match(serviceWorker, /yacyreta-shell-v2/i)
+  assert.match(serviceWorker, /yacyreta-shell-v3/i)
   assert.match(serviceWorker, /Promise\.allSettled/i)
   assert.match(serviceWorker, /extractSameOriginAssets/i)
 })
