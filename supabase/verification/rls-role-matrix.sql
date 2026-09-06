@@ -40,6 +40,7 @@ select 'admin_members' as check_name, count(*) as visible_rows from public.membe
 select 'admin_payments' as check_name, count(*) as visible_rows from public.payments;
 select 'admin_transactions' as check_name, count(*) as visible_rows from public.transactions;
 select 'admin_plans' as check_name, count(*) as visible_rows from public.plans;
+select 'admin_work_hours' as check_name, count(*) as visible_rows from public.staff_work_hours;
 rollback;
 
 -- 4) Recepción autenticada: debe poder operar consultas diarias, pero no
@@ -58,9 +59,13 @@ select 'recepcion_members' as check_name, count(*) as visible_rows from public.m
 select 'recepcion_payments' as check_name, count(*) as visible_rows from public.payments;
 select 'recepcion_transactions' as check_name, count(*) as visible_rows from public.transactions;
 select 'recepcion_plans' as check_name, count(*) as visible_rows from public.plans;
+select 'recepcion_own_work_hours' as check_name, count(*) as visible_rows
+from public.staff_work_hours
+where staff_id = auth.uid();
 -- Las siguientes sentencias deben fallar con RLS/privilegios; ejecutarlas
 -- individualmente para no abortar las lecturas anteriores:
 -- update public.config set nombre_gimnasio = nombre_gimnasio;
 -- update public.plans set nombre = nombre;
 -- update public.staff set activo = activo;
+-- select * from public.staff_work_hours where staff_id <> auth.uid();
 rollback;

@@ -8,6 +8,9 @@ import { createSupabasePlanRepository } from '../src/contexts/plans-catalog/infr
 import { CashTransaction } from '../src/contexts/billing-cash/domain/entities/CashTransaction.js'
 import { Payment } from '../src/contexts/billing-cash/domain/entities/Payment.js'
 import { Plan } from '../src/contexts/plans-catalog/domain/entities/Plan.js'
+import { WorkShift } from '../src/contexts/work-hours/domain/entities/WorkShift.js'
+import { createSupabaseReceptionistRosterReader } from '../src/contexts/work-hours/infrastructure/persistence/SupabaseReceptionistRosterReader.js'
+import { createSupabaseWorkShiftRepository } from '../src/contexts/work-hours/infrastructure/persistence/SupabaseWorkShiftRepository.js'
 
 function createFakeQuery(data, calls, error = null) {
   const query = {
@@ -187,4 +190,50 @@ test('los adaptadores rechazan dependencias obligatorias ausentes', () => {
   assert.throws(() => createSupabasePlanRepository({}), /cliente Supabase/i)
   assert.throws(() => createSupabasePaymentRepository({}), /cliente Supabase/i)
   assert.throws(() => createSupabaseCashTransactionRepository({ client: {} }), /ejecutor de consultas/i)
+})
+
+test('el adaptador de jornadas conserva rango, campos y agregado', async () => {
+  const shiftRow = {
+    id: 'shift-1',
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '18:00:00',
+    end_time: '22:00:00',
+    created_at: '2026-09-05T22:00:00Z',
+    updated_at: '2026-09-05T22:00:00Z'
+  }
+  const { client, calls } = createFakeClient({ staff_work_hours: [shiftRow] })
+  const repository = createSupabaseWorkShiftRepository({ client })
+  const shifts = await repository.findByStaffAndMonth('receptionist-1', {
+    startDate: '2026-09-01',
+    endDate: '2026-09-30'
+  })
+
+  assert.ok(shifts[0] instanceof WorkShift)
+  assert.equal(shifts[0].duration_minutes, 240)
+  assert.deepEqual(calls, [
+    ['from', 'staff_work_hours'],
+    ['select', 'id, staff_id, work_date, start_time, end_time, created_at, updated_at'],
+    ['eq', 'staff_id', 'receptionist-1'],
+    ['gte', 'work_date', '2026-09-01'],
+    ['lte', 'work_date', '2026-09-30'],
+    ['order', 'work_date', undefined]
+  ])
+})
+
+test('el lector de recepcionistas filtra el contexto IdentityAccess con campos explícitos', async () => {
+  const { client, calls } = createFakeClient({
+    staff: [{ id: 'receptionist-1', usuario: 'Ana', email: 'ana@example.com', rol: 'recepcion', activo: true }]
+  })
+  const reader = createSupabaseReceptionistRosterReader({ client })
+  const staff = await reader.findReceptionists()
+
+  assert.equal(staff[0].rol, 'recepcion')
+  assert.deepEqual(calls, [
+    ['from', 'staff'],
+    ['select', 'id, usuario, email, rol, activo'],
+    ['eq', 'rol', 'recepcion'],
+    ['order', 'activo', { ascending: false }],
+    ['order', 'usuario', undefined]
+  ])
 })

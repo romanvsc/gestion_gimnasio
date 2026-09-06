@@ -13,6 +13,8 @@ import { calculatePaymentEndDate } from '../src/contexts/billing-cash/domain/ser
 import { registerPayment } from '../src/contexts/billing-cash/application/use-cases/registerPayment.js'
 import { Plan } from '../src/contexts/plans-catalog/domain/entities/Plan.js'
 import { resolvePlanPrice } from '../src/contexts/plans-catalog/presentation/planPricing.js'
+import { WorkShift, calculateWorkMinutes, formatWorkDuration } from '../src/contexts/work-hours/domain/entities/WorkShift.js'
+import { getWorkMonthRange, summarizeWorkShifts } from '../src/contexts/work-hours/domain/services/workMonth.js'
 import { BRAND, COLOR_SCALES } from '../src/config/brand.js'
 import { UI_TOKENS } from '../src/config/uiTokens.js'
 
@@ -201,6 +203,54 @@ test('PaymentAdjustment exige motivo y monto válidos para una corrección audit
     () => PaymentAdjustment.create({ payment_id: 'payment-1', monto_nuevo: 24000, motivo: 'corto' }),
     /al menos 10 caracteres/i
   )
+})
+
+test('WorkShift calcula jornadas exactas y protege sus invariantes', () => {
+  const shift = WorkShift.create({
+    id: 'shift-1',
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '18:00',
+    end_time: '22:00',
+    today: '2026-09-05'
+  })
+
+  assert.equal(calculateWorkMinutes('18:00', '22:00'), 240)
+  assert.equal(shift.duration_minutes, 240)
+  assert.equal(formatWorkDuration(510), '8 h 30 min')
+  assert.deepEqual(shift.toPersistence(), {
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '18:00',
+    end_time: '22:00'
+  })
+})
+
+test('WorkShift rechaza futuro, horarios invertidos y cruces de medianoche', () => {
+  assert.throws(
+    () => WorkShift.create({ staff_id: 'receptionist-1', work_date: '2026-09-06', start_time: '18:00', end_time: '22:00', today: '2026-09-05' }),
+    /jornadas futuras/i
+  )
+  assert.throws(
+    () => WorkShift.create({ staff_id: 'receptionist-1', work_date: '2026-09-05', start_time: '22:00', end_time: '22:00', today: '2026-09-05' }),
+    /salida debe ser posterior/i
+  )
+  assert.throws(
+    () => WorkShift.create({ staff_id: 'receptionist-1', work_date: '2026-09-05', start_time: '22:00', end_time: '02:00', today: '2026-09-05' }),
+    /salida debe ser posterior/i
+  )
+})
+
+test('Work Hours resume un mes en minutos sin duplicar reglas de presentacion', () => {
+  assert.deepEqual(getWorkMonthRange('2026-09'), {
+    month: '2026-09',
+    startDate: '2026-09-01',
+    endDate: '2026-09-30'
+  })
+  assert.deepEqual(summarizeWorkShifts([
+    { duration_minutes: 240 },
+    { duration_minutes: 150 }
+  ]), { totalMinutes: 390, totalHours: 6.5 })
 })
 
 async function listJavaScriptFiles(directory) {

@@ -59,6 +59,12 @@ const routes = [
         meta: { roles: ['admin', 'recepcion'] }
       },
       {
+        path: 'banco-horas',
+        name: 'WorkHours',
+        component: () => import('@/views/WorkHours/WorkHoursView.vue'),
+        meta: { roles: ['admin', 'recepcion'] }
+      },
+      {
         path: 'staff',
         name: 'Staff',
         component: () => import('@/views/Staff/StaffListView.vue'),

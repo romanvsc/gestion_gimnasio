@@ -103,6 +103,27 @@ test('recepcion conserva acceso operativo a Caja en ruta y navegacion', async ()
   }
 })
 
+test('Banco de horas conserva aislamiento por recepcionista y acceso administrativo', async () => {
+  const migration = await readProjectFile('../supabase/migrations/20260905130000_create_staff_work_hours.sql')
+  const router = await readProjectFile('../src/router/index.js')
+  const view = await readProjectFile('../src/views/WorkHours/WorkHoursView.vue')
+  const composable = await readProjectFile('../src/composables/useWorkHours.js')
+
+  assert.match(migration, /create table if not exists public\.staff_work_hours/i)
+  assert.match(migration, /staff_work_hours_unique_staff_date/i)
+  assert.match(migration, /staff_work_hours_start_before_end/i)
+  assert.match(migration, /staff_work_hours_select/i)
+  assert.match(migration, /staff_work_hours_insert/i)
+  assert.match(migration, /staff_work_hours_update/i)
+  assert.match(migration, /work_date <= public\.business_today\(\)/i)
+  assert.match(migration, /target_staff\.rol = 'recepcion'/i)
+  assert.match(migration, /staff_work_hours\.staff_id = auth\.uid\(\)/i)
+  assert.doesNotMatch(migration, /create policy .*delete/i)
+  assert.match(router, /path: 'banco-horas'[\s\S]{0,220}roles: \['admin', 'recepcion'\]/i)
+  assert.doesNotMatch(view, /from\(['"]@\/lib\/supabase['"]\)/i)
+  assert.doesNotMatch(composable, /\.from\(['"]staff_work_hours['"]\)/i)
+})
+
 test('las lecturas operativas de socios y dashboard no usan select estrella', async () => {
   const members = await readProjectFile('../src/composables/useMembers.js')
   const gymStore = await readProjectFile('../src/stores/gymStore.js')
