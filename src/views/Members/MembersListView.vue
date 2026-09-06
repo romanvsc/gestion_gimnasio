@@ -76,6 +76,21 @@
           <span class="ml-1">el registro indica si la ficha está activa; la cuota indica si puede cobrar o revisar el vencimiento; el apto físico informa su vigencia.</span>
         </div>
 
+        <div
+          v-if="showOnlyOverdue"
+          class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-800 dark:border-danger-800 dark:bg-danger-950/30 dark:text-danger-200"
+          role="status"
+        >
+          <span><strong>Filtro activo:</strong> socios con cuotas vencidas.</span>
+          <button
+            type="button"
+            class="rounded-lg px-3 py-1.5 font-semibold text-danger-700 transition-colors hover:bg-danger-100 focus:outline-none focus:ring-2 focus:ring-danger-500 dark:text-danger-200 dark:hover:bg-danger-900/40"
+            @click="clearOverdueFilter"
+          >
+            Ver todos
+          </button>
+        </div>
+
         <!-- Empty state (cuando no hay socios) -->
         <div v-if="filteredMembers.length === 0" class="text-center py-12 bg-page-card rounded-xl shadow-sm border border-page-border">
           <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
@@ -282,7 +297,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
@@ -294,6 +309,7 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import MemberHistoryModal from '@/components/modals/MemberHistoryModal.vue'
 
 const router = useRouter()
+const route = useRoute()
 const { members, loading, error, getMembers } = useMembers()
 const { memberPageSizes, fetchMemberPageSizes } = useParameters()
 
@@ -304,6 +320,8 @@ const currentPage = ref(1)
 const showHistoryModal = ref(false)
 const selectedMemberId = ref('')
 const selectedMemberName = ref('')
+
+const showOnlyOverdue = computed(() => route.query.filter === 'vencidos')
 
 const pageSizeOptions = computed(() => {
   return memberPageSizes.value.map(option => ({
@@ -347,10 +365,14 @@ async function reloadMembers() {
 }
 
 const filteredMembers = computed(() => {
-  if (!searchQuery.value) return members.value
+  const sourceMembers = showOnlyOverdue.value
+    ? members.value.filter(member => member.estado_cuota === 'vencido')
+    : members.value
+
+  if (!searchQuery.value) return sourceMembers
 
   const query = searchQuery.value.toLowerCase()
-  return members.value.filter(member => {
+  return sourceMembers.filter(member => {
     const fullName = `${member.nombre} ${member.apellido}`.toLowerCase()
     const dni = member.dni?.toString() || ''
     return fullName.includes(query) || dni.includes(query)
@@ -384,6 +406,10 @@ const visibleTo = computed(() => {
 
 function goToNewMember() {
   router.push({ name: 'NewMember' })
+}
+
+function clearOverdueFilter() {
+  router.push({ name: 'Members' })
 }
 
 function goToMemberDetail(id) {

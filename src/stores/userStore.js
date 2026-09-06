@@ -6,6 +6,7 @@ import { reportClientError } from '@/lib/observability'
 
 export const useUserStore = defineStore('user', () => {
   const AUTH_BOOT_TIMEOUT_MS = 10000
+  const LOGIN_TIMEOUT_MS = 10000
   const ROLE_CHECK_TIMEOUT_MS = 8000
 
   function withTimeout(promise, timeoutMs, message) {
@@ -177,10 +178,11 @@ export const useUserStore = defineStore('user', () => {
       loading.value = true
       error.value = null
 
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
+      const { data, error: loginError } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password }),
+        LOGIN_TIMEOUT_MS,
+        'El inicio de sesión tardó demasiado en responder. Revisá la conexión e intentá nuevamente.'
+      )
 
       if (loginError) throw loginError
 
@@ -188,7 +190,11 @@ export const useUserStore = defineStore('user', () => {
       user.value = data.user
 
       // Verificar el rol del usuario después del login
-      await checkUserRole(data.user.id)
+      await withTimeout(
+        checkUserRole(data.user.id),
+        ROLE_CHECK_TIMEOUT_MS,
+        'No se pudo verificar el rol del usuario a tiempo.'
+      )
 
       return { success: true }
     } catch (err) {

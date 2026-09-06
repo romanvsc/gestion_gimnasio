@@ -355,7 +355,7 @@
                   <UserX v-else class="w-6 h-6 text-gray-400 dark:text-gray-500" />
                 </div>
                 <div class="text-left">
-                  <p class="font-semibold text-page-title">Socio Activo</p>
+                  <p class="font-semibold text-page-title">{{ formData.activo ? 'Socio activo' : 'Socio inactivo' }}</p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">Los socios inactivos no pueden hacer check-in</p>
                 </div>
               </div>

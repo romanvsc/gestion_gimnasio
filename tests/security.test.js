@@ -85,6 +85,8 @@ test('el arranque de autenticacion comparte una inicializacion acotada entre App
   assert.doesNotMatch(router, /supabase\.auth\.getSession\(\)/i)
   assert.match(router, /if \(!userStore\.initialized\) await userStore\.initSession\(\)/i)
   assert.match(userStore, /AUTH_BOOT_TIMEOUT_MS\s*=\s*10000/i)
+  assert.match(userStore, /LOGIN_TIMEOUT_MS\s*=\s*10000/i)
+  assert.match(userStore, /withTimeout\([\s\S]{0,180}signInWithPassword/i)
   assert.match(userStore, /initSessionPromise/i)
   assert.match(userStore, /if \(initialized\.value\)/i)
   assert.match(userStore, /initialized\.value\s*=\s*true/i)
@@ -139,6 +141,25 @@ test('las lecturas operativas de socios y dashboard no usan select estrella', as
   assert.doesNotMatch(reports, /\.from\(['"]v_socios_estado['"]\)[\s\S]{0,180}\.select\(['"]\*['"]\)/i)
   assert.match(staff, /STAFF_FIELDS/)
   assert.doesNotMatch(staff, /\.from\(['"]staff['"]\)[\s\S]{0,140}\.select\(['"]\*['"]\)/i)
+})
+
+test('la ficha de socios conserva la desactivacion y las alertas llevan al filtro correcto', async () => {
+  const deactivationMigration = await readProjectFile('../supabase/migrations/20260906020000_add_member_deactivation_date.sql')
+  const membersView = await readProjectFile('../src/views/Members/MembersListView.vue')
+  const memberForm = await readProjectFile('../src/views/Members/MemberFormView.vue')
+  const dashboard = await readProjectFile('../src/views/Dashboard/DashboardView.vue')
+  const sidebar = await readProjectFile('../src/components/layout/Sidebar.vue')
+
+  assert.match(deactivationMigration, /add column if not exists fecha_baja date/i)
+  assert.match(deactivationMigration, /create trigger members_set_deactivation_date/i)
+  assert.match(deactivationMigration, /America\/Argentina\/Buenos_Aires/i)
+  assert.match(membersView, /useRouter, useRoute/i)
+  assert.match(membersView, /route\.query\.filter === 'vencidos'/i)
+  assert.match(membersView, /member\.estado_cuota === 'vencido'/i)
+  assert.match(memberForm, /formData\.activo = !formData\.activo/i)
+  assert.match(dashboard, /aria-label="Notificaciones"/i)
+  assert.match(dashboard, /openExpiredMembers/i)
+  assert.match(sidebar, /items-center justify-between gap-2 border-t/i)
 })
 
 test('las modales operativas consumen fachadas y los adaptadores devuelven campos explicitos', async () => {

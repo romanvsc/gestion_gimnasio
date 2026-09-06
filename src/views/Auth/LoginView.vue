@@ -420,7 +420,7 @@ async function handleLogin() {
   if (result.success) {
     router.push({ name: 'Dashboard' })
   } else {
-    generalError.value = 'Credenciales incorrectas. Por favor, intenta de nuevo.'
+    generalError.value = result.error || 'No se pudo iniciar sesión. Por favor, intenta de nuevo.'
   }
 }
 </script>

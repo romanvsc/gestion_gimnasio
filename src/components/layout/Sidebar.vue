@@ -35,13 +35,13 @@
         </div>
       </nav>
 
-      <div class="space-y-2 border-t border-white/10 p-3">
+      <div class="flex items-center justify-between gap-2 border-t border-white/10 p-3">
         <button
           type="button"
           @click="toggleTheme"
           :aria-label="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
           :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-          class="flex h-11 w-full items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
+          class="flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
         >
           <Sun v-if="isDark" class="h-5 w-5 text-warning-400" aria-hidden="true" />
           <Moon v-else class="h-5 w-5" aria-hidden="true" />
@@ -51,7 +51,7 @@
           @click="handleLogout"
           aria-label="Cerrar sesión"
           title="Cerrar sesión"
-          class="flex h-11 w-full items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-danger-900/40 hover:text-danger-300"
+          class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-danger-900/40 hover:text-danger-300"
         >
           <LogOut class="h-5 w-5" aria-hidden="true" />
         </button>
@@ -103,31 +103,27 @@
           </div>
         </nav>
 
-        <div class="flex-shrink-0 border-t border-white/10">
-          <div class="px-4 pt-3 pb-1">
-            <button
-              type="button"
-              @click="toggleTheme"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
-              :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-            >
-              <Sun v-if="isDark" class="h-5 w-5 text-warning-400" aria-hidden="true" />
-              <Moon v-else class="h-5 w-5 text-neutral-500" aria-hidden="true" />
-              <span>{{ isDark ? 'Modo claro' : 'Modo oscuro' }}</span>
-            </button>
-          </div>
+        <div class="flex flex-shrink-0 items-center justify-between gap-2 border-t border-white/10 px-4 py-3">
+          <button
+            type="button"
+            @click="toggleTheme"
+            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
+            :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+          >
+            <Sun v-if="isDark" class="h-5 w-5 flex-shrink-0 text-warning-400" aria-hidden="true" />
+            <Moon v-else class="h-5 w-5 flex-shrink-0 text-neutral-500" aria-hidden="true" />
+            <span class="truncate">{{ isDark ? 'Modo claro' : 'Modo oscuro' }}</span>
+          </button>
 
-          <div class="flex items-center justify-end px-4 py-3">
-            <button
-              type="button"
-              @click="handleLogout"
-              class="rounded-md p-1.5 text-neutral-500 transition-colors hover:bg-danger-900/40 hover:text-danger-300"
-              aria-label="Cerrar sesión"
-              title="Cerrar sesión"
-            >
-              <LogOut class="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
+          <button
+            type="button"
+            @click="handleLogout"
+            class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-danger-900/40 hover:text-danger-300"
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+          >
+            <LogOut class="h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </div>

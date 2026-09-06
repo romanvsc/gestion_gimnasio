@@ -8,9 +8,57 @@
               <Search class="h-4 w-4" aria-hidden="true" />
               <span>Buscar socio...</span>
             </div>
-            <span class="flex h-10 w-10 items-center justify-center rounded-lg border border-page-border bg-page-card text-page-subtitle" title="Notificaciones">
+            <div class="relative">
+              <button
+                type="button"
+                class="relative flex h-10 w-10 items-center justify-center rounded-lg border border-page-border bg-page-card text-page-subtitle transition-colors hover:bg-page-card-hover hover:text-page-title focus:outline-none focus:ring-2 focus:ring-primary-500"
+                title="Notificaciones"
+                aria-label="Notificaciones"
+                :aria-expanded="showNotifications"
+                aria-controls="dashboard-notifications"
+                @click="showNotifications = !showNotifications"
+                @keydown.esc="showNotifications = false"
+              >
               <Bell class="h-4 w-4" aria-hidden="true" />
-            </span>
+                <span
+                  v-if="stats.expiredMembers > 0"
+                  class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-600 px-1 text-[10px] font-bold text-white"
+                >
+                  {{ stats.expiredMembers > 99 ? '99+' : stats.expiredMembers }}
+                </span>
+              </button>
+
+              <div
+                v-if="showNotifications"
+                id="dashboard-notifications"
+                role="dialog"
+                aria-label="Notificaciones pendientes"
+                class="absolute right-0 top-12 z-40 w-80 overflow-hidden rounded-xl border border-page-border bg-page-card shadow-xl"
+              >
+                <div class="border-b border-page-border px-4 py-3">
+                  <p class="text-sm font-semibold text-page-title">Notificaciones</p>
+                  <p class="mt-0.5 text-xs text-page-subtitle">Pendientes de atención</p>
+                </div>
+
+                <button
+                  type="button"
+                  v-if="stats.expiredMembers > 0"
+                  class="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-page-card-hover"
+                  @click="openExpiredMembers"
+                >
+                  <span class="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-danger-100 text-danger-600 dark:bg-danger-900/40 dark:text-danger-300">
+                    <AlertCircle class="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block text-sm font-semibold text-page-title">Cuotas vencidas</span>
+                    <span class="mt-0.5 block text-xs text-page-subtitle">{{ stats.expiredMembers }} socios necesitan regularizar su cuota.</span>
+                    <span class="mt-2 block text-xs font-semibold text-primary-600 dark:text-primary-400">Ver socios vencidos</span>
+                  </span>
+                </button>
+
+                <p v-else class="px-4 py-5 text-sm text-page-subtitle">No hay notificaciones pendientes.</p>
+              </div>
+            </div>
           </div>
           <div class="flex min-w-0 items-center gap-2.5">
             <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white">
@@ -137,13 +185,13 @@
         </section>
 
         <!-- Asistencia y prioridad operativa -->
-        <section class="mb-6 grid items-start gap-4 xl:grid-cols-3">
-          <div class="rounded-lg border border-page-border bg-page-card p-4 md:p-5 xl:col-span-2">
+        <section class="mb-6 grid gap-4 xl:grid-cols-3">
+          <div class="h-full rounded-lg border border-page-border bg-page-card p-4 md:p-5 xl:col-span-2">
             <AssistanceChart />
           </div>
 
           <aside
-            class="flex flex-col rounded-lg border p-4 md:p-5"
+            class="flex h-full flex-col rounded-lg border p-4 md:p-5"
             :class="stats.expiredMembers > 0
               ? 'border-danger-200 bg-danger-50/70 dark:border-danger-800 dark:bg-danger-950/30'
               : 'border-page-border bg-page-card'"
@@ -318,6 +366,7 @@ const roleLabel = computed(() => ({
 
 const loading = ref(false)
 const showLastAccessModal = ref(false)
+const showNotifications = ref(false)
 const statsUpdatedAt = ref(null)
 const stats = ref({
   totalMembers: 0,
@@ -363,6 +412,11 @@ function goToMember(memberId) {
   if (memberId) {
     router.push({ name: 'MemberDetail', params: { id: memberId } })
   }
+}
+
+function openExpiredMembers() {
+  showNotifications.value = false
+  router.push({ name: 'Members', query: { filter: 'vencidos' } })
 }
 
 async function refreshDashboardData() {
