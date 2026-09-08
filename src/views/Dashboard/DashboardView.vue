@@ -103,7 +103,7 @@
 
       <div v-else>
         <!-- Tarjetas de Métricas -->
-        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div v-reveal-on-scroll class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Cobrado este mes"
             :value="formatCurrencyFull(stats.monthlyRevenue)"
@@ -143,7 +143,7 @@
         </div>
 
         <!-- Acciones Rápidas -->
-        <section class="mb-6">
+        <section v-reveal-on-scroll class="mb-6">
           <!-- Acciones Rápidas -->
           <h2 class="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-page-muted">Acciones rápidas</h2>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -182,7 +182,7 @@
         </section>
 
         <!-- Asistencia y prioridad operativa -->
-        <section class="mb-6 grid gap-4 xl:grid-cols-3">
+        <section v-reveal-on-scroll class="mb-6 grid gap-4 xl:grid-cols-3">
           <div class="h-full rounded-lg border border-page-border bg-page-card p-4 md:p-5 xl:col-span-2">
             <AssistanceChart />
           </div>
@@ -241,7 +241,7 @@
         </section>
 
         <!-- Últimos Check-Ins -->
-        <section class="overflow-hidden rounded-lg border border-page-border bg-page-card">
+        <section v-reveal-on-scroll class="overflow-hidden rounded-lg border border-page-border bg-page-card">
           <div class="flex items-center justify-between border-b border-page-border px-4 py-3.5 md:px-5">
             <div>
               <h2 class="text-base font-bold text-page-title">Últimos ingresos</h2>
@@ -258,9 +258,7 @@
           </div>
 
           <!-- Loading de check-ins -->
-          <div v-if="loadingCheckIns" class="flex justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          </div>
+          <LoadingState v-if="loadingCheckIns" compact message="Cargando los últimos ingresos..." />
 
           <div v-else class="overflow-x-auto">
             <table class="w-full table-fixed">
@@ -337,6 +335,7 @@ import StatCard from '@/components/dashboard/StatCard.vue'
 import DashboardActionCard from '@/components/dashboard/DashboardActionCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import LoadingState from '@/components/ui/LoadingState.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LastAccessModal from '@/components/modals/LastAccessModal.vue'
 import AssistanceChart from '@/components/charts/AssistanceChart.vue'
@@ -346,6 +345,38 @@ const router = useRouter()
 const userStore = useUserStore()
 const gymStore = useGymStore()
 const { stats } = storeToRefs(gymStore)
+
+const vRevealOnScroll = {
+  mounted(element) {
+    element.classList.add('reveal-on-scroll')
+
+    if (
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ||
+      !('IntersectionObserver' in window)
+    ) {
+      element.classList.add('reveal-visible')
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+
+      element.classList.add('reveal-visible')
+      observer.unobserve(element)
+    }, {
+      root: document.querySelector('#main-content'),
+      threshold: 0.12,
+      rootMargin: '0px 0px -24px 0px'
+    })
+
+    element._revealObserver = observer
+    observer.observe(element)
+  },
+  unmounted(element) {
+    element._revealObserver?.disconnect()
+    delete element._revealObserver
+  }
+}
 
 const dashboardDate = computed(() => {
   const value = new Intl.DateTimeFormat('es-AR', {

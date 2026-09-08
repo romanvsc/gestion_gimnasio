@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import { billingCash, calculateCashSummary } from '@/contexts/billing-cash'
 import { formatCurrencyFull } from '@/utils/formatters'
-import { downloadExcelWorkbook } from '@/utils/excelExport'
 import { reportClientError } from '@/lib/observability'
 import { toUserMessage } from '@/lib/userFacingError'
 
@@ -139,6 +138,8 @@ export function useCashRegister() {
       if (transactions.value.length === 0) {
         throw new Error('No hay movimientos para descargar en este período.')
       }
+
+      const { downloadExcelWorkbook } = await import('@/utils/excelExport')
 
 
       // Formatear fechas para el nombre del archivo

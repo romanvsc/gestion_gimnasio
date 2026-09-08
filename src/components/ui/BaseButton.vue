@@ -73,7 +73,7 @@ const props = defineProps({
 const emit = defineEmits(['click'])
 
 const buttonClasses = computed(() => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-secondary-950'
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-[background-color,border-color,box-shadow,opacity,transform] focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] dark:focus:ring-offset-secondary-950'
   
   // Tamaño
   const sizeClasses = {

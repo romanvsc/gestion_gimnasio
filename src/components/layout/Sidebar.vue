@@ -1,6 +1,7 @@
 <template>
   <!-- Navegación compacta para tablet y navegador angosto -->
-  <aside class="z-30 hidden flex-shrink-0 md:flex xl:hidden" aria-label="Navegación compacta">
+  <Transition name="sidebar" appear>
+    <aside class="z-30 hidden flex-shrink-0 md:flex xl:hidden" aria-label="Navegación compacta">
     <div class="flex h-full w-20 flex-col bg-secondary-950 text-neutral-300 transition-colors duration-200">
       <div class="flex h-16 flex-shrink-0 items-center justify-center border-b border-white/10">
         <GymLogo
@@ -57,10 +58,12 @@
         </button>
       </div>
     </div>
-  </aside>
+    </aside>
+  </Transition>
 
   <!-- Sidebar completo para desktop -->
-  <aside class="z-30 hidden flex-shrink-0 xl:flex" aria-label="Navegación principal">
+  <Transition name="sidebar" appear>
+    <aside class="z-30 hidden flex-shrink-0 xl:flex" aria-label="Navegación principal">
     <div class="flex w-64 flex-col bg-secondary-950 text-neutral-300 transition-colors duration-200">
       <div class="flex h-full min-h-0 flex-col">
         <div class="flex min-h-20 flex-shrink-0 items-center gap-3 border-b border-white/10 px-5">
@@ -127,7 +130,8 @@
         </div>
       </div>
     </div>
-  </aside>
+    </aside>
+  </Transition>
 </template>
 
 <script setup>
@@ -191,3 +195,14 @@ async function handleLogout() {
   router.push({ name: 'Login' })
 }
 </script>
+
+<style scoped>
+.sidebar-enter-active {
+  transition: opacity 240ms ease, transform 280ms ease;
+}
+
+.sidebar-enter-from {
+  opacity: 0;
+  transform: translateX(-0.75rem);
+}
+</style>

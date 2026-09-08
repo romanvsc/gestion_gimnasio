@@ -35,7 +35,7 @@
       </div>
 
       <!-- Formulario -->
-      <form v-else @submit.prevent="handleSubmit" class="space-y-6">
+      <form ref="memberFormRef" v-else @submit.prevent="handleSubmit" class="space-y-6">
         
         <!-- SECCIÓN 1: Datos Personales & Foto -->
         <div id="datos-personales" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
@@ -376,9 +376,11 @@
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 -translate-y-2"
         >
-          <div 
+          <div
+            ref="duplicatePanelRef"
             v-if="duplicateErrors.length > 0" 
-            class="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-xl shadow-sm overflow-hidden"
+            tabindex="-1"
+            class="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-xl shadow-sm overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
           >
             <div class="p-5">
               <div class="flex items-start gap-4">
@@ -492,6 +494,7 @@ import { useParameters } from '@/composables/useParameters'
 import { resolvePlanPrice } from '@/contexts/plans-catalog'
 import { formatCurrencyFull } from '@/utils/formatters'
 import { toUserMessage } from '@/lib/userFacingError'
+import { focusFirstInvalid } from '@/utils/focusFirstInvalid'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -540,6 +543,8 @@ const uploadingPhoto = ref(false)
 const fileInput = ref(null)
 const previousPhotoUrl = ref('')
 const duplicateErrors = ref([])
+const memberFormRef = ref(null)
+const duplicatePanelRef = ref(null)
 
 // Calcular IMC
 const imc = computed(() => {
@@ -616,6 +621,12 @@ function removePhoto() {
 }
 
 async function handleSubmit() {
+  if (memberFormRef.value && !memberFormRef.value.checkValidity()) {
+    memberFormRef.value.reportValidity()
+    focusFirstInvalid(memberFormRef.value)
+    return
+  }
+
   if (!formData.value.nombre.trim() || !formData.value.apellido.trim()) {
     toast.error('Completá el nombre y el apellido para continuar.')
     return
@@ -631,7 +642,8 @@ async function handleSubmit() {
       duplicateErrors.value = validation.errors
       // Scroll suave hacia el panel de errores
       setTimeout(() => {
-        document.querySelector('.border-amber-400')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        duplicatePanelRef.value?.focus({ preventScroll: true })
+        duplicatePanelRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 100)
       return
     }

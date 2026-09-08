@@ -5,7 +5,7 @@
     :aria-label="route ? `${title}: abrir detalle` : undefined"
     @click="route && handleClick()"
     :class="[
-      'rounded-lg border p-4 transition-colors duration-200 hover:border-page-border md:p-4',
+      'appearance-none flex flex-col items-stretch justify-start rounded-lg border p-4 transition-colors duration-200 hover:border-page-border md:p-4',
       route ? 'w-full cursor-pointer text-left' : '',
       badgeVariant === 'urgent'
         ? 'border-danger-200 bg-danger-50 hover:border-danger-300 dark:border-danger-800 dark:bg-danger-950/40 dark:hover:border-danger-700'

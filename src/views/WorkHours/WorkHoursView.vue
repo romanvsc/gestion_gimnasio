@@ -87,10 +87,7 @@
             </BaseButton>
           </div>
 
-          <div v-if="loading" class="flex min-h-72 items-center justify-center text-page-subtitle" role="status" aria-live="polite">
-            <Loader2 class="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-            Cargando las horas trabajadas...
-          </div>
+          <LoadingState v-if="loading" message="Cargando las horas trabajadas..." class="min-h-72" />
           <WorkHoursCalendar
             v-else
             :month="currentMonth"
@@ -125,9 +122,10 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { toUserMessage } from '@/lib/userFacingError'
-import { AlertCircle, Archive, CalendarDays, ChevronLeft, ChevronRight, Loader2, UserRound, UsersRound } from 'lucide-vue-next'
+import { AlertCircle, Archive, CalendarDays, ChevronLeft, ChevronRight, UserRound, UsersRound } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
+import LoadingState from '@/components/ui/LoadingState.vue'
 import WorkHoursCalendar from '@/components/work-hours/WorkHoursCalendar.vue'
 import WorkShiftModal from '@/components/work-hours/WorkShiftModal.vue'
 import { formatWorkDuration, summarizeWorkShifts, workHours } from '@/contexts/work-hours'

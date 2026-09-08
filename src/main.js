@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import './style.css'
 import { reportClientError } from './lib/observability'
+import { installInvalidFieldFocus } from './utils/focusFirstInvalid'
 
 // Crear instancia de la app
 const app = createApp(App)
@@ -17,6 +18,7 @@ app.use(router)
 
 // Montar la aplicación
 app.mount('#app')
+installInvalidFieldFocus()
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

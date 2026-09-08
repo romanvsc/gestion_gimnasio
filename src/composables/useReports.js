@@ -1,7 +1,6 @@
 import { ref, reactive } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { reportClientError } from '@/lib/observability'
-import { downloadExcelWorkbook, objectsToExcelRows } from '@/utils/excelExport'
 import { toUserMessage } from '@/lib/userFacingError'
 
 const OVERDUE_MEMBER_FIELDS = 'id, nombre, apellido, dni, email, telefono, fecha_fin_cuota, dias_vencido, activo, estado_cuota, estado_apto_fisico, es_socio_club, plan_id, foto_url'
@@ -217,6 +216,8 @@ export function useReports() {
       if (!data || data.length === 0) {
         throw new Error('No hay datos para descargar en este período.')
       }
+
+      const { downloadExcelWorkbook, objectsToExcelRows } = await import('@/utils/excelExport')
 
       // Generar archivo y descargar
       const today = new Date().toISOString().split('T')[0]

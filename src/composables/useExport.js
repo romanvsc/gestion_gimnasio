@@ -1,8 +1,5 @@
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
 import { BRAND, COLOR_SCALES } from '@/config/brand'
 import { formatCurrency } from '@/utils/formatters'
-import { downloadExcelWorkbook } from '@/utils/excelExport'
 import { reportClientError } from '@/lib/observability'
 import { toUserMessage } from '@/lib/userFacingError'
 
@@ -37,6 +34,8 @@ export function useExport() {
      */
     async function exportToExcel({ stats, checkIns, gymName, periodLabel }) {
         try {
+            const { downloadExcelWorkbook } = await import('@/utils/excelExport')
+
             // Hoja 1: Resumen de estadísticas
             const statsData = [
                 ['Inicio - ' + gymName],
@@ -92,8 +91,13 @@ export function useExport() {
      * @param {string} options.periodLabel - Etiqueta del periodo seleccionado
      * @param {Object} options.comparison - Comparación con periodo anterior
      */
-    function exportToPDF({ stats, checkIns, gymName, periodLabel, comparison }) {
+    async function exportToPDF({ stats, checkIns, gymName, periodLabel, comparison }) {
         try {
+            const [{ default: jsPDF }] = await Promise.all([
+                import('jspdf'),
+                import('jspdf-autotable')
+            ])
+
             const doc = new jsPDF()
 
             // Colores del tema

@@ -19,9 +19,7 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="bg-page-card rounded-xl shadow-sm p-8 text-center">
-        <p class="text-gray-600 dark:text-gray-400">Cargando la lista de socios...</p>
-      </div>
+      <LoadingState v-if="loading" message="Cargando la lista de socios..." class="rounded-xl border border-page-border bg-page-card" />
 
       <!-- Error -->
       <div v-else-if="error" role="alert" aria-live="assertive" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -306,6 +304,7 @@ import { Search, UserPlus, ChevronLeft, ChevronRight, Users, Eye, Receipt } from
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
+import LoadingState from '@/components/ui/LoadingState.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import MemberHistoryModal from '@/components/modals/MemberHistoryModal.vue'
 

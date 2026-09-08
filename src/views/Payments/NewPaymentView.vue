@@ -30,7 +30,7 @@
         </ol>
       </nav>
 
-      <form @submit.prevent="handleSubmit">
+      <form ref="paymentFormRef" @submit.prevent="handleSubmit">
         <!-- En móvil: Resumen arriba (sticky) -->
         <div class="xl:hidden mb-6 sticky top-2 z-10">
           <PaymentSummaryCard
@@ -49,7 +49,7 @@
         <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
           
           <!-- Columna Izquierda: Formulario (3/5) -->
-          <div class="xl:col-span-3 bg-page-card rounded-xl shadow-sm border border-page-border p-5 md:p-6 space-y-6">
+          <div class="xl:col-span-3 bg-page-card rounded-xl shadow-sm border border-page-border p-5 pb-32 md:p-6 md:pb-32 xl:pb-6 space-y-6">
           <h2 class="text-lg font-semibold text-page-title">Datos del pago</h2>
             
             <!-- Buscar Socio -->
@@ -183,7 +183,7 @@
             </div>
 
             <!-- Botones (móvil) -->
-            <div class="xl:hidden flex flex-col gap-3 pt-4">
+            <div class="mobile-action-bar xl:hidden flex flex-col gap-3 pt-3">
               <BaseButton
                 type="submit"
                 variant="primary"
@@ -269,6 +269,7 @@ import { usePayments } from '@/composables/usePayments'
 import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
+import { focusFirstInvalid } from '@/utils/focusFirstInvalid'
 import { resolvePlanPrice } from '@/contexts/plans-catalog'
 import { calculatePaymentEndDate } from '@/contexts/billing-cash'
 import { formatCurrencyFull } from '@/utils/formatters'
@@ -281,6 +282,7 @@ import PaymentSummaryCard from '@/components/payments/PaymentSummaryCard.vue'
 import SuccessModal from '@/components/ui/SuccessModal.vue'
 
 const router = useRouter()
+const paymentFormRef = ref(null)
 const gymStore = useGymStore()
 const { createPayment, loading: paymentLoading } = usePayments()
 const { searchActiveMembers } = useMembers()
@@ -458,6 +460,12 @@ function updateDates() {
 
 async function handleSubmit() {
   if (paymentLoading.value) return
+
+  if (paymentFormRef.value && !paymentFormRef.value.checkValidity()) {
+    paymentFormRef.value.reportValidity()
+    focusFirstInvalid(paymentFormRef.value)
+    return
+  }
 
   if (!selectedMember.value) {
     toast.error('Elegí un socio para continuar.', { duration: 3000 })

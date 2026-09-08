@@ -1,12 +1,7 @@
 <template>
   <div id="app" class="min-h-screen">
     <!-- Mostrar loading mientras se inicializa la sesión -->
-    <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-page-bg transition-colors duration-200">
-      <div class="text-center">
-        <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
-        <p class="text-gray-600 dark:text-gray-400">Cargando información...</p>
-      </div>
-    </div>
+    <LoadingState v-if="userStore.loading" full-screen />
     <!-- Una vez inicializado, mostrar el contenido -->
     <router-view v-else v-slot="{ Component }">
       <Transition name="page" mode="out-in">
@@ -44,6 +39,7 @@ import { Toaster } from 'vue-sonner'
 import { useUserStore } from './stores/userStore'
 import { useSettings } from './composables/useSettings'
 import { useTheme } from './composables/useTheme'
+import LoadingState from './components/ui/LoadingState.vue'
 
 const userStore = useUserStore()
 const { fetchSettings } = useSettings()
