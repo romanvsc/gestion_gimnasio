@@ -3,6 +3,7 @@ import { billingCash, calculateCashSummary } from '@/contexts/billing-cash'
 import { formatCurrencyFull } from '@/utils/formatters'
 import { downloadExcelWorkbook } from '@/utils/excelExport'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 export function useCashRegister() {
   const transactions = ref([])
@@ -45,13 +46,13 @@ export function useCashRegister() {
       return { success: true }
     } catch (err) {
       reportClientError('cash.range_fetch', err)
-      error.value = err.message
+      error.value = toUserMessage(err, 'No pudimos cargar los movimientos. Intentá de nuevo.')
       
       // Resetear valores en caso de error
       transactions.value = []
       balanceAnterior.value = 0
       
-      return { success: false, error: err.message }
+      return { success: false, error: error.value }
     } finally {
       loading.value = false
     }
@@ -75,8 +76,8 @@ export function useCashRegister() {
       return { success: true, data }
     } catch (err) {
       reportClientError('cash.transaction_create', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      error.value = toUserMessage(err, 'No pudimos registrar el movimiento. Revisá los datos e intentá de nuevo.')
+      return { success: false, error: error.value }
     } finally {
       // CRÍTICO: Siempre liberar el loading
       loading.value = false
@@ -136,7 +137,7 @@ export function useCashRegister() {
     try {
       // Validar que hay datos
       if (transactions.value.length === 0) {
-        throw new Error('No hay movimientos para exportar en este período')
+        throw new Error('No hay movimientos para descargar en este período.')
       }
 
 
@@ -179,7 +180,7 @@ export function useCashRegister() {
           'Categoría': t.categoria || '-',
           'Descripción': t.descripcion || '-',
           'Monto': t.tipo === 'INGRESO' ? parseFloat(t.monto) : -parseFloat(t.monto),
-          'Usuario': t.payment_id ? 'Sistema' : 'Operador'
+          'Origen': t.payment_id ? 'Registro automático' : 'Carga manual'
         }
       })
 
@@ -190,7 +191,7 @@ export function useCashRegister() {
         {
           name: 'Movimientos',
           data: [
-            ['Fecha y Hora', 'Tipo', 'CategorÃ­a', 'DescripciÃ³n', 'Monto', 'Usuario'],
+            ['Fecha y hora', 'Tipo', 'Categoría', 'Descripción', 'Importe', 'Origen'],
             ...movimientosData.map((movement) => Object.values(movement))
           ],
           widths: [22, 12, 20, 36, 16, 14]
@@ -200,7 +201,7 @@ export function useCashRegister() {
       return { success: true }
     } catch (err) {
       reportClientError('cash.export_excel', err)
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err, 'No pudimos descargar el archivo. Intentá de nuevo.') }
     }
   }
 

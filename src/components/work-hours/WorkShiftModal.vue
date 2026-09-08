@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :model-value="modelValue"
-    :title="editingShiftId ? 'Editar intervalo' : 'Cargar intervalo'"
+    :title="editingShiftId ? 'Editar horas' : 'Agregar horas'"
     size="sm"
     @update:model-value="$emit('update:modelValue', $event)"
   >
@@ -12,7 +12,7 @@
       </div>
 
       <div v-if="shifts.length" class="space-y-2" aria-label="Intervalos cargados">
-        <p class="text-sm font-semibold text-page-title">Intervalos del día</p>
+        <p class="text-sm font-semibold text-page-title">Horas cargadas ese día</p>
         <div
           v-for="existingShift in shifts"
           :key="existingShift.id"
@@ -30,19 +30,19 @@
 
       <BaseButton type="button" variant="secondary" size="sm" :disabled="saving" @click="startNewInterval">
         <Plus class="mr-2 h-4 w-4" aria-hidden="true" />
-        Agregar intervalo
+        Agregar otro horario
       </BaseButton>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseInput id="work-start-time" v-model="form.start_time" type="time" label="Entrada" required step="60" />
-        <BaseInput id="work-end-time" v-model="form.end_time" type="time" label="Salida" required step="60" />
+        <BaseInput id="work-start-time" v-model="form.start_time" type="time" label="Hora de entrada" hint="Formato HH:mm" required step="60" />
+        <BaseInput id="work-end-time" v-model="form.end_time" type="time" label="Hora de salida" hint="Formato HH:mm" required step="60" />
       </div>
 
-      <p v-if="formError" id="work-shift-form-error" role="alert" class="text-sm text-danger-600 dark:text-danger-400">
+      <p v-if="formError" id="work-shift-form-error" role="alert" aria-live="assertive" class="text-sm text-danger-600 dark:text-danger-400">
         {{ formError }}
       </p>
 
-      <p class="text-xs text-page-subtitle">La salida debe ser posterior a la entrada. No se permiten turnos que crucen medianoche.</p>
+      <p class="text-xs text-page-subtitle">La salida debe ser posterior a la entrada. Si tenés un corte, agregá otro horario.</p>
     </form>
 
     <template #footer>

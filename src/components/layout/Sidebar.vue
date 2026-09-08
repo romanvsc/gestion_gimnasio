@@ -149,14 +149,14 @@ const { settings } = useSettings()
 const { isDark, toggleTheme } = useTheme()
 
 const navigationItems = [
-  { name: 'Dashboard', to: '/', icon: 'dashboard', section: 'Operación' },
+  { name: 'Inicio', to: '/', icon: 'dashboard', section: 'Operación' },
   { name: 'Banco de horas', to: '/banco-horas', icon: 'work-hours', section: 'Operación', roles: ['admin', 'recepcion'] },
   { name: 'Socios', to: '/miembros', icon: 'members', section: 'Operación' },
-  { name: 'Check-In', to: '/checkin', icon: 'check-in', section: 'Operación' },
+  { name: 'Control de acceso', to: '/checkin', icon: 'check-in', section: 'Operación' },
   { name: 'Pagos', to: '/pagos/nuevo', icon: 'payments', section: 'Operación' },
   { name: 'Reportes', to: '/reports', icon: 'reports', section: 'Operación', adminOnly: true },
   { name: 'Caja', to: '/caja', icon: 'cash', section: 'Administración', roles: ['admin', 'recepcion'] },
-  { name: 'Usuarios', to: '/staff', icon: 'staff', section: 'Administración', adminOnly: true },
+  { name: 'Equipo', to: '/staff', icon: 'staff', section: 'Administración', adminOnly: true },
   { name: 'Configuración', to: '/settings', icon: 'settings', section: 'Administración', adminOnly: true }
 ]
 
@@ -180,14 +180,14 @@ function isActive(path) {
 
 async function handleLogout() {
   const confirmed = await confirmAlert(
-    'Cerrar Sesión',
-    '¿Estás seguro de que deseas salir?'
+    'Cerrar sesión',
+    '¿Querés cerrar la sesión?'
   )
 
   if (!confirmed) return
 
   await userStore.logout()
-  toast.success('Sesión cerrada correctamente', { duration: 2000 })
+  toast.success('Sesión cerrada', { duration: 2000 })
   router.push({ name: 'Login' })
 }
 </script>

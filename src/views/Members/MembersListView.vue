@@ -6,7 +6,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 class="text-2xl md:text-3xl font-bold text-page-title">Socios</h1>
-          <p class="text-page-subtitle">Gestiona los miembros del gimnasio</p>
+          <p class="text-page-subtitle">Consultá y actualizá las fichas del gimnasio.</p>
         </div>
         <BaseButton 
           variant="primary" 
@@ -14,17 +14,17 @@
           @click="goToNewMember"
         >
           <UserPlus class="w-5 h-5 mr-2" />
-          Nuevo Socio
+          Nuevo socio
         </BaseButton>
       </div>
 
       <!-- Loading -->
       <div v-if="loading" class="bg-page-card rounded-xl shadow-sm p-8 text-center">
-        <p class="text-gray-600 dark:text-gray-400">Cargando socios...</p>
+        <p class="text-gray-600 dark:text-gray-400">Cargando la lista de socios...</p>
       </div>
 
       <!-- Error -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div v-else-if="error" role="alert" aria-live="assertive" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
         {{ error }}
       </div>
 
@@ -36,8 +36,9 @@
               <BaseInput
                 v-model="searchQuery"
                 id="member-search"
-                label="Buscar socio"
-                placeholder="Buscar por nombre, apellido o DNI..."
+                label="Buscá un socio"
+                placeholder="Nombre, apellido o DNI"
+                hint="Podés buscar por cualquiera de estos datos."
                 size="lg"
               >
                 <template #prefix>
@@ -49,11 +50,11 @@
               <BaseSelect
                 v-model="pageSize"
                 id="member-page-size"
-                label="Filas por página"
+                label="Socios por página"
                 :options="pageSizeOptions"
                 value-key="value"
                 label-key="label"
-                placeholder="Seleccionar cantidad"
+                placeholder="Elegí una cantidad"
                 size="lg"
                 :disabled="pageSizeOptions.length === 0"
                 @change="handlePageSizeChange"
@@ -73,7 +74,7 @@
 
         <div class="mb-6 rounded-xl border border-page-border bg-page-card px-4 py-3 text-sm text-page-subtitle" role="note">
           <span class="font-semibold text-page-title">Cómo leer los estados:</span>
-          <span class="ml-1">el registro indica si la ficha está activa; la cuota indica si puede cobrar o revisar el vencimiento; el apto físico informa su vigencia.</span>
+          <span class="ml-1">el estado muestra si la ficha está activa; la cuota indica si está al día; el apto físico indica si el certificado está vigente.</span>
         </div>
 
         <div
@@ -81,7 +82,7 @@
           class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-800 dark:border-danger-800 dark:bg-danger-950/30 dark:text-danger-200"
           role="status"
         >
-          <span><strong>Filtro activo:</strong> socios con cuotas vencidas.</span>
+          <span><strong>Filtro activo:</strong> socios con cuota vencida.</span>
           <button
             type="button"
             class="rounded-lg px-3 py-1.5 font-semibold text-danger-700 transition-colors hover:bg-danger-100 focus:outline-none focus:ring-2 focus:ring-danger-500 dark:text-danger-200 dark:hover:bg-danger-900/40"
@@ -94,8 +95,8 @@
         <!-- Empty state (cuando no hay socios) -->
         <div v-if="filteredMembers.length === 0" class="text-center py-12 bg-page-card rounded-xl shadow-sm border border-page-border">
           <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p class="text-lg font-medium text-gray-600 dark:text-gray-400">No se encontraron socios</p>
-          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Prueba ajustando los filtros o agrega un nuevo socio</p>
+          <p class="text-lg font-medium text-gray-600 dark:text-gray-400">No encontramos socios con esos datos.</p>
+          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Probá con otro nombre o DNI, o agregá un socio nuevo.</p>
         </div>
 
         <!-- Vista Mobile: Cards -->
@@ -147,7 +148,7 @@
                     <StatusBadge :status="member.estado_apto_fisico" type="apto" size="sm" />
                   </div>
                   <div v-if="!member.activo" class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs font-medium text-page-muted">Registro</span>
+                    <span class="text-xs font-medium text-page-muted">Ficha</span>
                     <StatusBadge type="secondary" size="sm">Inactivo</StatusBadge>
                   </div>
                 </div>
@@ -169,7 +170,7 @@
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contacto</th>
                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cuota</th>
                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Apto Físico</th>
-                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ficha</th>
                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
@@ -229,7 +230,7 @@
                       variant="ghost"
                       size="sm"
                       @click="goToMemberDetail(member.id)"
-                      title="Ver detalle"
+                      title="Abrir ficha"
                       :aria-label="`Ver detalle de ${member.nombre} ${member.apellido}`"
                     >
                       <Eye class="w-5 h-5" />
@@ -238,7 +239,7 @@
                       variant="ghost"
                       size="sm"
                       @click.stop="openHistoryModal(member, 'payments')"
-                      title="Historial de pagos"
+                      title="Ver pagos"
                       :aria-label="`Ver historial de pagos de ${member.nombre} ${member.apellido}`"
                     >
                       <Receipt class="w-5 h-5" />
@@ -253,7 +254,7 @@
         <!-- Paginacion + Contador -->
         <div v-if="totalFilteredMembers > 0" class="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <p class="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
-            Mostrando {{ visibleFrom }}-{{ visibleTo }} de {{ totalFilteredMembers }} socio(s)
+            Mostrando {{ visibleFrom }}-{{ visibleTo }} de {{ totalFilteredMembers }} socios
           </p>
 
           <div class="flex items-center justify-center gap-2">
@@ -268,7 +269,7 @@
             </BaseButton>
 
             <span class="text-sm font-medium text-gray-600 dark:text-gray-300 min-w-28 text-center">
-              Pagina {{ currentPage }} de {{ totalPages }}
+              Página {{ currentPage }} de {{ totalPages }}
             </span>
 
             <BaseButton
@@ -326,7 +327,7 @@ const showOnlyOverdue = computed(() => route.query.filter === 'vencidos')
 const pageSizeOptions = computed(() => {
   return memberPageSizes.value.map(option => ({
     value: Number(option.value),
-    label: option.label
+    label: String(option.label || `${option.value} por página`).replace(/\bpagina\b/gi, 'página')
   }))
 })
 

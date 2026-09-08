@@ -4,7 +4,7 @@
     <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-page-bg transition-colors duration-200">
       <div class="text-center">
         <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
-        <p class="text-gray-600 dark:text-gray-400">Cargando...</p>
+        <p class="text-gray-600 dark:text-gray-400">Cargando información...</p>
       </div>
     </div>
     <!-- Una vez inicializado, mostrar el contenido -->

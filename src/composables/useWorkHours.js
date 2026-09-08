@@ -1,12 +1,13 @@
 import { ref } from 'vue'
 import { workHours } from '@/contexts/work-hours'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 function getFriendlyError(error) {
-  if (error?.code === '23P01') return 'Ese intervalo se superpone con otra jornada del mismo día.'
+  if (error?.code === '23P01') return 'Este intervalo se superpone con otra jornada. Elegí un horario que no se cruce.'
   if (error?.code === '23505') return 'Ya existe un intervalo cargado con esos datos.'
-  if (error?.code === '42501') return 'No tenés permisos para modificar esa jornada.'
-  return error?.message || 'No se pudo completar la operación.'
+  if (error?.code === '42501') return 'No tenés permiso para modificar esa jornada.'
+  return toUserMessage(error, 'No pudimos completar la operación. Intentá de nuevo.')
 }
 
 export function useWorkHours() {

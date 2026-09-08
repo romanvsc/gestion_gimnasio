@@ -15,7 +15,7 @@
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
         <p
-          class="mb-1 text-[10px] font-bold uppercase tracking-[0.14em]"
+          class="mb-1 text-xs font-semibold tracking-wide"
           :class="badgeVariant === 'urgent' ? 'text-danger-700 dark:text-danger-300' : 'text-page-subtitle'"
         >{{ title }}</p>
         <p
@@ -40,7 +40,7 @@
     <span
       v-if="badge"
       :class="[
-        'mt-3 inline-flex rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-widest',
+        'mt-3 inline-flex rounded-md px-2 py-1 text-xs font-semibold',
         badgeClasses
       ]"
     >
@@ -112,7 +112,7 @@ const props = defineProps({
     default: ''
   },
   icon: {
-    type: Object,
+    type: [Object, Function],
     required: true
   },
   route: {

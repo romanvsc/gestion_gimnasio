@@ -5,18 +5,18 @@
         <div>
           <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
             <CalendarDays class="h-4 w-4" aria-hidden="true" />
-            Registro de jornadas
+            Horas trabajadas
           </div>
           <h1 class="text-2xl font-bold text-page-title md:text-3xl">Banco de horas</h1>
-          <p class="mt-1 max-w-2xl text-page-subtitle">Anotá tus horas trabajadas y consultá el total de cada mes.</p>
+          <p class="mt-1 max-w-2xl text-page-subtitle">Cargá tus jornadas y consultá el total de horas de cada mes.</p>
         </div>
 
         <div v-if="isAdmin" class="w-full lg:max-w-xs">
           <BaseSelect
             id="work-hours-active-staff"
             v-model="activeStaffId"
-            label="Recepcionista activa"
-            placeholder="Seleccionar recepcionista"
+            label="Elegí una recepcionista"
+            placeholder="Elegí una persona"
             :options="activeReceptionistOptions"
             @change="historicalStaffId = ''"
           />
@@ -27,8 +27,8 @@
         <div class="mb-3 flex items-start gap-3">
           <Archive class="mt-0.5 h-5 w-5 flex-shrink-0 text-warning-700 dark:text-warning-300" aria-hidden="true" />
           <div>
-            <h2 class="font-semibold text-warning-900 dark:text-warning-100">Historial de personal inactivo</h2>
-            <p class="text-sm text-warning-800 dark:text-warning-200">Podés consultar y corregir sus jornadas anteriores.</p>
+            <h2 class="font-semibold text-warning-900 dark:text-warning-100">Personal que ya no trabaja</h2>
+            <p class="text-sm text-warning-800 dark:text-warning-200">Podés revisar y corregir sus jornadas anteriores.</p>
           </div>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -49,10 +49,10 @@
         </div>
       </div>
 
-      <div v-if="error" class="mb-6 flex items-start gap-3 rounded-xl border border-danger-200 bg-danger-50 p-4 text-danger-800 dark:border-danger-800 dark:bg-danger-900/20 dark:text-danger-200" role="alert">
+      <div v-if="error" class="mb-6 flex items-start gap-3 rounded-xl border border-danger-200 bg-danger-50 p-4 text-danger-800 dark:border-danger-800 dark:bg-danger-900/20 dark:text-danger-200" role="alert" aria-live="assertive">
         <AlertCircle class="mt-0.5 h-5 w-5 flex-shrink-0" aria-hidden="true" />
         <div>
-          <p class="font-semibold">No se pudo cargar el banco de horas</p>
+            <p class="font-semibold">No pudimos cargar las horas trabajadas.</p>
           <p class="mt-1 text-sm">{{ error }}</p>
         </div>
       </div>
@@ -69,7 +69,7 @@
             </div>
           </div>
           <div class="rounded-2xl border border-primary-200 bg-primary-50 p-4 shadow-sm dark:border-primary-800 dark:bg-primary-900/20">
-            <p class="text-sm text-primary-700 dark:text-primary-300">Total de {{ monthLabel }}</p>
+            <p class="text-sm text-primary-700 dark:text-primary-300">Total trabajado en {{ monthLabel }}</p>
             <p class="mt-1 text-2xl font-bold text-primary-900 dark:text-primary-100">{{ formattedTotal }}</p>
           </div>
         </section>
@@ -80,7 +80,7 @@
               <ChevronLeft class="h-4 w-4" aria-hidden="true" />
               <span class="hidden sm:inline">Anterior</span>
             </BaseButton>
-            <h2 class="text-center text-lg font-bold capitalize text-page-title sm:text-xl">{{ monthLabel }}</h2>
+            <h2 class="text-center text-lg font-bold text-page-title sm:text-xl">{{ monthLabel }}</h2>
             <BaseButton type="button" variant="secondary" size="sm" aria-label="Mes siguiente" :disabled="isCurrentMonth" @click="goToNextMonth">
               <span class="hidden sm:inline">Siguiente</span>
               <ChevronRight class="h-4 w-4" aria-hidden="true" />
@@ -89,7 +89,7 @@
 
           <div v-if="loading" class="flex min-h-72 items-center justify-center text-page-subtitle" role="status" aria-live="polite">
             <Loader2 class="mr-2 h-5 w-5 animate-spin" aria-hidden="true" />
-            Cargando jornadas...
+            Cargando las horas trabajadas...
           </div>
           <WorkHoursCalendar
             v-else
@@ -104,8 +104,8 @@
 
       <div v-else class="rounded-2xl border border-dashed border-page-border bg-page-card p-10 text-center">
         <UsersRound class="mx-auto h-10 w-10 text-page-muted" aria-hidden="true" />
-        <h2 class="mt-4 text-lg font-semibold text-page-title">Seleccioná una recepcionista</h2>
-        <p class="mt-1 text-sm text-page-subtitle">Elegí una persona activa o consultá un historial inactivo para ver sus jornadas.</p>
+        <h2 class="mt-4 text-lg font-semibold text-page-title">Elegí una recepcionista</h2>
+        <p class="mt-1 text-sm text-page-subtitle">Elegí una persona activa o revisá el historial de alguien que ya no trabaja.</p>
       </div>
     </div>
 
@@ -124,6 +124,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
+import { toUserMessage } from '@/lib/userFacingError'
 import { AlertCircle, Archive, CalendarDays, ChevronLeft, ChevronRight, Loader2, UserRound, UsersRound } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
@@ -200,13 +201,13 @@ async function handleSaveShift({ id, start_time, end_time }) {
   const result = await saveShift({ id, staff_id: selectedStaffId.value, work_date: selectedDate.value, start_time, end_time })
 
   if (!result.success) {
-    toast.error(result.error, { duration: 5000 })
+    toast.error(toUserMessage({ message: result.error }, 'No pudimos guardar la jornada. Revisá los horarios e intentá de nuevo.'), { duration: 5000 })
     return
   }
 
   showShiftModal.value = false
   await reloadMonth()
-  toast.success(id ? 'Jornada actualizada correctamente' : 'Jornada guardada correctamente', { duration: 2500 })
+  toast.success(id ? 'Cambios guardados en la jornada.' : 'Jornada agregada.', { duration: 2500 })
 }
 
 watch(selectedStaffId, reloadMonth)

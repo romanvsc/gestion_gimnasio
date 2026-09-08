@@ -2,7 +2,7 @@
   <header class="mb-6 flex flex-col gap-4 border-b border-page-border pb-5 lg:flex-row lg:items-center lg:justify-between">
     <div class="min-w-0">
       <p class="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-page-muted">
-        Panel de control
+        Resumen
       </p>
       <h1 class="text-2xl font-bold tracking-tight text-page-title md:text-3xl">
         {{ title }}

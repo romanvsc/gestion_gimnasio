@@ -82,12 +82,31 @@ const displayText = computed(() => {
   // Si hay contenido en el slot, no necesitamos texto
   if (slots.default) return ''
   
+  if (props.type === 'cuota') {
+    return {
+      activo: 'Cuota al día',
+      al_dia: 'Cuota al día',
+      vencido: 'Cuota vencida',
+      por_vencer: 'Cuota por vencer',
+      sin_pagos: 'Sin cuota registrada'
+    }[props.status] || props.status || ''
+  }
+
+  if (props.type === 'apto') {
+    return {
+      vigente: 'Apto físico vigente',
+      vencido: 'Apto físico vencido',
+      por_vencer: 'Apto físico por vencer',
+      sin_apto: 'Sin apto físico'
+    }[props.status] || props.status || ''
+  }
+
   // Mapeo de textos según el tipo y status
   const statusLabels = {
     // Cuota
     'activo': 'Al día',
     'al_dia': 'Al día',
-    'vencido': 'Vencido',
+    'vencido': 'Cuota vencida',
     'por_vencer': 'Por vencer',
     'sin_pagos': 'Sin pagos',
     

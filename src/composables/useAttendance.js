@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { runQuery } from '@/lib/asyncHandler'
 import { formatTime } from '@/utils/formatters'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 const ATTENDANCE_FIELDS = 'id, member_id, created_at, acceso_permitido'
 const ATTENDANCE_WITH_MEMBER_FIELDS = 'id, member_id, created_at, acceso_permitido, members(nombre, apellido, dni)'
@@ -20,7 +21,7 @@ function mapAttendanceRow(row) {
     acceso_permitido: row.acceso_permitido,
     time: formatTime(row.created_at),
     status: row.acceso_permitido ? 'activo' : 'vencido',
-    statusLabel: row.acceso_permitido ? 'Al día' : 'Vencido'
+    statusLabel: row.acceso_permitido ? 'Ingreso permitido' : 'Ingreso no permitido'
   }
 }
 
@@ -50,9 +51,10 @@ export function useAttendance(options = {}) {
       return { success: true, data: recentCheckIns.value }
     } catch (err) {
       reportClientError('attendance.recent_fetch', err)
-      errorRecent.value = err.message
+      const message = toUserMessage(err)
+      errorRecent.value = message
       recentCheckIns.value = []
-      return { success: false, error: err.message }
+      return { success: false, error: message }
     } finally {
       loadingRecent.value = false
     }

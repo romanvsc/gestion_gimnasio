@@ -13,7 +13,7 @@
       aria-controls="payment-summary-details"
     >
       <div class="flex items-center gap-3">
-        <h3 class="text-base font-semibold text-page-title">Resumen de Pago</h3>
+        <h3 class="text-base font-semibold text-page-title">Resumen del pago</h3>
         <!-- Mini resumen cuando está colapsado -->
         <div v-if="!isExpanded" class="flex items-center gap-2">
           <span class="text-xl font-bold text-primary-600">{{ formatCurrencyFull(monto || 0) }}</span>
@@ -36,7 +36,7 @@
 
     <!-- Header normal (desktop) -->
     <h3 v-else class="text-lg font-semibold text-page-title mb-4">
-      Resumen de Pago
+      Resumen del pago
     </h3>
     
     <!-- Contenido con transición -->
@@ -61,7 +61,7 @@
           'text-center bg-white dark:bg-white/5 rounded-lg shadow-sm',
           compact ? 'py-4' : 'py-6'
         ]">
-          <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">Monto a Pagar</p>
+          <p class="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">Total a cobrar</p>
           <p :class="[
             'font-bold text-primary-600',
             compact ? 'text-3xl' : 'text-4xl md:text-5xl'
@@ -85,22 +85,22 @@
 
         <!-- Plan Seleccionado -->
         <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm">
-          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1.5">Plan Seleccionado</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1.5">Plan elegido</p>
           <p class="text-sm md:text-base font-medium text-page-title">
-            {{ planName || 'Ningún plan seleccionado' }}
+            {{ planName || 'Todavía no elegiste un plan' }}
           </p>
         </div>
 
         <!-- Fechas -->
         <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm space-y-2">
           <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Fecha de Inicio</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Comienza</p>
             <p class="text-sm md:text-base font-medium text-page-title">
               {{ fechaInicio || '—' }}
             </p>
           </div>
           <div class="border-t border-gray-100 dark:border-gray-700/50 pt-2">
-            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Fecha de Fin</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">Termina</p>
             <p class="text-sm md:text-base font-medium text-page-title">
               {{ fechaFin || '—' }}
             </p>
@@ -115,7 +115,7 @@
 
         <!-- Método de Pago -->
         <div class="bg-white dark:bg-white/5 rounded-lg p-3 shadow-sm">
-          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1.5">Método de Pago</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1.5">Cómo pagó</p>
           <p class="text-sm md:text-base font-medium text-page-title">
             {{ metodoPago || '—' }}
           </p>

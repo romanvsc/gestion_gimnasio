@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { runQuery } from '@/lib/asyncHandler'
 import { reportClientError } from '@/lib/observability'
 import { planCatalog } from '@/contexts/plans-catalog'
+import { toUserMessage } from '@/lib/userFacingError'
 
 function parseOptionalPrice(value) {
   return value === null || value === undefined || value === ''
@@ -43,7 +44,7 @@ export function useParameters() {
     } catch (err) {
       reportClientError('parameters.member_page_sizes', err)
       memberPageSizes.value = []
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err) }
     }
   }
 
@@ -89,8 +90,9 @@ export function useParameters() {
       return { success: true }
     } catch (err) {
       reportClientError('parameters.fetch', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -119,7 +121,7 @@ export function useParameters() {
       return { success: true, data }
     } catch (err) {
       reportClientError('parameters.fetch_plans', err)
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err) }
     }
   }
 
@@ -138,7 +140,7 @@ export function useParameters() {
       return { success: true, data }
     } catch (err) {
       reportClientError('parameters.fetch_payment_methods', err)
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err) }
     }
   }
 
@@ -162,19 +164,9 @@ export function useParameters() {
       reportClientError('parameters.create_plan', err)
 
       // Traducir errores de Postgres
-      const message = err.message || ''
-      const code = err.code || ''
-
-      let friendlyError = message
-
-      if (code === '23505' || message.includes('duplicate')) {
-        friendlyError = 'Ya existe un plan con este nombre'
-      } else if (code === '42501' || message.includes('permission denied')) {
-        friendlyError = 'No tienes permisos para crear planes. Contacta al administrador.'
-      } else if (code === '23502' || message.includes('violates not-null')) {
-        friendlyError = 'Faltan datos obligatorios para crear el plan'
-      }
-
+      let friendlyError = toUserMessage(err)
+      if (err.code === '23505') friendlyError = 'Ya existe un plan con ese nombre. Elegí otro nombre.'
+      if (err.code === '23502') friendlyError = 'Completá los datos obligatorios del plan.'
       return { success: false, error: friendlyError }
     }
   }
@@ -198,17 +190,8 @@ export function useParameters() {
     } catch (err) {
       reportClientError('parameters.update_plan', err)
 
-      const message = err.message || ''
-      const code = err.code || ''
-
-      let friendlyError = message
-
-      if (code === '23505' || message.includes('duplicate')) {
-        friendlyError = 'Ya existe un plan con este nombre'
-      } else if (code === '42501' || message.includes('permission denied')) {
-        friendlyError = 'No tienes permisos para modificar planes'
-      }
-
+      let friendlyError = toUserMessage(err)
+      if (err.code === '23505') friendlyError = 'Ya existe un plan con ese nombre. Elegí otro nombre.'
       return { success: false, error: friendlyError }
     }
   }
@@ -229,7 +212,7 @@ export function useParameters() {
       return { success: true, data }
     } catch (err) {
       reportClientError('parameters.update_payment_method', err)
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err) }
     }
   }
 

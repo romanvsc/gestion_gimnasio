@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { reportClientError } from '@/lib/observability'
 import { downloadExcelWorkbook, objectsToExcelRows } from '@/utils/excelExport'
+import { toUserMessage } from '@/lib/userFacingError'
 
 const OVERDUE_MEMBER_FIELDS = 'id, nombre, apellido, dni, email, telefono, fecha_fin_cuota, dias_vencido, activo, estado_cuota, estado_apto_fisico, es_socio_club, plan_id, foto_url'
 const REVENUE_FIELDS = 'created_at, monto'
@@ -47,8 +48,9 @@ export function useReports() {
       return { success: true, data }
     } catch (err) {
       reportClientError('reports.finance', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.finance = false
     }
@@ -77,8 +79,9 @@ export function useReports() {
       return { success: true, data }
     } catch (err) {
       reportClientError('reports.daily_activity', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.daily = false
     }
@@ -107,8 +110,9 @@ export function useReports() {
       return { success: true, data }
     } catch (err) {
       reportClientError('reports.hourly_activity', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.hourly = false
     }
@@ -126,7 +130,7 @@ export function useReports() {
       return { success: true, data: data || [] }
     } catch (err) {
       reportClientError('reports.revenue_range', err)
-      return { success: false, error: err.message, data: [] }
+      return { success: false, error: toUserMessage(err), data: [] }
     }
   }
 
@@ -142,7 +146,7 @@ export function useReports() {
       return { success: true, data: data || [] }
     } catch (err) {
       reportClientError('reports.attendance_range', err)
-      return { success: false, error: err.message, data: [] }
+      return { success: false, error: toUserMessage(err), data: [] }
     }
   }
 
@@ -167,8 +171,9 @@ export function useReports() {
       return { success: true, data }
     } catch (err) {
       reportClientError('reports.overdue_members', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.overdue = false
     }
@@ -194,8 +199,9 @@ export function useReports() {
       return { success: true, data }
     } catch (err) {
       reportClientError('reports.inactive_members', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.inactive = false
     }
@@ -209,7 +215,7 @@ export function useReports() {
   async function exportToExcel(data, filename = 'reporte') {
     try {
       if (!data || data.length === 0) {
-        throw new Error('No hay datos para exportar')
+        throw new Error('No hay datos para descargar en este período.')
       }
 
       // Generar archivo y descargar
@@ -223,7 +229,7 @@ export function useReports() {
       return { success: true }
     } catch (err) {
       reportClientError('reports.export_excel', err)
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err) }
     }
   }
 
@@ -238,7 +244,7 @@ export function useReports() {
       'Email': member.email || '',
       'Teléfono': member.telefono || '',
       'Fecha Vencimiento': member.fecha_fin_cuota || '',
-      'Días Vencido': member.dias_vencido || 0
+      'Días de atraso': member.dias_vencido || 0
     }))
   }
 

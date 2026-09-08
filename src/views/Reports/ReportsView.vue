@@ -4,8 +4,8 @@
       
       <!-- Header -->
       <div class="mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Reportes y Análisis</h1>
-        <p class="text-page-subtitle">Métricas clave para la toma de decisiones estratégicas</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Reportes</h1>
+        <p class="text-page-subtitle">Consultá la actividad, la asistencia y los cobros del gimnasio.</p>
       </div>
 
       <!-- Filtro de Rango de Fechas -->
@@ -17,10 +17,10 @@
         <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 class="font-semibold text-page-title">Resumen del período</h2>
-            <p class="text-sm text-page-subtitle">Una lectura rápida de los datos seleccionados</p>
+            <p class="text-sm text-page-subtitle">Estos son los datos del rango que elegiste.</p>
           </div>
           <span v-if="financeSummary.isSparse" class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-            Pocos datos para comparar
+            Hay pocos datos para comparar
           </span>
         </div>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -42,22 +42,22 @@
 
       <section v-if="activitySummary.hasData" class="mb-6 rounded-2xl border border-page-border bg-page-card p-4 md:p-5" aria-live="polite">
         <div class="mb-4">
-          <h2 class="font-semibold text-page-title">Lectura rápida de asistencia</h2>
-          <p class="text-sm text-page-subtitle">Una guía para convertir los gráficos en una decisión operativa</p>
+          <h2 class="font-semibold text-page-title">Cómo estuvo la asistencia</h2>
+          <p class="text-sm text-page-subtitle">Mirá qué días y horarios tuvieron más visitas.</p>
         </div>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div class="rounded-xl bg-secondary-50 p-4 dark:bg-secondary-900/20">
-            <p class="text-xs font-semibold uppercase tracking-wide text-secondary-700 dark:text-secondary-300">Día con más asistencia</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-secondary-700 dark:text-secondary-300">Día con más visitas</p>
             <p class="mt-1 text-lg font-bold text-secondary-900 dark:text-secondary-100">
               {{ activitySummary.peakDay.label }}
-              <span v-if="activitySummary.peakDay.count > 0" class="text-sm font-medium">({{ activitySummary.peakDay.count }} visitas)</span>
+              <span v-if="activitySummary.peakDay.count > 0" class="text-sm font-medium">({{ activitySummary.peakDay.count }} {{ activitySummary.peakDay.unit }})</span>
             </p>
           </div>
           <div class="rounded-xl bg-blue-50 p-4 dark:bg-blue-900/20">
-            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">Horario pico</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">Horario con más visitas</p>
             <p class="mt-1 text-lg font-bold text-blue-900 dark:text-blue-100">
               {{ activitySummary.peakHour.label }}
-              <span v-if="activitySummary.peakHour.count > 0" class="text-sm font-medium">({{ activitySummary.peakHour.count }} visitas)</span>
+              <span v-if="activitySummary.peakHour.count > 0" class="text-sm font-medium">({{ activitySummary.peakHour.count }} {{ activitySummary.peakHour.unit }})</span>
             </p>
           </div>
         </div>
@@ -73,13 +73,13 @@
                 <TrendingUp class="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h2 class="font-semibold text-page-title">Análisis Financiero</h2>
-                <p class="text-sm text-page-subtitle">Evolución de Ingresos vs Egresos</p>
+        <h2 class="font-semibold text-page-title">Ingresos y egresos</h2>
+                <p class="text-sm text-page-subtitle">Compará lo que entró y salió de Caja.</p>
               </div>
             </div>
             <div v-if="loading.finance" class="flex items-center gap-2 text-sm text-page-subtitle">
               <Loader2 class="w-4 h-4 animate-spin" />
-              <span class="hidden sm:inline">Cargando...</span>
+              <span class="hidden sm:inline">Cargando el reporte...</span>
             </div>
           </div>
           
@@ -96,8 +96,8 @@
             <Activity class="w-5 h-5 text-secondary-600" />
           </div>
           <div>
-            <h2 class="font-semibold text-page-title">Patrones de Actividad</h2>
-            <p class="text-sm text-page-subtitle">Análisis de asistencia en el período</p>
+              <h2 class="font-semibold text-page-title">Visitas al gimnasio</h2>
+            <p class="text-sm text-page-subtitle">Consultá la asistencia del período.</p>
           </div>
         </div>
         
@@ -106,7 +106,7 @@
           <!-- Gráfico 1: Actividad por Día -->
           <div class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
             <div class="p-4 border-b border-page-border flex items-center justify-between">
-              <h3 class="font-medium text-page-title">Actividad por Día</h3>
+              <h3 class="font-medium text-page-title">Visitas por día</h3>
               <Loader2 v-if="loading.daily" class="w-4 h-4 animate-spin text-page-muted" />
             </div>
             <div class="p-4 h-56 xl:h-64">
@@ -117,7 +117,7 @@
           <!-- Gráfico 2: Horarios Pico -->
           <div class="bg-page-card rounded-2xl shadow-sm border border-page-border overflow-hidden">
             <div class="p-4 border-b border-page-border flex items-center justify-between">
-              <h3 class="font-medium text-page-title">Horarios Pico</h3>
+              <h3 class="font-medium text-page-title">Visitas por horario</h3>
               <Loader2 v-if="loading.hourly" class="w-4 h-4 animate-spin text-page-muted" />
             </div>
             <div class="p-4 h-56 xl:h-64">
@@ -135,8 +135,8 @@
             <AlertTriangle class="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <h2 class="font-semibold text-page-title">Alertas de Socios</h2>
-            <p class="text-sm text-page-subtitle">Situaciones que requieren atención</p>
+            <h2 class="font-semibold text-page-title">Situaciones para revisar</h2>
+            <p class="text-sm text-page-subtitle">Cuotas vencidas y fichas inactivas.</p>
           </div>
         </div>
         
@@ -226,11 +226,13 @@ const activitySummary = computed(() => {
     hasData,
     peakDay: {
       label: peakDayCount > 0 ? dayNames[peakDayIndex] : 'Sin visitas registradas',
-      count: peakDayCount
+      count: peakDayCount,
+      unit: peakDayCount === 1 ? 'visita' : 'visitas'
     },
     peakHour: {
       label: peakHourCount > 0 ? `${String(peakHourIndex).padStart(2, '0')}:00` : 'Sin visitas registradas',
-      count: peakHourCount
+      count: peakHourCount,
+      unit: peakHourCount === 1 ? 'visita' : 'visitas'
     },
     message: peakDayCount > 0 && peakHourCount > 0
       ? `Podés reforzar la recepción los ${dayNames[peakDayIndex]} y preparar recursos cerca de las ${String(peakHourIndex).padStart(2, '0')}:00.`

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { runQuery, runCountQuery } from '@/lib/asyncHandler'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 import { businessDayStart } from '@/utils/businessDate'
 
 export const useGymStore = defineStore('gym', () => {
@@ -120,7 +121,8 @@ export const useGymStore = defineStore('gym', () => {
       return { success: true, data: stats.value }
     } catch (err) {
       reportClientError('dashboard.stats', err)
-      error.value = err.message
+      const message = toUserMessage(err, 'No pudimos cargar el resumen. Intentá de nuevo.')
+      error.value = message
       
       // Resetear stats en caso de error crítico
       stats.value = {
@@ -133,7 +135,7 @@ export const useGymStore = defineStore('gym', () => {
         periodRevenue: 0
       }
       
-      return { success: false, error: err.message }
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -218,7 +220,7 @@ export const useGymStore = defineStore('gym', () => {
         revenueChange: 0,
         attendanceChange: 0
       }
-      return { success: false, error: err.message }
+      return { success: false, error: toUserMessage(err, 'No pudimos comparar este período. Intentá de nuevo.') }
     }
   }
 

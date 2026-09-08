@@ -7,8 +7,8 @@
       <div class="bg-page-card rounded-lg shadow-md p-6 border-l-4 border-red-500">
         <div class="flex items-start justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-page-title mb-1">Cuotas Vencidas</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Socios activos con pagos pendientes</p>
+            <h3 class="text-lg font-semibold text-page-title mb-1">Cuotas vencidas</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Socios activos que necesitan renovar su cuota.</p>
           </div>
           <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
             <AlertCircle class="w-6 h-6 text-red-600" />
@@ -20,7 +20,7 @@
           <p class="text-5xl font-bold text-red-600">
             {{ loading.overdue ? '...' : overdueMembers.length }}
           </p>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Socios activos con deuda</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Socios que necesitan renovar.</p>
         </div>
 
         <div v-if="overdueMembers.length > 0" class="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
@@ -51,10 +51,10 @@
           :disabled="loading.overdue || overdueMembers.length === 0"
         >
           <FileText class="w-4 h-4 mr-2" />
-          Ver Listado Completo
+          Ver socios con cuota vencida
         </BaseButton>
         <p v-else class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300" role="status">
-          No hay socios activos con cuotas vencidas.
+          No encontramos socios activos con cuota vencida.
         </p>
       </div>
 
@@ -62,8 +62,8 @@
       <div class="bg-page-card rounded-lg shadow-md p-6 border-l-4 border-gray-400 dark:border-gray-500">
         <div class="flex items-start justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-page-title mb-1">Socios Inactivos</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Usuarios dados de baja</p>
+            <h3 class="text-lg font-semibold text-page-title mb-1">Socios inactivos</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Fichas que ya no están activas.</p>
           </div>
           <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
             <UserX class="w-6 h-6 text-gray-600 dark:text-gray-400" />
@@ -75,7 +75,7 @@
           <p class="text-5xl font-bold text-gray-600 dark:text-gray-400">
             {{ loading.inactive ? '...' : inactiveMembers.length }}
           </p>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total de bajas registradas</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total de fichas inactivas.</p>
         </div>
 
         <!-- Botón Ver Listado -->
@@ -87,10 +87,10 @@
           :disabled="loading.inactive || inactiveMembers.length === 0"
         >
           <FileText class="w-4 h-4 mr-2" />
-          Ver Listado Completo
+          Ver socios inactivos
         </BaseButton>
         <p v-else class="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300" role="status">
-          No hay bajas registradas en el período.
+          No encontramos socios inactivos en este período.
         </p>
       </div>
 
@@ -116,6 +116,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
+import { toUserMessage } from '@/lib/userFacingError'
 import { useReports } from '@/composables/useReports'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import OverdueMembersModal from '@/components/modals/OverdueMembersModal.vue'
@@ -157,7 +158,7 @@ onMounted(async () => {
 
 function handleShowOverdue() {
   if (overdueMembers.value.length === 0) {
-    toast.info('No hay socios con cuotas vencidas')
+    toast.info('No encontramos socios con cuota vencida.')
     return
   }
   showOverdueModal.value = true
@@ -165,7 +166,7 @@ function handleShowOverdue() {
 
 function handleShowInactive() {
   if (inactiveMembers.value.length === 0) {
-    toast.info('No hay socios inactivos')
+    toast.info('No encontramos socios inactivos.')
     return
   }
   showInactiveModal.value = true
@@ -174,18 +175,18 @@ function handleShowInactive() {
 async function handleExportOverdue() {
   const result = await exportOverdueMembers()
   if (result.success) {
-    toast.success('Archivo Excel descargado correctamente')
+    toast.success('Archivo descargado.')
   } else {
-    toast.error('Error al exportar: ' + result.error)
+    toast.error(toUserMessage({ message: result.error }, 'No pudimos descargar el archivo. Intentá de nuevo.'))
   }
 }
 
 async function handleExportInactive() {
   const result = await exportInactiveMembers()
   if (result.success) {
-    toast.success('Archivo Excel descargado correctamente')
+    toast.success('Archivo descargado.')
   } else {
-    toast.error('Error al exportar: ' + result.error)
+    toast.error(toUserMessage({ message: result.error }, 'No pudimos descargar el archivo. Intentá de nuevo.'))
   }
 }
 </script>

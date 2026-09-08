@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'vue-sonner'
+import { toUserMessage } from '@/lib/userFacingError'
 import { reportClientError } from '@/lib/observability'
 
 export const useUserStore = defineStore('user', () => {
@@ -83,7 +84,7 @@ export const useUserStore = defineStore('user', () => {
       const { data, error: sessionError } = await withTimeout(
         supabase.auth.getSession(),
         AUTH_BOOT_TIMEOUT_MS,
-        'No se pudo verificar la sesión a tiempo. Revisá la conexión e intentá nuevamente.'
+        'No pudimos verificar la sesión a tiempo. Revisá la conexión e intentá de nuevo.'
       )
 
       if (sessionError) {
@@ -104,7 +105,7 @@ export const useUserStore = defineStore('user', () => {
         await withTimeout(
           checkUserRole(currentSession.user.id),
           ROLE_CHECK_TIMEOUT_MS,
-          'No se pudo verificar el rol del usuario a tiempo.'
+          'No pudimos verificar tu acceso a tiempo. Intentá de nuevo.'
         )
       } else {
         // No hay sesión, resetear todo
@@ -143,7 +144,7 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       reportClientError('auth.session_init', err)
       roleRequestId += 1
-      error.value = err.message
+      error.value = toUserMessage(err, 'No pudimos recuperar tu sesión. Volvé a iniciar sesión.')
       // IMPORTANTE: Resetear todo en caso de error crítico
       session.value = null
       user.value = null
@@ -197,15 +198,16 @@ export const useUserStore = defineStore('user', () => {
       await withTimeout(
         checkUserRole(data.user.id),
         ROLE_CHECK_TIMEOUT_MS,
-        'No se pudo verificar el rol del usuario a tiempo.'
+        'No pudimos verificar tu acceso a tiempo. Intentá de nuevo.'
       )
 
       return { success: true }
     } catch (err) {
       reportClientError('auth.login', err)
-      error.value = err.message
-      toast.error('Error al iniciar sesión: ' + err.message)
-      return { success: false, error: err.message }
+      const message = toUserMessage(err, 'No pudimos iniciar sesión. Revisá tu email y contraseña e intentá de nuevo.')
+      error.value = message
+      toast.error(message)
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -229,9 +231,10 @@ export const useUserStore = defineStore('user', () => {
       return { success: true }
     } catch (err) {
       reportClientError('auth.logout', err)
-      error.value = err.message
-      toast.error('Error al cerrar sesión: ' + err.message)
-      return { success: false, error: err.message }
+      const message = toUserMessage(err, 'No pudimos cerrar la sesión. Intentá de nuevo.')
+      error.value = message
+      toast.error(message)
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -255,9 +258,10 @@ export const useUserStore = defineStore('user', () => {
       return { success: true, data }
     } catch (err) {
       reportClientError('auth.register', err)
-      error.value = err.message
-      toast.error('Error al registrar usuario: ' + err.message)
-      return { success: false, error: err.message }
+      const message = toUserMessage(err, 'No pudimos crear la cuenta. Revisá los datos e intentá de nuevo.')
+      error.value = message
+      toast.error(message)
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }

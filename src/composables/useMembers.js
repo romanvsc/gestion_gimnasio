@@ -4,6 +4,7 @@ import { runQuery } from '@/lib/asyncHandler'
 import { reportClientError } from '@/lib/observability'
 import imageCompression from 'browser-image-compression'
 import { toast } from 'vue-sonner'
+import { toUserMessage } from '@/lib/userFacingError'
 
 const MEMBER_LIST_FIELDS = 'id, nombre, apellido, dni, email, telefono, foto_url, es_socio_club, plan_id, activo, estado_cuota, estado_apto_fisico, fecha_fin_cuota, dias_vencido'
 const MEMBER_FIELDS = 'id, nombre, apellido, dni, fecha_nacimiento, fecha_alta, fecha_baja, email, telefono, peso, altura, apto_fisico, es_socio_club, plan_id, activo, foto_url'
@@ -29,25 +30,25 @@ export function useMembers() {
     // Error de constraint UNIQUE (código 23505)
     if (code === '23505' || fullError.includes('duplicate key') || fullError.includes('unique constraint') || fullError.includes('already exists')) {
       if (fullError.includes('dni') || fullError.includes('members_dni')) {
-        return 'Ya existe un socio registrado con este DNI. Por favor, verifica el número ingresado.'
+        return 'Ya existe un socio registrado con este DNI. Revisá el número ingresado.'
       }
       if (fullError.includes('email') || fullError.includes('members_email')) {
-        return 'Ya existe un socio registrado con este email. Por favor, usa otro email.'
+        return 'Ya existe un socio registrado con este email. Usá otro email.'
       }
-      return 'Ya existe un registro con estos datos. Por favor, verifica la información ingresada.'
+      return 'Ya existe un registro con esos datos. Revisá la información ingresada.'
     }
 
     // Error de foreign key (código 23503)
     if (code === '23503' || fullError.includes('foreign key') || fullError.includes('violates foreign key')) {
-      return 'No se puede completar la operación porque hay datos relacionados.'
+      return 'No pudimos completar la operación porque hay información relacionada.'
     }
 
     // Error de conexión
     if (fullError.includes('network') || fullError.includes('connection') || fullError.includes('timeout')) {
-      return 'Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.'
+      return 'No pudimos conectarnos. Revisá internet e intentá de nuevo.'
     }
 
-    return message || 'Ocurrió un error inesperado. Por favor, intenta nuevamente.'
+    return toUserMessage(err, 'No pudimos completar la operación. Revisá los datos e intentá de nuevo.')
   }
 
   /**
@@ -76,7 +77,7 @@ export function useMembers() {
       return { exists: !!data, member: data }
     } catch (err) {
       reportClientError('members.duplicate_dni', err)
-      return { exists: false, error: err.message }
+      return { exists: false, error: toUserMessage(err, 'No pudimos validar el DNI. Intentá de nuevo.') }
     }
   }
 
@@ -139,7 +140,7 @@ export function useMembers() {
       return { exists: !!data, member: data }
     } catch (err) {
       reportClientError('members.duplicate_email', err)
-      return { exists: false, error: err.message }
+      return { exists: false, error: toUserMessage(err, 'No pudimos validar el email. Intentá de nuevo.') }
     }
   }
 
@@ -171,7 +172,7 @@ export function useMembers() {
       return { exists: !!data, member: data }
     } catch (err) {
       reportClientError('members.duplicate_name', err)
-      return { exists: false, error: err.message }
+      return { exists: false, error: toUserMessage(err, 'No pudimos validar el nombre. Intentá de nuevo.') }
     }
   }
 
@@ -237,7 +238,7 @@ export function useMembers() {
       return { success: true, data }
     } catch (err) {
       reportClientError('members.list', err)
-      error.value = 'No se pudo cargar la lista de socios. Intentá nuevamente.'
+      error.value = toUserMessage(err, 'No pudimos cargar la lista de socios. Intentá de nuevo.')
       toast.error(error.value)
       return { success: false, error: error.value }
     } finally {
@@ -265,9 +266,9 @@ export function useMembers() {
       return { success: true, data }
     } catch (err) {
       reportClientError('members.detail', err)
-      error.value = err.message
-      toast.error('Error al cargar datos del socio: ' + err.message)
-      return { success: false, error: err.message }
+      error.value = toUserMessage(err, 'No pudimos cargar la ficha del socio. Intentá de nuevo.')
+      toast.error(error.value)
+      return { success: false, error: error.value }
     } finally {
       loading.value = false
     }
@@ -289,13 +290,12 @@ export function useMembers() {
           .single()
       )
 
-      toast.success('Socio creado exitosamente')
       return { success: true, data }
     } catch (err) {
       reportClientError('members.create', err)
       const friendlyError = translatePostgresError(err)
       error.value = friendlyError
-      toast.error('Error al crear socio: ' + friendlyError)
+      toast.error(friendlyError)
       return { success: false, error: friendlyError }
     } finally {
       loading.value = false
@@ -320,13 +320,12 @@ export function useMembers() {
       if (updateError) throw updateError
 
       currentMember.value = data
-      toast.success('Datos actualizados correctamente')
       return { success: true, data }
     } catch (err) {
       reportClientError('members.update', err)
       const friendlyError = translatePostgresError(err)
       error.value = friendlyError
-      toast.error('Error al actualizar socio: ' + friendlyError)
+      toast.error(friendlyError)
       return { success: false, error: friendlyError }
     } finally {
       loading.value = false
@@ -348,13 +347,13 @@ export function useMembers() {
 
       if (deleteError) throw deleteError
 
-      toast.success('Socio eliminado correctamente')
+      toast.success('Socio eliminado.')
       return { success: true }
     } catch (err) {
       reportClientError('members.delete', err)
-      error.value = err.message
-      toast.error('Error al eliminar socio: ' + err.message)
-      return { success: false, error: err.message }
+      error.value = toUserMessage(err, 'No pudimos eliminar el socio. Intentá de nuevo.')
+      toast.error(error.value)
+      return { success: false, error: error.value }
     } finally {
       loading.value = false
     }
@@ -404,8 +403,9 @@ export function useMembers() {
       return { success: true, url: publicUrl }
     } catch (err) {
       reportClientError('members.avatar_upload', err)
-      toast.error('Error al subir imagen: ' + err.message)
-      return { success: false, error: err.message }
+      const friendlyError = toUserMessage(err, 'No pudimos subir la imagen. Intentá de nuevo.')
+      toast.error(friendlyError)
+      return { success: false, error: friendlyError }
     }
   }
 
@@ -435,8 +435,9 @@ export function useMembers() {
       return { success: true }
     } catch (err) {
       reportClientError('members.avatar_delete', err)
-      toast.error('Error al borrar imagen anterior: ' + err.message)
-      return { success: false, error: err.message }
+      const friendlyError = toUserMessage(err, 'No pudimos quitar la imagen anterior. Intentá de nuevo.')
+      toast.error(friendlyError)
+      return { success: false, error: friendlyError }
     }
   }
 

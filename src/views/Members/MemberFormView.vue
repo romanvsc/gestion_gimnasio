@@ -9,10 +9,10 @@
         </BaseButton>
         
         <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">
-          {{ isEditing ? 'Editar Socio' : 'Nuevo Socio' }}
+          {{ isEditing ? 'Editar socio' : 'Nuevo socio' }}
         </h1>
         <p class="text-page-subtitle">
-          {{ isEditing ? 'Actualiza la información del socio' : 'Completa el formulario para agregar un nuevo socio' }}
+          {{ isEditing ? 'Actualizá la información del socio.' : 'Completá los datos para agregar un socio nuevo.' }}
         </p>
         <nav class="mt-5 overflow-x-auto" aria-label="Secciones del formulario">
           <ol class="flex min-w-max items-center gap-2 text-sm">
@@ -31,7 +31,7 @@
           <div class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
           <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
         </div>
-        <p class="text-gray-500 dark:text-gray-400 mt-4">Cargando datos del socio...</p>
+        <p class="text-gray-500 dark:text-gray-400 mt-4">Cargando la ficha del socio...</p>
       </div>
 
       <!-- Formulario -->
@@ -41,14 +41,14 @@
         <div id="datos-personales" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <User class="w-5 h-5 text-primary-500" />
-            Datos Personales & Foto
+            Datos personales y foto
           </h2>
           
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Columna 1: Foto de Perfil -->
             <div class="lg:col-span-1">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Foto de Perfil
+                Foto de perfil
               </label>
               <div class="flex flex-col items-center">
                 <!-- Preview de la foto -->
@@ -90,11 +90,11 @@
                   :disabled="uploadingPhoto"
                 >
                   <Upload class="w-4 h-4 mr-2" />
-                  {{ uploadingPhoto ? 'Subiendo...' : (photoPreview ? 'Cambiar Foto' : 'Subir Foto') }}
+                  {{ uploadingPhoto ? 'Subiendo...' : (photoPreview ? 'Cambiar foto' : 'Subir foto') }}
                 </BaseButton>
                 
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-                  JPG, PNG o WebP (máx. 2MB)
+              JPG, PNG o WebP (máx. 2 MB)
                 </p>
               </div>
             </div>
@@ -131,7 +131,8 @@
                 <BaseInput
                   v-model="formData.fecha_nacimiento"
                   type="date"
-                  label="Fecha de Nacimiento"
+                  label="Fecha de nacimiento"
+                  hint="Usá el formato día, mes y año."
                   size="lg"
                 />
               </div>
@@ -158,8 +159,8 @@
               <BaseInput
                 v-model="formData.fecha_alta"
                 type="date"
-                label="Fecha de Alta"
-                hint="Fecha en que el socio se registró en el gimnasio"
+                label="Fecha de inscripción"
+                hint="Es la fecha en que el socio empezó a registrarse en el gimnasio."
                 size="lg"
               />
             </div>
@@ -170,10 +171,10 @@
         <div id="salud" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <Heart class="w-5 h-5 text-red-500" />
-            Salud & Datos Físicos
+            Salud y datos físicos
           </h2>
           <p class="-mt-3 mb-6 text-sm text-page-subtitle">
-            Estos datos ayudan a orientar el entrenamiento y solo se usan dentro de la gestión del gimnasio.
+            Estos datos ayudan a orientar el entrenamiento y se usan solo dentro del gimnasio.
           </p>
           
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -185,7 +186,8 @@
               min="0"
               max="300"
               label="Peso (kg)"
-              placeholder="75.5"
+              placeholder="75,5"
+              hint="En kilogramos. Ejemplo: 75,5"
               size="lg"
             />
             
@@ -197,7 +199,8 @@
               min="0"
               max="3"
               label="Altura (m)"
-              placeholder="1.75"
+              placeholder="1,75"
+              hint="En metros. Ejemplo: 1,75"
               size="lg"
             />
             
@@ -219,7 +222,7 @@
               </p>
               <p v-if="imcWarning" class="text-sm mt-1 text-yellow-600 flex items-center gap-1">
                 <AlertTriangle class="w-4 h-4" />
-                Verifique los datos ingresados
+                Revisá los datos ingresados.
               </p>
             </div>
           </div>
@@ -229,8 +232,8 @@
             <BaseInput
               v-model="formData.apto_fisico"
               type="date"
-              label="Fecha de Vencimiento del Apto Físico"
-              hint="Fecha hasta la cual es válido el apto médico"
+              label="Vencimiento del apto físico"
+              hint="Indicá hasta qué fecha está vigente el certificado."
               size="lg"
             />
           </div>
@@ -240,7 +243,7 @@
         <div id="membresia" class="scroll-mt-24 bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-lg font-semibold text-page-title mb-6 flex items-center gap-2">
             <CreditCard class="w-5 h-5 text-primary-500" />
-            Membresía y Estado
+            Membresía y estado
           </h2>
           
           <div class="space-y-6">
@@ -249,7 +252,7 @@
               type="button"
               @click="formData.es_socio_club = !formData.es_socio_club"
               :aria-pressed="formData.es_socio_club"
-              aria-label="Alternar tarifa de Socio del Club"
+              aria-label="Indicar si pertenece al Club"
               :class="[
                 'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all touch-manipulation',
                 formData.es_socio_club 
@@ -268,8 +271,8 @@
                   ]" />
                 </div>
                 <div class="text-left">
-                  <p class="font-semibold text-page-title">¿Es Socio del Club?</p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Aplica tarifa preferencial en los planes</p>
+                  <p class="font-semibold text-page-title">¿Pertenece al Club?</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Accede a una tarifa preferencial.</p>
                 </div>
               </div>
               <div :class="[
@@ -286,7 +289,7 @@
             <!-- Selección de Plan (Cards) -->
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Plan Asociado
+                Plan actual
               </label>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <!-- Opción: Sin plan fijo -->
@@ -294,7 +297,7 @@
                   type="button"
                   @click="formData.plan_id = null"
                   :aria-pressed="formData.plan_id === null"
-                  aria-label="Seleccionar sin plan fijo"
+                  aria-label="Elegir sin plan fijo"
                   :class="[
                     'p-4 rounded-xl border-2 text-left transition-all touch-manipulation',
                     formData.plan_id === null
@@ -303,7 +306,7 @@
                   ]"
                 >
                   <p class="font-semibold text-page-title">Sin plan fijo</p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Elegir al pagar</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Elegilo al registrar el pago.</p>
                 </button>
                 
                 <!-- Planes de la DB -->
@@ -329,7 +332,7 @@
                 </button>
               </div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                El plan se pre-seleccionará automáticamente al registrar pagos
+                Si elegís un plan, aparecerá seleccionado al registrar el próximo pago.
               </p>
             </div>
 
@@ -338,7 +341,7 @@
               type="button"
               @click="formData.activo = !formData.activo"
               :aria-pressed="formData.activo"
-              aria-label="Alternar estado activo del socio"
+              aria-label="Cambiar el estado de la ficha del socio"
               :class="[
                 'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all touch-manipulation',
                 formData.activo 
@@ -356,7 +359,7 @@
                 </div>
                 <div class="text-left">
                   <p class="font-semibold text-page-title">{{ formData.activo ? 'Socio activo' : 'Socio inactivo' }}</p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">Los socios inactivos no pueden hacer check-in</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Una ficha inactiva no permite registrar ingresos.</p>
                 </div>
               </div>
               <StatusBadge :status="formData.activo ? 'activo' : 'inactivo'" size="lg" />
@@ -384,10 +387,10 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <h3 class="text-lg font-semibold text-amber-800 mb-1">
-                    Socio ya registrado
+                    Este socio ya está registrado
                   </h3>
                   <p class="text-sm text-amber-700 mb-3">
-                    Se encontraron coincidencias con socios existentes en el sistema:
+                    Revisá estos datos antes de guardar:
                   </p>
                   <ul class="space-y-2">
                     <li 
@@ -423,7 +426,9 @@
           leave-to-class="opacity-0 -translate-y-2"
         >
           <div 
-            v-if="error" 
+            v-if="error"
+            role="alert"
+            aria-live="assertive"
             class="bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-400 rounded-xl shadow-sm overflow-hidden"
           >
             <div class="p-5">
@@ -433,7 +438,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <h3 class="text-lg font-semibold text-red-800 mb-1">
-                    Error al guardar
+                    No pudimos guardar la ficha
                   </h3>
                   <p class="text-sm text-red-700">
                     {{ error }}
@@ -458,9 +463,9 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Guardando...
+              Guardando la ficha...
             </span>
-            <span v-else>{{ isEditing ? 'Actualizar Socio' : 'Guardar Socio' }}</span>
+            <span v-else>{{ isEditing ? 'Guardar cambios' : 'Guardar socio' }}</span>
           </BaseButton>
 
           <BaseButton
@@ -486,6 +491,7 @@ import { useMembers } from '@/composables/useMembers'
 import { useParameters } from '@/composables/useParameters'
 import { resolvePlanPrice } from '@/contexts/plans-catalog'
 import { formatCurrencyFull } from '@/utils/formatters'
+import { toUserMessage } from '@/lib/userFacingError'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -581,12 +587,12 @@ function handleFileChange(event) {
   if (!file) return
 
   if (!file.type.startsWith('image/')) {
-    toast.error('Solo se permiten archivos de imagen')
+    toast.error('Elegí un archivo de imagen (JPG, PNG o WebP).')
     return
   }
 
   if (file.size > 2 * 1024 * 1024) {
-    toast.error('La imagen no debe superar 2MB')
+    toast.error('La imagen no puede superar los 2 MB.')
     return
   }
 
@@ -611,7 +617,7 @@ function removePhoto() {
 
 async function handleSubmit() {
   if (!formData.value.nombre.trim() || !formData.value.apellido.trim()) {
-    toast.error('Complete los campos obligatorios')
+    toast.error('Completá el nombre y el apellido para continuar.')
     return
   }
 
@@ -648,7 +654,7 @@ async function handleSubmit() {
       if (uploadResult.success) {
         memberData.foto_url = uploadResult.url
       } else {
-        toast.error('Error al subir la foto: ' + uploadResult.error)
+        toast.error(toUserMessage({ message: uploadResult.error }, 'No pudimos subir la foto. Revisá el archivo e intentá de nuevo.'))
         uploadingPhoto.value = false
         return
       }
@@ -664,13 +670,13 @@ async function handleSubmit() {
       : await createMember(memberData)
 
     if (result.success) {
-      toast.success(isEditing.value ? 'Socio actualizado correctamente' : 'Socio creado correctamente')
+      toast.success(isEditing.value ? 'Cambios guardados en la ficha.' : 'Socio agregado.')
       router.push({ name: 'Members' })
     } else {
-      toast.error('Error al guardar: ' + result.error)
+      toast.error(toUserMessage({ message: result.error }, 'No pudimos guardar la ficha. Revisá los datos e intentá de nuevo.'))
     }
   } catch (err) {
-    toast.error('Error inesperado: ' + err.message)
+    toast.error(toUserMessage(err, 'No pudimos guardar la ficha. Revisá los datos e intentá de nuevo.'))
   }
 }
 

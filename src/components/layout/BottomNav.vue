@@ -120,13 +120,13 @@ const showMoreMenu = ref(false)
 const navigationItems = [
   { name: 'Inicio', to: '/', icon: 'dashboard' },
   { name: 'Socios', to: '/miembros', icon: 'members' },
-  { name: 'Check-In', to: '/checkin', icon: 'check-in' },
+  { name: 'Control de acceso', to: '/checkin', icon: 'check-in' },
   { name: 'Pagos', to: '/pagos/nuevo', icon: 'payments' },
   { name: 'Caja', to: '/caja', icon: 'cash', roles: ['admin', 'recepcion'] }
 ]
 
 const moreMenuItemsList = [
-  { name: 'Usuarios', to: '/staff', icon: 'staff', adminOnly: true },
+  { name: 'Equipo', to: '/staff', icon: 'staff', adminOnly: true },
   { name: 'Reportes', to: '/reports', icon: 'reports', adminOnly: true },
   { name: 'Configuración', to: '/settings', icon: 'settings', adminOnly: true },
   { name: 'Banco de horas', to: '/banco-horas', icon: 'work-hours', roles: ['admin', 'recepcion'] }
@@ -150,8 +150,8 @@ function isActive(path) {
 async function handleLogout() {
   showMoreMenu.value = false
   const confirmed = await confirmAlert(
-    'Cerrar Sesión',
-    '¿Estás seguro de que deseas cerrar sesión?'
+    'Cerrar sesión',
+    '¿Querés cerrar la sesión?'
   )
 
   if (confirmed) {

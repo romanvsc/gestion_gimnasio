@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :model-value="show"
-    :title="isEditing ? 'Editar Plan' : 'Nuevo Plan'"
+    :title="isEditing ? 'Editar plan' : 'Agregar plan'"
     size="md"
     :max-body-height="'calc(100dvh - var(--mobile-nav-height) - 5rem)'"
     @close="handleClose"
@@ -17,7 +17,7 @@
 
       <BaseInput
         v-model.number="form.dias_duracion"
-        label="Duración (días)"
+        label="Duración del plan (días)"
         type="number"
         placeholder="30"
         size="lg"
@@ -26,7 +26,7 @@
 
       <BaseInput
         v-model.number="form.precio"
-        label="Precio regular"
+        label="Precio para no socios"
         type="number"
         placeholder="5000"
         size="lg"
@@ -39,7 +39,7 @@
 
       <BaseInput
         v-model.number="form.precio_socio"
-        label="Precio socio (opcional)"
+        label="Precio para socios (opcional)"
         type="number"
         placeholder="4500"
         size="lg"
@@ -52,7 +52,7 @@
       <div class="flex items-center justify-between rounded-xl bg-gray-50 p-4 dark:bg-white/5">
         <div>
           <p class="font-medium text-page-title">Plan activo</p>
-          <p class="text-sm text-page-subtitle">Los planes inactivos no aparecen al registrar pagos</p>
+          <p class="text-sm text-page-subtitle">Los planes inactivos no aparecen al registrar un pago.</p>
         </div>
         <button
           type="button"
@@ -88,7 +88,7 @@
           :loading="saving"
           @click="handleSave"
         >
-          {{ isEditing ? 'Guardar cambios' : 'Crear plan' }}
+          {{ isEditing ? 'Guardar cambios' : 'Agregar plan' }}
         </BaseButton>
       </div>
     </template>
@@ -148,17 +148,17 @@ function handleClose() {
 
 async function handleSave() {
   if (!form.value.nombre?.trim()) {
-    toast.error('Ingresa un nombre para el plan')
+    toast.error('Ingresá un nombre para el plan.')
     return
   }
 
   if (!form.value.dias_duracion || form.value.dias_duracion < 1) {
-    toast.error('Ingresa una duración válida')
+    toast.error('Ingresá una duración válida en días.')
     return
   }
 
   if (form.value.precio === null || form.value.precio === undefined || form.value.precio < 0) {
-    toast.error('Ingresa un precio válido')
+    toast.error('Ingresá un precio válido.')
     return
   }
 

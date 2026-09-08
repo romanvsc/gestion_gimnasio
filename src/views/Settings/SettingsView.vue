@@ -7,14 +7,14 @@
           <button 
             @click="goToDashboard"
             type="button"
-            aria-label="Volver al dashboard"
+            aria-label="Volver al inicio"
             class="p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-colors touch-manipulation"
           >
             <ArrowLeft class="w-5 h-5 text-gray-600 dark:text-gray-400" />
           </button>
           <div>
             <h1 class="text-xl font-bold text-page-title">Configuración</h1>
-            <p class="text-sm text-page-subtitle">Personaliza tu gimnasio</p>
+            <p class="text-sm text-page-subtitle">Personalizá tu gimnasio</p>
           </div>
           <div class="ml-auto flex items-center gap-3">
             <span class="text-xs font-medium" :class="hasUnsavedChanges ? 'text-amber-600 dark:text-amber-300' : 'text-emerald-600 dark:text-emerald-300'" aria-live="polite">
@@ -43,7 +43,7 @@
     <div v-if="loading" class="flex items-center justify-center py-20">
       <div class="text-center">
         <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
-        <p class="text-page-subtitle">Cargando configuración...</p>
+        <p class="text-page-subtitle">Cargando la configuración...</p>
       </div>
     </div>
 
@@ -105,7 +105,7 @@
               
               <p v-if="uploadingLogo" class="text-sm text-primary-600 flex items-center gap-2">
                 <div class="h-4 w-4 animate-spin rounded-full border-2 border-solid border-primary-500 border-r-transparent"></div>
-                Subiendo...
+                Subiendo el logo...
               </p>
             </div>
           </div>
@@ -200,7 +200,7 @@
             @click="openPlanModal(null)"
           >
             <Plus class="w-4 h-4 mr-1" />
-            Nuevo
+            Agregar plan
           </BaseButton>
         </div>
         
@@ -208,8 +208,8 @@
           <!-- Empty State -->
           <div v-if="!plans.length" class="p-8 text-center">
             <CreditCard class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p class="text-page-subtitle">No hay planes configurados</p>
-            <p class="text-sm text-page-muted">Crea tu primer plan para comenzar</p>
+            <p class="text-page-subtitle">Todavía no hay planes configurados.</p>
+            <p class="text-sm text-page-muted">Agregá un plan para poder cobrar cuotas.</p>
           </div>
           
           <!-- Plan Items -->
@@ -295,7 +295,7 @@
             </button>
           </div>
           <p class="text-xs text-page-muted mt-3">
-            Toca para activar o desactivar cada método
+            Elegí un método para activarlo o desactivarlo.
           </p>
         </div>
       </section>
@@ -352,6 +352,7 @@ import GymLogo from '@/components/brand/GymLogo.vue'
 import { BRAND } from '@/config/brand'
 import { LOGO_ACCEPT, validateLogoFile } from '@/utils/logoUpload'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 import { 
   ArrowLeft, 
   ImageIcon, 
@@ -420,8 +421,8 @@ const selectedPlan = ref(null)
 const showSuccessModal = ref(false)
 const successModalConfig = reactive({
   type: 'success',
-  title: '¡Guardado!',
-  message: 'Los cambios se han guardado correctamente.',
+  title: 'Cambios guardados',
+  message: 'Los cambios se guardaron.',
   buttonText: 'Entendido'
 })
 
@@ -508,7 +509,7 @@ async function handleLogoUpload(event) {
       {
         loading: 'Subiendo logo...',
         success: 'Logo actualizado',
-        error: 'Error al subir el logo'
+        error: 'No pudimos subir el logo. Revisá el archivo e intentá de nuevo.'
       }
     )
     formData.logo_url = settings.logo_url
@@ -522,8 +523,8 @@ async function handleLogoUpload(event) {
 
 async function handleDeleteLogo() {
   const confirmed = await confirmAlert(
-    'Eliminar Logo',
-    '¿Estás seguro de que deseas eliminar el logo actual?'
+    'Eliminar logo',
+    '¿Querés eliminar el logo actual?'
   )
   if (!confirmed) return
 
@@ -533,7 +534,7 @@ async function handleDeleteLogo() {
       {
         loading: 'Eliminando logo...',
         success: 'Logo eliminado',
-        error: 'Error al eliminar el logo'
+        error: 'No pudimos eliminar el logo. Intentá de nuevo.'
       }
     )
     formData.logo_url = null
@@ -573,12 +574,12 @@ async function handleSavePlan(planData) {
         
         // Mostrar modal de éxito
         successModalConfig.type = 'success'
-        successModalConfig.title = '¡Plan actualizado!'
-        successModalConfig.message = `El plan "${planData.nombre}" se ha modificado correctamente.`
+        successModalConfig.title = 'Plan actualizado'
+        successModalConfig.message = `El plan "${planData.nombre}" quedó actualizado.`
         successModalConfig.buttonText = 'Entendido'
         showSuccessModal.value = true
       } else {
-        toast.error(result.error || 'Error al actualizar')
+        toast.error(toUserMessage({ message: result.error }, 'No pudimos actualizar el plan. Revisá los datos e intentá de nuevo.'))
       }
     } else {
       // Crear nuevo plan
@@ -596,17 +597,17 @@ async function handleSavePlan(planData) {
         
         // Mostrar modal de éxito
         successModalConfig.type = 'success'
-        successModalConfig.title = '¡Plan creado!'
-        successModalConfig.message = `El plan "${planData.nombre}" ya está disponible para asignar a tus socios.`
-        successModalConfig.buttonText = '¡Genial!'
+        successModalConfig.title = 'Plan creado'
+        successModalConfig.message = `El plan "${planData.nombre}" ya está disponible para cobrar cuotas.`
+        successModalConfig.buttonText = 'Entendido'
         showSuccessModal.value = true
       } else {
-        toast.error(result.error || 'Error al crear')
+        toast.error(toUserMessage({ message: result.error }, 'No pudimos crear el plan. Revisá los datos e intentá de nuevo.'))
       }
     }
   } catch (err) {
     reportClientError('settings.plan_create', err)
-    toast.error('Error inesperado')
+    toast.error(toUserMessage(err, 'No pudimos guardar el plan. Revisá los datos e intentá de nuevo.'))
   }
 }
 
@@ -621,13 +622,13 @@ async function togglePaymentMethod(method) {
     
     if (result.success) {
       await fetchAllPaymentMethods()
-      toast.success(method.activo ? 'Método desactivado' : 'Método activado')
+      toast.success(method.activo ? 'Método de pago desactivado.' : 'Método de pago activado.')
     } else {
-      toast.error('Error al actualizar')
+      toast.error(toUserMessage({ message: result.error }, 'No pudimos actualizar el método de pago. Intentá de nuevo.'))
     }
   } catch (err) {
     reportClientError('settings.plan_update', err)
-    toast.error('Error inesperado')
+    toast.error(toUserMessage(err, 'No pudimos actualizar el método de pago. Intentá de nuevo.'))
   }
 }
 
@@ -636,7 +637,7 @@ async function togglePaymentMethod(method) {
 // ==================
 async function handleSave() {
   if (!formData.nombre_gimnasio?.trim()) {
-    toast.error('Ingresa el nombre del gimnasio')
+    toast.error('Ingresá el nombre del gimnasio.')
     return
   }
 
@@ -655,13 +656,13 @@ async function handleSave() {
     
     // Mostrar modal de éxito
     successModalConfig.type = 'success'
-    successModalConfig.title = '¡Configuración guardada!'
-    successModalConfig.message = 'Los datos del gimnasio se han actualizado correctamente.'
+    successModalConfig.title = 'Configuración guardada'
+    successModalConfig.message = 'Los datos del gimnasio quedaron actualizados.'
     successModalConfig.buttonText = 'Perfecto'
     showSuccessModal.value = true
   } catch (err) {
     reportClientError('settings.save', err)
-    toast.error('Error al guardar la configuración')
+    toast.error(toUserMessage(err, 'No pudimos guardar la configuración. Revisá los datos e intentá de nuevo.'))
   } finally {
     saving.value = false
   }

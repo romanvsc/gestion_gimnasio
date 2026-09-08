@@ -1,7 +1,7 @@
 <template>
   <div class="bg-page-bg min-h-screen transition-colors duration-200">
     <div class="mx-auto max-w-[1440px] px-4 py-4 md:px-6 md:py-6 xl:px-8">
-      <TopBar title="Dashboard" :subtitle="dashboardDate">
+      <TopBar title="Inicio" :subtitle="dashboardDate">
         <template #actions>
           <div class="hidden items-center gap-3 lg:flex">
             <div class="flex h-10 items-center gap-2 rounded-lg border border-page-border bg-page-card px-3 text-sm text-page-muted">
@@ -12,7 +12,7 @@
               <button
                 type="button"
                 class="relative flex h-10 w-10 items-center justify-center rounded-lg border border-page-border bg-page-card text-page-subtitle transition-colors hover:bg-page-card-hover hover:text-page-title focus:outline-none focus:ring-2 focus:ring-primary-500"
-                title="Notificaciones"
+                title="Tareas pendientes"
                 aria-label="Notificaciones"
                 :aria-expanded="showNotifications"
                 aria-controls="dashboard-notifications"
@@ -32,12 +32,12 @@
                 v-if="showNotifications"
                 id="dashboard-notifications"
                 role="dialog"
-                aria-label="Notificaciones pendientes"
+                aria-label="Tareas pendientes"
                 class="absolute right-0 top-12 z-40 w-80 overflow-hidden rounded-xl border border-page-border bg-page-card shadow-xl"
               >
                 <div class="border-b border-page-border px-4 py-3">
-                  <p class="text-sm font-semibold text-page-title">Notificaciones</p>
-                  <p class="mt-0.5 text-xs text-page-subtitle">Pendientes de atención</p>
+                  <p class="text-sm font-semibold text-page-title">Tareas pendientes</p>
+                  <p class="mt-0.5 text-xs text-page-subtitle">Revisá lo que necesita atención</p>
                 </div>
 
                 <button
@@ -52,11 +52,11 @@
                   <span class="min-w-0">
                     <span class="block text-sm font-semibold text-page-title">Cuotas vencidas</span>
                     <span class="mt-0.5 block text-xs text-page-subtitle">{{ stats.expiredMembers }} socios necesitan regularizar su cuota.</span>
-                    <span class="mt-2 block text-xs font-semibold text-primary-600 dark:text-primary-400">Ver socios vencidos</span>
+                    <span class="mt-2 block text-xs font-semibold text-primary-600 dark:text-primary-400">Ver socios con cuota vencida</span>
                   </span>
                 </button>
 
-                <p v-else class="px-4 py-5 text-sm text-page-subtitle">No hay notificaciones pendientes.</p>
+                <p v-else class="px-4 py-5 text-sm text-page-subtitle">No hay tareas pendientes por ahora.</p>
               </div>
             </div>
           </div>
@@ -105,16 +105,15 @@
         <!-- Tarjetas de Métricas -->
         <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            title="Recaudación"
+            title="Cobrado este mes"
             :value="formatCurrencyFull(stats.monthlyRevenue)"
             :icon="Wallet"
             icon-bg-color="bg-primary-50"
             icon-color="text-primary-600"
-            badge="Mensual"
           />
           
           <StatCard
-            title="Socios Activos"
+            title="Socios activos"
             :value="stats.activeMembers"
             :icon="Users"
             route="/miembros"
@@ -123,24 +122,22 @@
           />
           
           <StatCard
-            title="Asistencia Hoy"
+            title="Visitas de hoy"
             :value="stats.todayAttendance"
             :icon="Activity"
             route="/checkin"
             icon-bg-color="bg-success-50"
             icon-color="text-success-600"
-            badge="En vivo"
-            badge-variant="live"
           />
           
           <StatCard
-            title="Cuotas Vencidas"
+            title="Cuotas vencidas"
             :value="stats.expiredMembers"
             :icon="AlertCircle"
             route="/miembros"
             icon-bg-color="bg-danger-50"
             icon-color="text-danger-600"
-            :badge="stats.expiredMembers > 0 ? 'Revisar' : ''"
+            :badge="stats.expiredMembers > 0 ? 'Ver cuotas' : ''"
             badge-variant="urgent"
           />
         </div>
@@ -151,8 +148,8 @@
           <h2 class="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-page-muted">Acciones rápidas</h2>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <DashboardActionCard
-                title="Nuevo Socio"
-                subtitle="Registrar nueva alta"
+                title="Nuevo socio"
+                subtitle="Agregar una inscripción"
                 :icon="UserPlus"
                 featured
                 icon-bg-class="bg-primary-50"
@@ -162,8 +159,8 @@
                 @click="router.push({ name: 'NewMember' })"
               />
               <DashboardActionCard
-                title="Registrar Pago"
-                subtitle="Ingresar cuota"
+                title="Registrar pago"
+                subtitle="Cobrar una cuota"
                 :icon="BadgeDollarSign"
                 icon-bg-class="bg-success-50"
                 icon-text-class="text-success-600"
@@ -172,8 +169,8 @@
                 @click="router.push({ name: 'NewPayment' })"
               />
               <DashboardActionCard
-                title="Check-In"
-                subtitle="Control de acceso"
+                title="Control de acceso"
+                subtitle="Registrar un ingreso"
                 :icon="CheckCircle"
                 icon-bg-class="bg-info-50"
                 icon-text-class="text-info-600"
@@ -226,7 +223,7 @@
               {{ stats.expiredMembers }}
             </p>
             <p class="mt-1 text-sm" :class="stats.expiredMembers > 0 ? 'text-danger-800/80 dark:text-danger-200/80' : 'text-page-subtitle'">
-              {{ stats.expiredMembers > 0 ? 'socios necesitan regularizar su cuota.' : 'No hay cuotas vencidas para revisar.' }}
+              {{ stats.expiredMembers > 0 ? 'Hay socios que necesitan renovar su cuota.' : 'No hay cuotas vencidas para revisar.' }}
             </p>
             <p v-if="statsUpdatedAt" class="mt-2 text-xs text-page-muted">
               Actualizado: {{ formatDateTime(statsUpdatedAt) }}
@@ -238,7 +235,7 @@
               class="mt-auto w-full !font-semibold"
               @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
             >
-              Gestionar vencidos
+              {{ stats.expiredMembers > 0 ? 'Ver socios con cuota vencida' : 'Ver socios' }}
             </BaseButton>
           </aside>
         </section>
@@ -247,8 +244,8 @@
         <section class="overflow-hidden rounded-lg border border-page-border bg-page-card">
           <div class="flex items-center justify-between border-b border-page-border px-4 py-3.5 md:px-5">
             <div>
-              <h2 class="text-base font-bold text-page-title">Últimos accesos</h2>
-              <p class="mt-0.5 text-xs text-page-subtitle">Actividad reciente del gimnasio</p>
+              <h2 class="text-base font-bold text-page-title">Últimos ingresos</h2>
+              <p class="mt-0.5 text-xs text-page-subtitle">Personas que ingresaron recientemente</p>
             </div>
             <BaseButton
               variant="ghost"
@@ -307,7 +304,7 @@
             </table>
             
             <div v-if="recentCheckIns.length === 0" class="py-8 text-center text-sm text-page-muted">
-              No hay check-ins recientes
+              Todavía no hay ingresos registrados.
             </div>
           </div>
         </section>
@@ -332,6 +329,7 @@ import { useGymStore } from '@/stores/gymStore'
 import { useAppResume } from '@/composables/useAppResume'
 import { errorAlert } from '@/lib/alerts'
 import { reportClientError } from '@/lib/observability'
+import { ROLE_LABELS } from '@/config/uiCopy'
 import { formatCurrencyFull, formatDateTime } from '@/utils/formatters'
 import { useAttendance } from '@/composables/useAttendance'
 import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, Search, Bell } from 'lucide-vue-next'
@@ -360,11 +358,7 @@ const dashboardDate = computed(() => {
 })
 
 const userInitial = computed(() => (userStore.userEmail || 'U').charAt(0).toUpperCase())
-const roleLabel = computed(() => ({
-  admin: 'Administrador',
-  recepcion: 'Recepción',
-  staff: 'Staff'
-}[userStore.userRole] || 'Usuario'))
+const roleLabel = computed(() => ROLE_LABELS[userStore.userRole] || 'Persona autorizada')
 
 const loading = ref(false)
 const showLastAccessModal = ref(false)
@@ -388,7 +382,7 @@ async function loadStats() {
     statsUpdatedAt.value = new Date()
   } catch (err) {
     reportClientError('dashboard.stats_fetch', err)
-    errorAlert('Error', 'No se pudieron cargar las estadísticas')
+    errorAlert('No pudimos cargar el resumen', 'Intentá de nuevo en unos segundos.')
   } finally {
     loading.value = false
   }

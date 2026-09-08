@@ -15,7 +15,7 @@
       <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full shadow-lg ring-4 ring-white dark:ring-page-card" :class="iconBgClass">
         <component :is="iconComponent" class="h-10 w-10" :class="iconColorClass" aria-hidden="true" />
       </div>
-      <p class="text-base leading-relaxed text-page-subtitle">{{ message }}</p>
+      <p role="status" aria-live="polite" class="text-base leading-relaxed text-page-subtitle">{{ message }}</p>
 
       <div v-if="$slots.default" class="mt-5 rounded-2xl bg-gray-50 p-4 dark:bg-white/5">
         <slot />
@@ -52,11 +52,11 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '¡Operación exitosa!'
+    default: 'Operación completada'
   },
   message: {
     type: String,
-    default: 'Los cambios se han guardado correctamente.'
+    default: 'Los cambios se guardaron.'
   },
   buttonText: {
     type: String,

@@ -5,8 +5,8 @@
       <div class="mb-8">
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Gestión de Caja</h1>
-            <p class="text-page-subtitle">Control de ingresos y egresos por período</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Caja</h1>
+            <p class="text-page-subtitle">Consultá ingresos, egresos y saldo del período.</p>
           </div>
           
           <!-- Selector de Rango de Fechas -->
@@ -15,14 +15,14 @@
               <BaseInput
                 v-model="startDate"
                 type="date"
-                label="Fecha Inicio"
+                label="Desde"
               />
             </div>
             <div class="w-full xl:w-48">
               <BaseInput
                 v-model="endDate"
                 type="date"
-                label="Fecha Fin"
+                label="Hasta"
                 :min="startDate"
               />
             </div>
@@ -45,11 +45,11 @@
         <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-page-subtitle text-sm font-medium mb-2">Saldo Inicial del Período</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Saldo inicial</p>
               <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrencyFull(balanceAnterior) }}
               </p>
-              <span class="text-sm text-gray-500 dark:text-gray-400">Al inicio del rango</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">Antes del período elegido</span>
             </div>
             <div class="p-3 rounded-lg bg-gray-50 dark:bg-white/5">
               <Calendar class="w-6 h-6 text-gray-600 dark:text-gray-400" />
@@ -61,7 +61,7 @@
         <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-page-subtitle text-sm font-medium mb-2">Ingresos</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Total de ingresos</p>
               <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrencyFull(ingresosDia) }}
               </p>
@@ -79,7 +79,7 @@
         <div class="bg-page-card rounded-xl shadow-sm p-6">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <p class="text-page-subtitle text-sm font-medium mb-2">Egresos</p>
+              <p class="text-page-subtitle text-sm font-medium mb-2">Total de egresos</p>
               <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrencyFull(egresosDia) }}
               </p>
@@ -101,7 +101,7 @@
               <p class="text-page-title text-3xl font-bold mb-1">
                 {{ formatCurrencyFull(saldoFinal) }}
               </p>
-              <span class="text-sm text-primary-700 dark:text-primary-300 font-semibold">En caja ahora</span>
+              <span class="text-sm text-primary-700 dark:text-primary-300 font-semibold">Saldo actual</span>
             </div>
             <div class="p-3 rounded-lg bg-primary-50 dark:bg-primary-900/30">
               <Wallet class="w-6 h-6 text-primary-600" />
@@ -119,7 +119,7 @@
           class="flex items-center justify-center gap-2"
         >
           <Plus class="w-5 h-5" />
-          Registrar Movimiento
+          Agregar movimiento
         </BaseButton>
 
         <BaseButton
@@ -130,25 +130,25 @@
           class="flex items-center justify-center gap-2"
         >
           <FileSpreadsheet class="w-5 h-5" />
-          {{ exportingExcel ? 'Generando...' : 'Exportar Excel' }}
+          {{ exportingExcel ? 'Preparando archivo...' : 'Descargar Excel' }}
         </BaseButton>
       </div>
 
       <!-- Tabla de Movimientos -->
       <div class="bg-page-card rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-page-border flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <h2 class="text-lg font-semibold text-page-title">
-            Movimientos del Período ({{ transactions.length }})
+            <h2 class="text-lg font-semibold text-page-title">
+            Movimientos del período ({{ transactions.length }})
           </h2>
           <div class="w-full xl:w-56">
             <BaseSelect
               v-model="pageSize"
               id="cash-page-size"
-              label="Filas por página"
+              label="Movimientos por página"
               :options="pageSizeOptions"
               value-key="value"
               label-key="label"
-              placeholder="Seleccionar cantidad"
+              placeholder="Elegí una cantidad"
               size="md"
               :disabled="pageSizeOptions.length === 0"
               @change="handlePageSizeChange"
@@ -158,12 +158,13 @@
 
         <div v-if="loading" class="p-12 text-center">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary-600"></div>
-          <p class="mt-4 text-gray-500 dark:text-gray-400">Cargando movimientos...</p>
+          <p class="mt-4 text-gray-500 dark:text-gray-400">Cargando los movimientos...</p>
         </div>
 
         <div v-else-if="transactions.length === 0" class="p-12 text-center">
           <FileText class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p class="text-gray-500 dark:text-gray-400">No hay movimientos registrados en este período</p>
+          <p class="text-gray-500 dark:text-gray-400">No hay movimientos en este período.</p>
+          <p class="mt-1 text-sm text-gray-400 dark:text-gray-500">Probá con otro rango de fechas o agregá un movimiento.</p>
         </div>
 
         <div v-else>
@@ -188,8 +189,8 @@
                 <span :class="transaction.tipo === 'INGRESO' ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'">
                   {{ transaction.tipo === 'INGRESO' ? 'Ingreso' : 'Egreso' }}
                 </span>
-                <span v-if="transaction.payment_id" class="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">Cuota</span>
-                <span class="ml-auto text-xs text-page-muted">{{ transaction.payment_id ? 'Sistema' : 'Operador' }}</span>
+                <span v-if="transaction.payment_id" class="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">Cobro de cuota</span>
+                <span class="ml-auto text-xs text-page-muted">{{ transaction.payment_id ? 'Registrado automáticamente' : 'Cargado manualmente' }}</span>
               </div>
             </article>
           </div>
@@ -211,7 +212,7 @@
                   Monto
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Usuario
+                  Registrado por
                 </th>
               </tr>
             </thead>
@@ -269,8 +270,8 @@
 
                 <!-- Usuario -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" :title="transaction.payment_id ? 'Movimiento generado por un pago' : 'Movimiento registrado por un operador'">
-                    {{ transaction.payment_id ? 'Sistema' : 'Operador' }}
+                  <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" :title="transaction.payment_id ? 'Movimiento generado por un pago' : 'Movimiento cargado manualmente'">
+                    {{ transaction.payment_id ? 'Registro automático' : 'Carga manual' }}
                   </span>
                 </td>
               </tr>
@@ -332,12 +333,12 @@
         <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
           <CheckCircle class="h-6 w-6 text-emerald-600" aria-hidden="true" />
         </div>
-        <p class="text-page-subtitle">El movimiento se ha guardado correctamente.</p>
+        <p class="text-page-subtitle">El movimiento quedó registrado en Caja.</p>
       </div>
 
       <template #footer>
         <BaseButton variant="primary" full-width @click="showSuccessModal = false">
-          Aceptar
+          Entendido
         </BaseButton>
       </template>
     </BaseModal>
@@ -352,6 +353,7 @@ import { useParameters } from '@/composables/useParameters'
 import { useAppResume } from '@/composables/useAppResume'
 import { formatCurrencyFull } from '@/utils/formatters'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
@@ -407,7 +409,7 @@ const currentPage = ref(1)
 const pageSizeOptions = computed(() => {
   return memberPageSizes.value.map(option => ({
     value: Number(option.value),
-    label: option.label
+    label: String(option.label || `${option.value} por página`).replace(/\bpagina\b/gi, 'página')
   }))
 })
 
@@ -514,14 +516,14 @@ const handleSubmit = async (formData) => {
     // Recargar con el rango actual
     await handleFilterClick()
   } else {
-    toast.error(`Error al registrar el movimiento: ${result.error}`, { duration: 5000 })
+    toast.error(toUserMessage({ message: result.error }, 'No pudimos registrar el movimiento. Revisá los datos e intentá de nuevo.'), { duration: 5000 })
   }
 }
 
 const handleExportExcel = async () => {
   // Validar que hay datos
   if (transactions.value.length === 0) {
-    toast.warning('No hay movimientos para exportar en este período', { duration: 3000 })
+    toast.warning('No hay movimientos para descargar en este período.', { duration: 3000 })
     return
   }
 
@@ -531,15 +533,16 @@ const handleExportExcel = async () => {
     const start = new Date(startDate.value + 'T12:00:00')
     const end = new Date(endDate.value + 'T12:00:00')
     
-    const exportPromise = exportToExcel(start, end)
-    
-    await toast.promise(exportPromise, {
-      loading: 'Generando archivo Excel...',
-      success: 'Reporte exportado exitosamente',
-      error: (err) => `Error al exportar: ${err.message || 'Error desconocido'}`
-    })
+    toast.info('Preparando el archivo...', { duration: 1500 })
+    const result = await exportToExcel(start, end)
+    if (result.success) {
+      toast.success('Archivo descargado.', { duration: 2500 })
+    } else {
+      toast.error(toUserMessage({ message: result.error }, 'No pudimos descargar el archivo. Intentá de nuevo.'), { duration: 5000 })
+    }
   } catch (err) {
     reportClientError('cash.export', err)
+    toast.error(toUserMessage(err, 'No pudimos descargar el archivo. Intentá de nuevo.'), { duration: 5000 })
   } finally {
     exportingExcel.value = false
   }

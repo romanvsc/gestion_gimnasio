@@ -12,7 +12,7 @@
 
     <div v-if="loading" class="py-8 text-center">
       <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-primary-600 dark:border-gray-700"></div>
-      <p class="mt-4 text-page-subtitle">Cargando accesos...</p>
+      <p class="mt-4 text-page-subtitle">Cargando los últimos ingresos...</p>
     </div>
 
     <div v-else-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
@@ -91,7 +91,7 @@
 
     <div v-else class="py-12 text-center">
       <ListChecks class="mx-auto mb-4 h-16 w-16 text-page-muted" aria-hidden="true" />
-      <p class="text-page-subtitle">No hay accesos registrados</p>
+      <p class="text-page-subtitle">Todavía no hay ingresos registrados.</p>
     </div>
   </BaseModal>
 </template>

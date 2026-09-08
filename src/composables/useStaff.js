@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { supabaseGhost } from '@/lib/supabaseGhost'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 const STAFF_FIELDS = 'id, usuario, email, rol, activo, created_at'
 
@@ -25,7 +26,7 @@ export function useStaff() {
       if (err) throw err
       staffList.value = data || []
     } catch (err) {
-      error.value = err.message
+      error.value = toUserMessage(err, 'No pudimos cargar el equipo. Intentá de nuevo.')
       reportClientError('staff.list', err)
     } finally {
       loading.value = false
@@ -53,7 +54,7 @@ export function useStaff() {
       })
 
       if (authError) throw authError
-      if (!authData.user) throw new Error('No se pudo crear el usuario en Auth')
+      if (!authData.user) throw new Error('No pudimos crear la cuenta.')
 
       // 2. Insertar en tabla staff con el ID del usuario Auth
       const { error: insertError } = await supabase
@@ -75,9 +76,10 @@ export function useStaff() {
       
       return { success: true }
     } catch (err) {
-      error.value = err.message
+      const message = toUserMessage(err)
+      error.value = message
       reportClientError('staff.create', err)
-      return { success: false, error: err.message }
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -103,9 +105,10 @@ export function useStaff() {
       
       return { success: true }
     } catch (err) {
-      error.value = err.message
+      const message = toUserMessage(err)
+      error.value = message
       reportClientError('staff.update', err)
-      return { success: false, error: err.message }
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -130,9 +133,10 @@ export function useStaff() {
       
       return { success: true }
     } catch (err) {
-      error.value = err.message
+      const message = toUserMessage(err)
+      error.value = message
       reportClientError('staff.toggle_status', err)
-      return { success: false, error: err.message }
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }

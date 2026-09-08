@@ -13,7 +13,7 @@
             <CheckCircle class="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Guarda esta contraseña, solo se mostrará una vez:
+            Guardá esta contraseña: solo se mostrará una vez.
           </p>
         </div>
 
@@ -52,7 +52,7 @@
           <!-- Usuario -->
           <div>
             <label for="staff-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nombre de Usuario *
+              Nombre de usuario *
             </label>
             <BaseInput
               v-model="form.usuario"
@@ -128,8 +128,8 @@
               :disabled="loading"
               required
             >
-              <option value="">Seleccionar...</option>
-              <option value="admin">Admin</option>
+              <option value="">Elegí un rol</option>
+              <option value="admin">Administrador</option>
               <option value="recepcion">Recepción</option>
             </select>
           </div>
@@ -140,13 +140,13 @@
               <AlertCircle class="w-5 h-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0 mt-0.5" />
               <div class="text-sm text-primary-800 dark:text-primary-300">
                 <p class="font-medium mb-1">Email: {{ staff?.email }}</p>
-                <p class="text-xs">El email no se puede modificar una vez creado</p>
+                <p class="text-xs">El email no se puede modificar después de crear la cuenta.</p>
               </div>
             </div>
           </div>
 
           <!-- Error general -->
-          <div v-if="errors.general" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+          <div v-if="errors.general" role="alert" aria-live="assertive" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
             <p class="text-sm text-red-800 dark:text-red-400">{{ errors.general }}</p>
           </div>
 
@@ -169,9 +169,9 @@
             >
               <span v-if="loading" class="flex items-center justify-center">
                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Guardando...
+                Guardando los cambios...
               </span>
-              <span v-else>{{ isEditing ? 'Actualizar' : 'Crear Usuario' }}</span>
+              <span v-else>{{ isEditing ? 'Guardar cambios' : 'Crear persona' }}</span>
             </BaseButton>
           </div>
         </form>
@@ -188,6 +188,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { useStaff } from '@/composables/useStaff'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 const props = defineProps({
   staff: {
@@ -220,8 +221,8 @@ const showSuccess = ref(false)
 const generatedPassword = ref('')
 
 const dialogTitle = computed(() => {
-  if (showSuccess.value) return '¡Usuario creado exitosamente!'
-  return isEditing.value ? 'Editar Usuario' : 'Nuevo Usuario'
+  if (showSuccess.value) return 'Persona creada'
+  return isEditing.value ? 'Editar persona' : 'Agregar persona'
 })
 
 // Inicializar form si está editando
@@ -236,7 +237,7 @@ watch(() => props.staff, (newStaff) => {
 const validateUsuario = () => {
   errors.value.usuario = ''
   if (form.value.usuario.includes(' ')) {
-    errors.value.usuario = 'El nombre de usuario no puede contener espacios'
+    errors.value.usuario = 'El nombre de usuario no puede tener espacios.'
     return false
   }
   return true
@@ -257,18 +258,18 @@ const handleSubmit = async () => {
   errors.value.general = ''
   
   if (!validateUsuario()) {
-    toast.warning('El nombre de usuario no puede contener espacios', { duration: 3000 })
+    toast.warning('El nombre de usuario no puede tener espacios.', { duration: 3000 })
     return
   }
   
   // Validación de campos vacíos
   if (!form.value.usuario || !form.value.rol) {
-    toast.warning('Complete todos los campos requeridos', { duration: 3000 })
+    toast.warning('Completá todos los campos obligatorios.', { duration: 3000 })
     return
   }
   
   if (!isEditing.value && (!form.value.email || !form.value.password)) {
-    toast.warning('Complete todos los campos requeridos', { duration: 3000 })
+    toast.warning('Completá todos los campos obligatorios.', { duration: 3000 })
     return
   }
 
@@ -296,7 +297,7 @@ const handleSubmit = async () => {
 
     if (result.success) {
       if (isEditing.value) {
-        toast.success('Usuario actualizado correctamente', { duration: 2000 })
+        toast.success('Cambios guardados en la cuenta.', { duration: 2000 })
         emit('success')
         emit('close')
       } else {
@@ -304,12 +305,14 @@ const handleSubmit = async () => {
         showSuccess.value = true
       }
     } else {
-      toast.error(result.error || 'Error al guardar el usuario', { duration: 5000 })
-      errors.value.general = result.error || 'Error al guardar el usuario'
+      const message = toUserMessage({ message: result.error }, 'No pudimos guardar la cuenta. Revisá los datos e intentá de nuevo.')
+      toast.error(message, { duration: 5000 })
+      errors.value.general = message
     }
   } catch (err) {
-    toast.error(err.message || 'Error inesperado', { duration: 5000 })
-    errors.value.general = err.message || 'Error inesperado'
+    const message = toUserMessage(err, 'No pudimos guardar la cuenta. Revisá los datos e intentá de nuevo.')
+    toast.error(message, { duration: 5000 })
+    errors.value.general = message
   } finally {
     loading.value = false
   }
@@ -321,7 +324,7 @@ const copyPassword = async () => {
     toast.success('Contraseña copiada al portapapeles', { duration: 2000 })
   } catch (err) {
     reportClientError('staff.copy_password', err)
-    toast.error('Error al copiar la contraseña', { duration: 3000 })
+    toast.error('No pudimos copiar la contraseña. Intentá de nuevo.', { duration: 3000 })
   }
 }
 

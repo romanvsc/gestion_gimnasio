@@ -4,23 +4,23 @@
     <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-page-card/75">
       <div class="text-center">
         <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent"></div>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Cargando datos...</p>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Cargando los movimientos...</p>
       </div>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="!chartData.labels || chartData.labels.length === 0" class="flex items-center justify-center h-full">
       <div class="text-center text-gray-500 dark:text-gray-400">
-        <p class="text-lg font-medium">No hay datos disponibles</p>
-        <p class="text-sm">Aún no se registraron transacciones</p>
+        <p class="text-lg font-medium">Todavía no hay movimientos.</p>
+        <p class="text-sm">Probá con otro período.</p>
       </div>
     </div>
 
     <div v-else-if="chartData.labels.length === 1" class="flex h-full items-center justify-center">
       <div class="max-w-sm text-center">
-        <p class="text-sm font-semibold uppercase tracking-wide text-page-muted">Un solo período disponible</p>
+        <p class="text-sm font-semibold uppercase tracking-wide text-page-muted">Solo hay un período disponible</p>
         <p class="mt-2 text-3xl font-bold text-page-title">{{ formatCurrencyFull(singlePeriodTotal) }}</p>
-        <p class="mt-2 text-sm text-page-subtitle">Amplía el rango para comparar la evolución de ingresos y egresos.</p>
+        <p class="mt-2 text-sm text-page-subtitle">Elegí un rango más amplio para comparar ingresos y egresos.</p>
       </div>
     </div>
 

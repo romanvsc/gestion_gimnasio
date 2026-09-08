@@ -21,7 +21,7 @@
             <CreditCard class="h-12 w-12 text-gray-200 dark:text-gray-700 md:h-16 md:w-16" aria-hidden="true" />
           </div>
           <h1 class="mb-2 text-2xl font-bold text-page-title md:text-4xl">Acceso al Gimnasio</h1>
-          <p class="text-base text-page-subtitle md:text-lg">Escanea o ingresa tu DNI</p>
+          <p class="text-base text-page-subtitle md:text-lg">Buscá un socio para registrar su ingreso.</p>
         </div>
 
         <!-- Buscador Gigante Centrado -->
@@ -29,9 +29,10 @@
           <BaseInput
             v-model="searchQuery"
             id="checkin-search"
-            label="Buscar socio"
+            label="Buscá un socio"
             size="kiosk"
-            placeholder="Ingresa DNI, nombre o apellido..."
+            placeholder="DNI, nombre o apellido"
+            hint="Escribí al menos 2 caracteres."
             :autofocus="true"
             @input="searchMembers"
           />
@@ -72,7 +73,7 @@
             v-for="member in searchResults"
             :key="member.id"
             type="button"
-            :aria-label="`${canCheckIn(member) ? 'Registrar acceso permitido' : 'Registrar acceso denegado'} para ${member.nombre} ${member.apellido}`"
+            :aria-label="`${canCheckIn(member) ? 'Registrar ingreso permitido' : 'Registrar ingreso no permitido'} para ${member.nombre} ${member.apellido}`"
             @click="handleCheckIn(member)"
             class="w-full transform cursor-pointer rounded-3xl text-left transition-transform hover:scale-[1.01] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-300 md:hover:scale-[1.02]"
           >
@@ -96,12 +97,12 @@
                   <div class="flex items-start gap-3 rounded-xl bg-white px-3 py-3 shadow-sm dark:bg-white/5 md:px-4">
                     <CheckCircle class="mt-0.5 h-6 w-6 flex-shrink-0 text-emerald-500 md:h-8 md:w-8" aria-hidden="true" />
                     <div class="flex-1">
-                      <span class="block text-lg font-bold text-emerald-600 md:text-2xl">ACCESO PERMITIDO</span>
+                  <span class="block text-lg font-bold text-emerald-600 md:text-2xl">PUEDE INGRESAR</span>
                       <span
                         v-if="member.estado_apto_fisico !== 'vigente'"
                         class="text-sm font-medium text-amber-600"
                       >
-                        Aviso: apto físico vencido (no bloquea el check-in)
+                        Aviso: el apto físico está vencido, pero no bloquea el ingreso.
                       </span>
                     </div>
                   </div>
@@ -129,7 +130,7 @@
                   <div class="flex items-center gap-3 rounded-xl bg-white px-3 py-3 shadow-sm dark:bg-white/5 md:px-4">
                     <AlertCircle class="h-6 w-6 flex-shrink-0 text-red-500 md:h-8 md:w-8" aria-hidden="true" />
                     <div class="flex-1">
-                      <span class="block text-lg font-bold text-red-600 md:text-2xl">ACCESO DENEGADO</span>
+                      <span class="block text-lg font-bold text-red-600 md:text-2xl">NO PUEDE INGRESAR</span>
                       <span class="text-base text-red-500 font-medium">
                         {{ accessDeniedReason(member) }}
                       </span>
@@ -144,9 +145,9 @@
         <!-- Sin resultados -->
         <div v-else-if="searchQuery && !loading" class="text-center text-gray-500 dark:text-gray-400 text-xl" role="status" aria-live="polite">
           <AlertCircle class="h-16 w-16 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
-          <p>No se encontraron resultados</p>
+          <p>No encontramos socios con esos datos.</p>
           <p class="mt-2 text-base text-gray-400 dark:text-gray-500">
-            Revisá el DNI o buscá por nombre y apellido.
+            Revisá el DNI o probá con otro nombre o apellido.
           </p>
           <div class="mt-5 flex flex-wrap justify-center gap-3">
             <BaseButton variant="secondary" @click="clearSearch">Limpiar búsqueda</BaseButton>
@@ -162,12 +163,12 @@
         <div class="xl:sticky xl:top-0 bg-page-card border-b border-page-border p-4 md:p-6 z-10">
           <h2 class="text-lg font-semibold text-page-title flex items-center gap-2">
             <Activity class="h-5 w-5 text-primary-600" />
-            Últimos Accesos
+            Últimos ingresos
           </h2>
-          <p class="text-xs text-gray-500 mt-1">Actividad en vivo · Se actualiza automáticamente</p>
+          <p class="text-xs text-gray-500 mt-1">Actividad reciente · Se actualiza automáticamente</p>
         </div>
         
-        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50 dark:divide-gray-700/50" aria-live="polite" aria-label="Últimos accesos registrados">
+        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50 dark:divide-gray-700/50" aria-live="polite" aria-label="Últimos ingresos registrados">
           <div
             v-for="checkIn in recentCheckIns"
             :key="checkIn.id"
@@ -201,7 +202,7 @@
         
         <div v-else class="p-8 text-center">
           <Activity class="h-12 w-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-          <p class="text-gray-400 dark:text-gray-500 text-sm">Sin accesos recientes</p>
+          <p class="text-gray-400 dark:text-gray-500 text-sm">Todavía no hay ingresos registrados.</p>
         </div>
       </aside>
     </div>
@@ -217,6 +218,7 @@ import { useMembers } from '@/composables/useMembers'
 import { useAttendance } from '@/composables/useAttendance'
 import { BRAND } from '@/config/brand'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -289,9 +291,9 @@ function canCheckIn(member) {
 }
 
 function accessDeniedReason(member) {
-  if (member.activo === false) return 'Ficha de socio inactiva'
-  if (member.estado_cuota === 'sin_pagos') return 'No hay pagos registrados'
-  return 'Cuota vencida'
+  if (member.activo === false) return 'La ficha del socio está inactiva.'
+  if (member.estado_cuota === 'sin_pagos') return 'Este socio no tiene una cuota registrada.'
+  return 'La cuota está vencida.'
 }
 
 function getInitials(nombre, apellido) {
@@ -321,8 +323,8 @@ async function handleCheckIn(member) {
       const humanDate = formatDateForHuman(selectedAttendanceDate.value)
 
       await Swal.fire({
-        title: 'Asistencia ya registrada',
-        text: `${member.nombre} ${member.apellido} ya tiene asistencia el ${humanDate} a las ${checkInTime}.`,
+        title: 'Ingreso ya registrado',
+        text: `${member.nombre} ${member.apellido} ya tiene un ingreso registrado el ${humanDate} a las ${checkInTime}.`,
         icon: 'info',
         confirmButtonText: 'Entendido',
         confirmButtonColor: BRAND.colors.primary,
@@ -354,8 +356,8 @@ async function handleCheckIn(member) {
 
     if (!allowed) {
       await Swal.fire({
-        title: 'Acceso denegado',
-        text: `${member.nombre} ${member.apellido} quedó registrado con acceso denegado por cuota vencida/inactiva (${humanDate}).`,
+        title: 'Ingreso no permitido',
+        text: `${member.nombre} ${member.apellido} quedó registrado sin ingreso el ${humanDate}. ${accessDeniedReason(member)}`,
         icon: 'error',
         confirmButtonText: 'Entendido',
         confirmButtonColor: BRAND.colors.primary,
@@ -373,8 +375,8 @@ async function handleCheckIn(member) {
         : ''
 
       await Swal.fire({
-        title: 'Asistencia registrada',
-        text: `${member.nombre} ${member.apellido} registrado correctamente para el ${humanDate}.${aptoWarning}`,
+        title: 'Ingreso registrado',
+        text: `${member.nombre} ${member.apellido} puede ingresar el ${humanDate}.${aptoWarning}`,
         icon: 'success',
         confirmButtonText: 'Perfecto',
         confirmButtonColor: BRAND.colors.primary,
@@ -394,8 +396,8 @@ async function handleCheckIn(member) {
   } catch (error) {
     reportClientError('checkin_failed', error)
     await Swal.fire({
-      title: 'Error al registrar asistencia',
-      text: 'Ocurrió un problema al guardar el check-in. Intentá nuevamente.',
+      title: 'No pudimos registrar el ingreso',
+      text: toUserMessage(error, 'Revisá la conexión e intentá de nuevo.'),
       icon: 'error',
       confirmButtonText: 'Entendido',
       confirmButtonColor: BRAND.colors.primary,

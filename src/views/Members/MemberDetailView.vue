@@ -26,7 +26,7 @@
       </div>
 
       <!-- Error -->
-      <div v-else-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+      <div v-else-if="error" role="alert" aria-live="assertive" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
         {{ error }}
       </div>
 
@@ -83,12 +83,12 @@
 
             <!-- Botón Editar -->
             <div class="flex-shrink-0">
-              <button
-                @click="goToEdit"
-                type="button"
+                <button
+                  @click="goToEdit"
+                  type="button"
                 class="px-6 py-2 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-lg shadow-md transition-colors border-2 border-white"
               >
-                Editar Perfil
+                Editar ficha
               </button>
             </div>
           </div>
@@ -98,7 +98,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Tarjeta: Estado de Cuota -->
           <MemberStatusCard
-            title="Estado de Cuota"
+            title="Estado de la cuota"
             :icon="CalendarCheck"
             :status="cuotaStatusInfo.status"
             :statusText="cuotaStatusInfo.description"
@@ -108,7 +108,7 @@
 
           <!-- Tarjeta: Apto Físico -->
           <MemberStatusCard
-            title="Apto Físico"
+            title="Apto físico"
             :icon="Heart"
             :status="aptoStatusInfo.status"
             :statusText="aptoStatusInfo.description"
@@ -153,7 +153,7 @@
             </div>
             
             <div v-else class="text-sm text-gray-500 dark:text-gray-400">
-              Sin datos de salud registrados
+              Todavía no hay datos de salud cargados.
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@
         <div class="bg-page-card rounded-xl shadow-sm border border-page-border p-6">
           <h2 class="text-xl font-semibold text-page-title mb-4 flex items-center gap-2">
             <User class="w-5 h-5" />
-            Datos Personales
+            Datos personales
           </h2>
           <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -174,16 +174,16 @@
               <dd class="mt-1 text-sm text-page-title">{{ memberData.telefono || '-' }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de Nacimiento</dt>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de nacimiento</dt>
               <dd class="mt-1 text-sm text-page-title">{{ formatDateLong(memberData.fecha_nacimiento) }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de Alta</dt>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha de inscripción</dt>
               <dd class="mt-1 text-sm text-page-title">{{ formatDateLong(memberData.fecha_alta) }}</dd>
             </div>
             <div>
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Plan Asignado</dt>
-              <dd class="mt-1 text-sm text-page-title">{{ planName || 'Sin plan fijo' }}</dd>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Plan actual</dt>
+              <dd class="mt-1 text-sm text-page-title">{{ planName || 'Sin plan asignado' }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tipo de Membresía</dt>
@@ -245,7 +245,7 @@ const cuotaStatusInfo = computed(() => {
       status: 'success',
       badge: 'bg-emerald-600',
       label: 'Cuota al día',
-      description: 'El socio está al día',
+      description: 'La cuota está al día.',
       dateLabel: 'Vence'
     }
   } else if (estado === 'vencido') {
@@ -253,7 +253,7 @@ const cuotaStatusInfo = computed(() => {
       status: 'danger',
       badge: 'bg-red-600',
       label: 'Cuota Vencida',
-      description: 'Cuota vencida',
+      description: 'La cuota está vencida.',
       dateLabel: 'Venció'
     }
   } else {
@@ -261,7 +261,7 @@ const cuotaStatusInfo = computed(() => {
       status: 'default',
       badge: 'bg-gray-500',
       label: 'Sin pagos',
-      description: 'Sin pagos registrados',
+      description: 'Todavía no hay pagos registrados.',
       dateLabel: ''
     }
   }
@@ -276,19 +276,19 @@ const aptoStatusInfo = computed(() => {
   if (estado === 'vigente') {
     return {
       status: 'info',
-      description: 'Vigente',
+      description: 'El certificado está vigente.',
       dateLabel: 'Vence'
     }
   } else if (estado === 'vencido') {
     return {
       status: 'warning',
-      description: 'Apto físico vencido',
+      description: 'El certificado está vencido.',
       dateLabel: 'Venció'
     }
   } else {
     return {
       status: 'default',
-      description: 'Sin apto físico',
+      description: 'Todavía no hay un apto físico cargado.',
       dateLabel: ''
     }
   }
@@ -341,7 +341,7 @@ const imcTextColor = computed(() => {
 const planName = computed(() => {
   if (!memberData.value?.plan_id) return null
   const plan = plans.value.find(p => p.id === memberData.value.plan_id)
-  return plan ? plan.nombre : `Plan ID: ${memberData.value.plan_id}`
+  return plan ? plan.nombre : 'Plan no disponible'
 })
 
 // Función: Cargar historial de pagos

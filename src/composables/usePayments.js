@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { planCatalog } from '@/contexts/plans-catalog'
 import { billingCash } from '@/contexts/billing-cash'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 export function usePayments() {
   const payments = ref([])
@@ -24,8 +25,9 @@ export function usePayments() {
       return { success: true, data }
     } catch (err) {
       reportClientError('billing.plans_fetch', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -44,8 +46,9 @@ export function usePayments() {
       return { success: true, data }
     } catch (err) {
       reportClientError('billing.payment_create', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
@@ -65,8 +68,9 @@ export function usePayments() {
       return { success: true, data }
     } catch (err) {
       reportClientError('billing.payments_fetch', err)
-      error.value = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err)
+      error.value = message
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }

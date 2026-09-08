@@ -52,7 +52,7 @@
         <!-- Loading -->
         <div v-if="loading" class="text-center py-8" role="status" aria-live="polite">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-700 border-t-primary-600"></div>
-          <p class="mt-4 text-gray-500 dark:text-gray-400">Cargando datos...</p>
+          <p class="mt-4 text-gray-500 dark:text-gray-400">Cargando el historial...</p>
         </div>
 
         <!-- Error -->
@@ -171,7 +171,7 @@
           </div>
           <div v-else class="text-center py-12">
             <Receipt class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p class="text-gray-500 dark:text-gray-400">No hay pagos registrados</p>
+            <p class="text-gray-500 dark:text-gray-400">Este socio todavía no tiene pagos registrados.</p>
           </div>
         </div>
 
@@ -203,7 +203,7 @@
           </div>
           <div v-else class="text-center py-12">
             <CalendarClock class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p class="text-gray-500 dark:text-gray-400">No hay asistencias registradas</p>
+            <p class="text-gray-500 dark:text-gray-400">Este socio todavía no tiene ingresos registrados.</p>
           </div>
         </div>
       </div>
@@ -236,6 +236,7 @@ import { useUserStore } from '@/stores/userStore'
 import { toast } from 'vue-sonner'
 import { useAttendance } from '@/composables/useAttendance'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 const props = defineProps({
   memberId: {
@@ -313,12 +314,12 @@ function requestAdjustment() {
   adjustmentError.value = ''
 
   if (!payment) {
-    adjustmentError.value = 'Selecciona un pago para corregir.'
+    adjustmentError.value = 'Elegí un pago para corregir.'
     return
   }
 
   if (!Number.isFinite(amount) || amount <= 0 || amount === Number(payment.monto)) {
-    adjustmentFieldError.value = 'Ingresa un importe positivo y diferente al actual.'
+    adjustmentFieldError.value = 'Ingresá un importe positivo y diferente al actual.'
     return
   }
 
@@ -346,11 +347,11 @@ async function applyAdjustment() {
     })
 
     await loadPayments()
-    toast.success('Pago corregido y auditado correctamente')
+    toast.success('Pago corregido. La auditoría quedó guardada.')
     cancelAdjustment()
   } catch (err) {
     showAdjustmentConfirm.value = false
-    adjustmentError.value = err?.message || 'No se pudo corregir el pago.'
+    adjustmentError.value = toUserMessage(err, 'No pudimos corregir el pago. Revisá los datos e intentá de nuevo.')
   } finally {
     adjustmentLoading.value = false
   }
@@ -367,7 +368,7 @@ async function loadData() {
     ])
   } catch (err) {
     reportClientError('member_history.fetch', err)
-    error.value = 'Error al cargar el historial'
+    error.value = toUserMessage(err, 'No pudimos cargar el historial. Intentá de nuevo.')
   } finally {
     loading.value = false
   }

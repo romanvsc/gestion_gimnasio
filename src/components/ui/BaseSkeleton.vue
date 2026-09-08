@@ -4,7 +4,7 @@
     :class="[roundedClass, customClass]"
     :style="{ width: computedWidth, height: computedHeight }"
   >
-    <span class="sr-only">Cargando...</span>
+    <span class="sr-only">Cargando información...</span>
   </div>
 </template>
 

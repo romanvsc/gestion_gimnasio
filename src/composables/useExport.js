@@ -4,6 +4,7 @@ import { BRAND, COLOR_SCALES } from '@/config/brand'
 import { formatCurrency } from '@/utils/formatters'
 import { downloadExcelWorkbook } from '@/utils/excelExport'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 function hexToRgb(hex) {
     const normalized = hex.replace('#', '')
@@ -38,16 +39,16 @@ export function useExport() {
         try {
             // Hoja 1: Resumen de estadísticas
             const statsData = [
-                ['Dashboard - ' + gymName],
+                ['Inicio - ' + gymName],
                 ['Periodo: ' + periodLabel],
                 ['Generado: ' + new Date().toLocaleString('es-AR')],
                 [],
-                ['Métrica', 'Valor'],
-                ['Ingresos del Periodo', '$' + formatCurrency(stats.periodRevenue || stats.monthlyRevenue)],
-                ['Socios Activos', stats.activeMembers],
-                ['Asistencia del Periodo', stats.periodAttendance || stats.todayAttendance],
-                ['Socios Vencidos', stats.expiredMembers],
-                ['Total Miembros', stats.totalMembers]
+                ['Indicador', 'Valor'],
+                ['Cobrado en el período', '$' + formatCurrency(stats.periodRevenue || stats.monthlyRevenue)],
+                ['Socios activos', stats.activeMembers],
+                ['Ingresos registrados', stats.periodAttendance || stats.todayAttendance],
+                ['Cuotas vencidas', stats.expiredMembers],
+                ['Total de socios', stats.totalMembers]
             ]
 
             const sheets = [{ name: 'Resumen', data: statsData, widths: [25, 20] }]
@@ -55,7 +56,7 @@ export function useExport() {
             // Hoja 2: Check-ins recientes
             if (checkIns && checkIns.length > 0) {
                 const checkInsData = [
-                    ['Últimos Check-Ins'],
+                    ['Últimos ingresos'],
                     [],
                     ['Socio', 'DNI', 'Hora', 'Estado']
                 ]
@@ -65,7 +66,7 @@ export function useExport() {
                 })
 
                 sheets.push({
-                    name: 'Check-Ins',
+                    name: 'Ingresos',
                     data: checkInsData,
                     widths: [30, 15, 15, 12]
                 })
@@ -78,7 +79,7 @@ export function useExport() {
             return { success: true, filename }
         } catch (error) {
             reportClientError('report.export_excel', error)
-            return { success: false, error: error.message }
+            return { success: false, error: toUserMessage(error, 'No pudimos descargar el archivo. Intentá de nuevo.') }
         }
     }
 
@@ -102,7 +103,7 @@ export function useExport() {
             // Título
             doc.setFontSize(22)
             doc.setTextColor(...primaryColor)
-            doc.text('Dashboard', 14, 20)
+            doc.text('Inicio', 14, 20)
 
             // Nombre del gimnasio
             doc.setFontSize(14)
@@ -123,14 +124,14 @@ export function useExport() {
             // Tabla de estadísticas
             doc.setFontSize(14)
             doc.setTextColor(0, 0, 0)
-            doc.text('Resumen de Estadísticas', 14, 58)
+            doc.text('Resumen', 14, 58)
 
             const statsTableData = [
-                ['Ingresos del Periodo', `$${formatCurrency(stats.periodRevenue || stats.monthlyRevenue)}`],
-                ['Socios Activos', String(stats.activeMembers)],
-                ['Asistencia del Periodo', String(stats.periodAttendance || stats.todayAttendance)],
-                ['Socios Vencidos', String(stats.expiredMembers)],
-                ['Total Miembros', String(stats.totalMembers)]
+                ['Cobrado en el período', `$${formatCurrency(stats.periodRevenue || stats.monthlyRevenue)}`],
+                ['Socios activos', String(stats.activeMembers)],
+                ['Ingresos registrados', String(stats.periodAttendance || stats.todayAttendance)],
+                ['Cuotas vencidas', String(stats.expiredMembers)],
+                ['Total de socios', String(stats.totalMembers)]
             ]
 
             // Agregar comparación si está disponible
@@ -165,7 +166,7 @@ export function useExport() {
 
                 doc.setFontSize(14)
                 doc.setTextColor(0, 0, 0)
-                doc.text('Últimos Check-Ins', 14, checkInsY)
+                doc.text('Últimos ingresos', 14, checkInsY)
 
                 doc.autoTable({
                     startY: checkInsY + 4,
@@ -203,7 +204,7 @@ export function useExport() {
             return { success: true, filename }
         } catch (error) {
             reportClientError('report.export_pdf', error)
-            return { success: false, error: error.message }
+            return { success: false, error: toUserMessage(error, 'No pudimos descargar el archivo. Intentá de nuevo.') }
         }
     }
 

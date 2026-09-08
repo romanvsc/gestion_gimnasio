@@ -3,27 +3,27 @@
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-semibold text-page-title flex items-center gap-2">
         <History class="w-5 h-5" />
-        Historial de Pagos
+        Historial de pagos
       </h2>
       <BaseButton
         color="primary"
         size="sm"
         @click="$emit('new-payment')"
       >
-        + Registrar Pago
+        + Registrar pago
       </BaseButton>
     </div>
 
     <!-- Loading de pagos -->
     <div v-if="loading" class="text-center py-8">
-      <p class="text-gray-600 dark:text-gray-400">Cargando historial...</p>
+      <p class="text-gray-600 dark:text-gray-400">Cargando el historial...</p>
     </div>
 
     <!-- Sin pagos -->
     <div v-else-if="payments.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
       <History class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-      <p class="text-lg font-medium">No hay pagos registrados</p>
-      <p class="text-sm">Registra el primer pago para este socio</p>
+      <p class="text-lg font-medium">Este socio todavía no tiene pagos.</p>
+      <p class="text-sm">Registrá el primer pago para actualizar su cuota.</p>
     </div>
 
     <!-- Tabla de Pagos -->
@@ -32,13 +32,13 @@
         <thead class="bg-gray-50 dark:bg-white/5">
           <tr>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Fecha Pago
+              Fecha del pago
             </th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Plan
             </th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Periodo
+              Período de la cuota
             </th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Monto
@@ -81,10 +81,10 @@
       <!-- Total de Pagos -->
       <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
         <span class="text-sm text-gray-600 dark:text-gray-400">
-          Total de pagos: <span class="font-semibold">{{ payments.length }}</span>
+          Pagos registrados: <span class="font-semibold">{{ payments.length }}</span>
         </span>
         <span class="text-lg font-bold text-page-title">
-          Total recaudado: <span class="text-emerald-600">{{ formatCurrencyFull(totalAmount) }}</span>
+          Total cobrado: <span class="text-emerald-600">{{ formatCurrencyFull(totalAmount) }}</span>
         </span>
       </div>
     </div>

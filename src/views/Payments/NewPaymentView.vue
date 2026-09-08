@@ -9,8 +9,8 @@
           Volver
         </BaseButton>
         
-        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Registrar Pago</h1>
-        <p class="text-page-subtitle">Registra un nuevo pago de membresía</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title mb-2">Registrar pago</h1>
+        <p class="text-page-subtitle">Cargá el pago de una cuota y actualizá la membresía.</p>
       </div>
 
       <nav class="mb-6 rounded-xl border border-page-border bg-page-card p-4" aria-label="Progreso del registro de pago">
@@ -50,16 +50,17 @@
           
           <!-- Columna Izquierda: Formulario (3/5) -->
           <div class="xl:col-span-3 bg-page-card rounded-xl shadow-sm border border-page-border p-5 md:p-6 space-y-6">
-            <h2 class="text-lg font-semibold text-page-title">Datos del Pago</h2>
+          <h2 class="text-lg font-semibold text-page-title">Datos del pago</h2>
             
             <!-- Buscar Socio -->
             <div>
               <BaseInput
                 v-model="memberSearch"
                 id="payment-member-search"
-                label="Buscar socio"
+                label="Elegí un socio"
                 required
-                placeholder="Nombre, apellido o DNI..."
+                placeholder="Buscá por nombre, apellido o DNI"
+                hint="Escribí al menos 2 caracteres."
                 class="text-base md:text-lg"
                 @input="searchMembers"
               />
@@ -103,8 +104,8 @@
 
             <!-- Seleccionar Plan -->
             <fieldset>
-              <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Plan <span class="text-red-500" aria-hidden="true">*</span>
+                <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Elegí un plan <span class="text-red-500" aria-hidden="true">*</span>
               </legend>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
@@ -137,8 +138,8 @@
 
             <!-- Método de Pago -->
             <fieldset>
-              <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Método de pago <span class="text-red-500" aria-hidden="true">*</span>
+                <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Elegí cómo pagó <span class="text-red-500" aria-hidden="true">*</span>
               </legend>
               <div class="flex flex-wrap gap-2">
                 <button
@@ -165,9 +166,10 @@
               <BaseInput
                 v-model="formData.fecha_inicio"
                 id="payment-start-date"
-                label="Fecha de inicio"
+                label="Fecha desde la que comienza la cuota"
                 type="date"
                 required
+                hint="La cuota tendrá vigencia desde esta fecha."
                 @change="updateDates"
               />
             </div>
@@ -190,7 +192,7 @@
                 :loading="isSubmitting"
                 full-width
               >
-                Registrar Pago
+                Registrar pago
               </BaseButton>
               <BaseButton
                 type="button"
@@ -200,7 +202,7 @@
                 full-width
                 @click="resetForm"
               >
-                Limpiar Formulario
+                Limpiar formulario
               </BaseButton>
             </div>
           </div>
@@ -229,7 +231,7 @@
                   :loading="isSubmitting"
                   full-width
                 >
-                  Registrar Pago
+                  Registrar pago
                 </BaseButton>
                 <BaseButton
                   type="button"
@@ -239,7 +241,7 @@
                   full-width
                   @click="resetForm"
                 >
-                  Limpiar Formulario
+                  Limpiar formulario
                 </BaseButton>
               </div>
             </div>
@@ -250,8 +252,8 @@
       <!-- Modal de éxito -->
       <SuccessModal
         v-model="showSuccessModal"
-        title="¡Pago Registrado!"
-        message="El pago se ha registrado exitosamente y la membresía ha sido actualizada."
+        title="Pago registrado"
+        :message="successMessage"
         @close="closeSuccessModal"
       />
     </div>
@@ -271,6 +273,7 @@ import { resolvePlanPrice } from '@/contexts/plans-catalog'
 import { calculatePaymentEndDate } from '@/contexts/billing-cash'
 import { formatCurrencyFull } from '@/utils/formatters'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 import { useGymStore } from '@/stores/gymStore'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -286,14 +289,15 @@ const { plans, paymentMethods, loading: parametersLoading, error, fetchParameter
 const memberSearch = ref('')
 const memberSearchResults = ref([])
 const selectedMember = ref(null)
+const completedPaymentMember = ref('')
 const showSuccessModal = ref(false)
 const isSubmitting = computed(() => paymentLoading.value || parametersLoading.value)
 
 const paymentSteps = [
-  { number: 1, label: 'Socio' },
-  { number: 2, label: 'Plan' },
-  { number: 3, label: 'Medio y fecha' },
-  { number: 4, label: 'Confirmar' }
+  { number: 1, label: 'Elegí el socio' },
+  { number: 2, label: 'Elegí el plan' },
+  { number: 3, label: 'Completá el pago' },
+  { number: 4, label: 'Revisá y confirmá' }
 ]
 
 const formData = ref({
@@ -345,10 +349,15 @@ const paymentMethodLabel = computed(() => {
 })
 
 const nextStepHint = computed(() => {
-  if (!selectedMember.value) return 'Falta seleccionar un socio'
-  if (!formData.value.plan_id) return 'Falta seleccionar un plan'
-  if (!formData.value.metodo_pago) return 'Falta seleccionar un medio de pago'
+  if (!selectedMember.value) return 'Elegí un socio para continuar.'
+  if (!formData.value.plan_id) return 'Elegí un plan para continuar.'
+  if (!formData.value.metodo_pago) return 'Elegí cómo pagó el socio.'
   return ''
+})
+
+const successMessage = computed(() => {
+  const memberName = completedPaymentMember.value || 'El socio'
+  return `La cuota de ${memberName} quedó registrada y la membresía se actualizó.`
 })
 
 const tarifaBadge = computed(() => {
@@ -413,7 +422,7 @@ function selectMember(member) {
   if (member.plan_id) {
     formData.value.plan_id = member.plan_id
     updateDates()
-    toast.success(`Plan "${selectedPlanName.value}" seleccionado automáticamente`, { duration: 2000 })
+    toast.success(`El plan "${selectedPlanName.value}" quedó seleccionado automáticamente`, { duration: 2000 })
   }
 }
 
@@ -451,12 +460,12 @@ async function handleSubmit() {
   if (paymentLoading.value) return
 
   if (!selectedMember.value) {
-    toast.error('Por favor selecciona un socio', { duration: 3000 })
+    toast.error('Elegí un socio para continuar.', { duration: 3000 })
     return
   }
   
   if (!formData.value.plan_id) {
-    toast.error('Por favor selecciona un plan', { duration: 3000 })
+    toast.error('Elegí un plan para continuar.', { duration: 3000 })
     return
   }
 
@@ -465,7 +474,7 @@ async function handleSubmit() {
   })
 
   if (!result.success) {
-    toast.error(result.error || 'No se pudo registrar el pago', { duration: 5000 })
+    toast.error(toUserMessage({ message: result.error }, 'No pudimos registrar el pago. Revisá los datos e intentá de nuevo.'), { duration: 5000 })
     return
   }
 
@@ -476,9 +485,9 @@ async function handleSubmit() {
     reportClientError('payments.dashboard_refresh', new Error(statsResult.error || 'No se pudieron actualizar las métricas'))
   }
 
+  completedPaymentMember.value = `${selectedMember.value.nombre} ${selectedMember.value.apellido}`
   resetForm()
   showSuccessModal.value = true
-  toast.success('Pago registrado correctamente', { duration: 2500 })
 }
 
 function resetForm() {

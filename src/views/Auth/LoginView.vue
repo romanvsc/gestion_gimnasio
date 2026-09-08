@@ -60,10 +60,10 @@
         <!-- Título de bienvenida -->
         <div class="text-center lg:text-left mb-8">
           <h1 class="text-3xl lg:text-4xl font-bold text-page-title mb-2">
-            Iniciar Sesión
+            Iniciar sesión
           </h1>
           <p class="text-page-subtitle">
-            Por favor, ingresa tus datos para acceder.
+            Ingresá tus datos para acceder.
           </p>
         </div>
 
@@ -72,7 +72,7 @@
           <!-- Campo de Email -->
           <div>
             <label for="email-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-              Correo Electrónico *
+              Correo electrónico *
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -135,7 +135,7 @@
                   'border-green-400': password && !passwordError && password.length >= 6
                 }"
               />
-              <button 
+              <button
                 type="button"
                 @click="showPassword = !showPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
@@ -190,7 +190,7 @@
             class="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center group shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 disabled:shadow-none"
           >
             <span v-if="!userStore.loading" class="flex items-center">
-              Iniciar Sesión
+                Iniciar sesión
               <ArrowRight class="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </span>
             <span v-else class="flex items-center">
@@ -208,7 +208,7 @@
           <p class="text-sm text-gray-500 dark:text-gray-400">
             ¿Problemas para ingresar?
             <a href="#" class="text-primary-600 hover:text-primary-700 font-medium hover:underline ml-1">
-              Contacta soporte
+              Contactá a soporte
             </a>
           </p>
         </div>
@@ -420,7 +420,7 @@ async function handleLogin() {
   if (result.success) {
     router.push({ name: 'Dashboard' })
   } else {
-    generalError.value = result.error || 'No se pudo iniciar sesión. Por favor, intenta de nuevo.'
+    generalError.value = result.error || 'No pudimos iniciar sesión. Revisá tu email y contraseña e intentá de nuevo.'
   }
 }
 </script>

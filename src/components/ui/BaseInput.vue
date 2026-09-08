@@ -34,6 +34,7 @@
       v-if="error"
       :id="descriptionId"
       role="alert"
+      aria-live="assertive"
       class="mt-1 text-sm text-red-600 dark:text-red-400"
     >
       {{ error }}
@@ -42,6 +43,7 @@
     <p 
       v-if="hint && !error"
       :id="descriptionId"
+      aria-live="polite"
       class="mt-1 text-sm text-gray-500 dark:text-gray-400"
     >
       {{ hint }}

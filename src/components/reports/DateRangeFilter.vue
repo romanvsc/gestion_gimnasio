@@ -3,8 +3,8 @@
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <!-- Label y descripción -->
       <div>
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Período de Análisis</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400">Selecciona el rango temporal para los reportes</p>
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">¿Qué período querés consultar?</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Elegí un rango para actualizar los reportes.</p>
       </div>
 
       <!-- Botones de rango -->
@@ -35,7 +35,7 @@
               : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
           ]"
         >
-          Rango personalizado
+          Elegir fechas
         </button>
       </div>
     </div>
@@ -44,7 +44,7 @@
       <BaseInput v-model="customStartDate" type="date" label="Desde" id="report-custom-start" />
       <BaseInput v-model="customEndDate" type="date" label="Hasta" id="report-custom-end" :min="customStartDate" />
       <BaseButton variant="primary" :disabled="!isCustomRangeValid" @click="applyCustomRange">
-        Aplicar rango
+        Aplicar fechas
       </BaseButton>
     </div>
     <p v-if="customRangeError" class="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">

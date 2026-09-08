@@ -1,4 +1,4 @@
-import { reactive, readonly } from 'vue'
+import { reactive, readonly, toRef } from 'vue'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 import { toast } from 'vue-sonner'
@@ -6,6 +6,7 @@ import { BRAND } from '@/config/brand'
 import { getLogoUploadInfo, sanitizeSvgFile, validateLogoFile } from '@/utils/logoUpload'
 import { normalizeGymName } from '@/contexts/gym-identity-config/domain/services/normalizeGymName.js'
 import { reportClientError } from '@/lib/observability'
+import { toUserMessage } from '@/lib/userFacingError'
 
 // Estado reactivo global compartido (Singleton)
 const state = reactive({
@@ -81,8 +82,9 @@ export function useSettings() {
       return { success: true, data }
     } catch (err) {
       reportClientError('settings.fetch', err)
-      state.error = err.message
-      return { success: false, error: err.message }
+      const message = toUserMessage(err, 'No pudimos cargar la configuración. Intentá de nuevo.')
+      state.error = message
+      return { success: false, error: message }
     } finally {
       state.loading = false
     }
@@ -117,7 +119,7 @@ export function useSettings() {
       return { success: true, data }
     } catch (err) {
       reportClientError('settings.update', err)
-      state.error = err.message
+      state.error = toUserMessage(err, 'No pudimos guardar la configuración. Revisá los datos e intentá de nuevo.')
       throw err
     } finally {
       state.loading = false
@@ -199,7 +201,7 @@ export function useSettings() {
       return { success: true, data }
     } catch (err) {
       reportClientError('settings.logo_upload', err)
-      state.error = err.message
+      state.error = toUserMessage(err, 'No pudimos subir el logo. Revisá el archivo e intentá de nuevo.')
       throw err
     } finally {
       state.loading = false
@@ -215,7 +217,7 @@ export function useSettings() {
       state.error = null
 
       if (!state.settings.logo_url) {
-        throw new Error('No hay logo para eliminar')
+        throw new Error('No hay un logo cargado para eliminar.')
       }
 
       // 1. Extraer nombre del archivo
@@ -242,7 +244,7 @@ export function useSettings() {
       return { success: true }
     } catch (err) {
       reportClientError('settings.logo_delete', err)
-      state.error = err.message
+      state.error = toUserMessage(err, 'No pudimos eliminar el logo. Intentá de nuevo.')
       throw err
     } finally {
       state.loading = false
@@ -252,8 +254,8 @@ export function useSettings() {
   return {
     // Estado reactivo de solo lectura (prevenir mutaciones externas)
     settings: readonly(state.settings),
-    loading: readonly(state.loading),
-    error: readonly(state.error),
+    loading: readonly(toRef(state, 'loading')),
+    error: readonly(toRef(state, 'error')),
     
     // Métodos
     fetchSettings,

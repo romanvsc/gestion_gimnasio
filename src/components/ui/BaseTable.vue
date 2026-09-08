@@ -135,11 +135,11 @@ const props = defineProps({
   },
   loadingText: {
     type: String,
-    default: 'Cargando datos...'
+    default: 'Cargando información...'
   },
   emptyText: {
     type: String,
-    default: 'No se encontraron datos'
+    default: 'Todavía no hay datos para mostrar.'
   },
   emptySubtext: {
     type: String,

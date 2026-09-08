@@ -81,11 +81,11 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '¿Estás seguro?'
+    default: '¿Querés continuar?'
   },
   message: {
     type: String,
-    default: 'Esta acción no se puede deshacer.'
+    default: 'Revisá la información antes de confirmar.'
   },
   type: {
     type: String,
@@ -94,7 +94,7 @@ const props = defineProps({
   },
   confirmText: {
     type: String,
-    default: 'Confirmar'
+    default: 'Continuar'
   },
   cancelText: {
     type: String,

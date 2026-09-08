@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :model-value="true"
-    title="Registrar Movimiento"
+    title="Agregar movimiento"
     size="sm"
     :close-on-backdrop="false"
     @close="$emit('close')"
@@ -10,7 +10,7 @@
         <!-- Tipo -->
         <fieldset>
           <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Tipo <span class="text-red-500" aria-hidden="true">*</span>
+            ¿Qué tipo de movimiento es? <span class="text-red-500" aria-hidden="true">*</span>
           </legend>
           <div class="grid grid-cols-2 gap-4">
             <button
@@ -56,7 +56,7 @@
             :disabled="!formData.tipo"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-200 dark:disabled:bg-gray-800"
           >
-            <option value="">{{ formData.tipo ? 'Seleccionar...' : 'Primero selecciona un tipo' }}</option>
+            <option value="">{{ formData.tipo ? 'Elegí una categoría' : 'Primero elegí ingreso o egreso' }}</option>
             <option v-for="concept in filteredConcepts" :key="concept.id" :value="concept.nombre">
               {{ concept.nombre }}
             </option>
@@ -67,8 +67,9 @@
         <BaseInput
           v-model="formData.monto"
           type="number"
-          label="Monto"
-          placeholder="0.00"
+          label="Importe"
+          placeholder="0,00"
+          hint="Ingresá un importe mayor que cero."
           required
           :min="0"
           step="0.01"
@@ -83,7 +84,7 @@
             id="descripcion"
             v-model="formData.descripcion"
             rows="3"
-            placeholder="Detalle opcional del movimiento..."
+            placeholder="Por ejemplo: compra de artículos de limpieza"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-gray-800 dark:text-gray-200"
           ></textarea>
         </div>

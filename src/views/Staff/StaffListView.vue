@@ -4,19 +4,19 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-page-title">Gestión de Usuarios</h1>
-        <p class="text-page-subtitle mt-1">Administra el personal del gimnasio</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-page-title">Equipo</h1>
+        <p class="text-page-subtitle mt-1">Administrá las personas que usan el sistema.</p>
       </div>
       <BaseButton @click="openCreateModal" color="primary">
         <UserPlus class="w-5 h-5 mr-2" />
-        Nuevo Usuario
+        Agregar persona
       </BaseButton>
     </div>
 
     <!-- Loading -->
     <div v-if="loading && staffList.length === 0" class="text-center py-12">
       <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando usuarios...</p>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando el equipo...</p>
     </div>
 
     <!-- Desktop Table -->
@@ -24,7 +24,7 @@
       <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead class="bg-gray-50 dark:bg-white/5">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Usuario</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nombre de usuario</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rol</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
@@ -51,7 +51,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <StatusBadge :type="staff.rol === 'admin' ? 'success' : 'info'">
-                {{ staff.rol === 'admin' ? 'Admin' : 'Recepción' }}
+                {{ staff.rol === 'admin' ? 'Administrador' : 'Recepción' }}
               </StatusBadge>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -85,7 +85,7 @@
       <!-- Empty State -->
       <div v-if="staffList.length === 0" class="text-center py-12">
         <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-        <p class="text-gray-600 dark:text-gray-400">No hay usuarios registrados</p>
+        <p class="text-gray-600 dark:text-gray-400">Todavía no hay personas en el equipo.</p>
       </div>
     </div>
 
@@ -114,7 +114,7 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex gap-2">
             <StatusBadge :type="staff.rol === 'admin' ? 'success' : 'info'" size="sm">
-              {{ staff.rol === 'admin' ? 'Admin' : 'Recepción' }}
+              {{ staff.rol === 'admin' ? 'Administrador' : 'Recepción' }}
             </StatusBadge>
             <StatusBadge :type="staff.activo ? 'success' : 'danger'" size="sm">
               {{ staff.activo ? 'Activo' : 'Inactivo' }}
@@ -147,7 +147,7 @@
       <!-- Empty State Mobile -->
       <div v-if="staffList.length === 0" class="text-center py-12">
         <Users class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-        <p class="text-gray-600 dark:text-gray-400">No hay usuarios registrados</p>
+        <p class="text-gray-600 dark:text-gray-400">Todavía no hay personas en el equipo.</p>
       </div>
     </div>
 
@@ -165,6 +165,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
+import { toUserMessage } from '@/lib/userFacingError'
 import { Users, UserPlus, Edit, XCircle, CheckCircle } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -209,17 +210,17 @@ const handleSuccess = () => {
 const handleToggleStatus = async (staff) => {
   const action = staff.activo ? 'desactivar' : 'activar'
   const confirmed = await confirmAlert(
-    `${action === 'desactivar' ? 'Desactivar' : 'Activar'} Usuario`,
-    `¿Estás seguro de ${action} a ${staff.usuario}?`
+    `${action === 'desactivar' ? 'Desactivar' : 'Activar'} acceso`,
+    `${action === 'desactivar' ? 'Esta persona ya no podrá entrar al sistema.' : 'Esta persona podrá volver a entrar al sistema.'}`
   )
   
   if (!confirmed) return
 
   const result = await toggleStatus(staff.id, staff.activo)
   if (result.success) {
-    toast.success(`Usuario ${action === 'desactivar' ? 'desactivado' : 'activado'} correctamente`, { duration: 2000 })
+    toast.success(action === 'desactivar' ? 'Acceso desactivado.' : 'Acceso activado.', { duration: 2000 })
   } else {
-    toast.error(`Error al ${action} usuario: ${result.error}`, { duration: 5000 })
+    toast.error(toUserMessage({ message: result.error }, `No pudimos ${action} el acceso. Intentá de nuevo.`), { duration: 5000 })
   }
 }
 

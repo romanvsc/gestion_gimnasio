@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between border-b border-page-border px-3 py-3 sm:px-5">
       <div>
         <h2 id="work-calendar-title" class="text-base font-semibold text-page-title sm:text-lg">Calendario mensual</h2>
-        <p class="text-xs text-page-subtitle sm:text-sm">Seleccioná un día para cargar o editar la jornada.</p>
+        <p class="text-xs text-page-subtitle sm:text-sm">Elegí un día para agregar o editar horas.</p>
       </div>
       <span class="hidden rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 sm:inline-flex">
         {{ monthLabel }}
@@ -57,9 +57,9 @@
             </span>
           </div>
           <span class="block text-[10px] font-semibold text-page-subtitle sm:text-xs">
-            Total: {{ day.totalDurationLabel }}
+            Total del día: {{ day.totalDurationLabel }}
           </span>
-          <span class="block text-[10px] text-page-muted">{{ day.isToday ? 'Hoy' : 'Jornada cargada' }}</span>
+          <span class="block text-[10px] text-page-muted">{{ day.isToday ? 'Hoy' : 'Horas cargadas' }}</span>
         </div>
 
         <span
@@ -67,10 +67,10 @@
           class="mt-auto inline-flex items-center gap-1 text-[10px] font-semibold text-primary-600 opacity-80 transition-opacity group-hover:opacity-100 dark:text-primary-400 sm:text-xs"
         >
           <Plus class="h-3 w-3" aria-hidden="true" />
-          Cargar
+          Agregar horas
         </span>
         <span v-else-if="day.isFuture && day.isCurrentMonth" class="mt-auto text-[10px] text-page-muted sm:text-xs">
-          Próximamente
+          No podés cargar una fecha futura
         </span>
       </button>
     </div>
@@ -151,7 +151,7 @@ function getDayAriaLabel(day) {
       .join('; ')
     return `${dateLabel}: ${intervals}. Total ${day.totalDurationLabel}`
   }
-  if (day.isFuture) return `${dateLabel}: fecha futura`
-  return `${dateLabel}: sin jornada cargada`
+  if (day.isFuture) return `${dateLabel}: no podés cargar una fecha futura`
+  return `${dateLabel}: no hay horas cargadas`
 }
 </script>
