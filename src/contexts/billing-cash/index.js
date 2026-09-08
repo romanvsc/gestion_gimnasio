@@ -26,10 +26,6 @@ const paymentAdjustmentRepository = createSupabasePaymentAdjustmentRepository({ 
 const currentUserProvider = createSupabaseCurrentUserProvider({ client: supabase })
 const planBillingReader = createPlanCatalogBillingReader({ catalog: planCatalog })
 
-const executeRegisterPayment = registerPaymentUseCase({
-  paymentRepository,
-  planBillingReader
-})
 const executeListMemberPayments = listMemberPaymentsUseCase({ paymentRepository })
 
 function serializePayment(payment) {
@@ -46,7 +42,12 @@ function serializeTransaction(transaction) {
  */
 export const billingCash = Object.freeze({
   async registerPayment(input, { isClubMember = false } = {}) {
-    return serializePayment(await executeRegisterPayment({ input, isClubMember }))
+    return serializePayment(await registerPaymentUseCase({
+      paymentRepository,
+      planBillingReader,
+      input,
+      isClubMember
+    }))
   },
 
   async listMemberPayments(memberId) {
