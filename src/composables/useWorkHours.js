@@ -3,7 +3,8 @@ import { workHours } from '@/contexts/work-hours'
 import { reportClientError } from '@/lib/observability'
 
 function getFriendlyError(error) {
-  if (error?.code === '23505') return 'Ya existe una jornada cargada para esa persona y fecha.'
+  if (error?.code === '23P01') return 'Ese intervalo se superpone con otra jornada del mismo día.'
+  if (error?.code === '23505') return 'Ya existe un intervalo cargado con esos datos.'
   if (error?.code === '42501') return 'No tenés permisos para modificar esa jornada.'
   return error?.message || 'No se pudo completar la operación.'
 }

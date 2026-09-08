@@ -186,8 +186,8 @@
                 type="submit"
                 variant="primary"
                 size="lg"
-                :disabled="!isFormValid || loading"
-                :loading="loading"
+                :disabled="!isFormValid || isSubmitting"
+                :loading="isSubmitting"
                 full-width
               >
                 Registrar Pago
@@ -196,7 +196,7 @@
                 type="button"
                 variant="outline"
                 size="lg"
-                :disabled="loading"
+                :disabled="isSubmitting"
                 full-width
                 @click="resetForm"
               >
@@ -225,8 +225,8 @@
                   type="submit"
                   variant="primary"
                   size="lg"
-                  :disabled="!isFormValid || loading"
-                  :loading="loading"
+                  :disabled="!isFormValid || isSubmitting"
+                  :loading="isSubmitting"
                   full-width
                 >
                   Registrar Pago
@@ -235,7 +235,7 @@
                   type="button"
                   variant="outline"
                   size="lg"
-                  :disabled="loading"
+                  :disabled="isSubmitting"
                   full-width
                   @click="resetForm"
                 >
@@ -271,20 +271,23 @@ import { resolvePlanPrice } from '@/contexts/plans-catalog'
 import { calculatePaymentEndDate } from '@/contexts/billing-cash'
 import { formatCurrencyFull } from '@/utils/formatters'
 import { reportClientError } from '@/lib/observability'
+import { useGymStore } from '@/stores/gymStore'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import PaymentSummaryCard from '@/components/payments/PaymentSummaryCard.vue'
 import SuccessModal from '@/components/ui/SuccessModal.vue'
 
 const router = useRouter()
-const { createPayment } = usePayments()
+const gymStore = useGymStore()
+const { createPayment, loading: paymentLoading } = usePayments()
 const { searchActiveMembers } = useMembers()
-const { plans, paymentMethods, loading, error, fetchParameters } = useParameters()
+const { plans, paymentMethods, loading: parametersLoading, error, fetchParameters } = useParameters()
 
 const memberSearch = ref('')
 const memberSearchResults = ref([])
 const selectedMember = ref(null)
 const showSuccessModal = ref(false)
+const isSubmitting = computed(() => paymentLoading.value || parametersLoading.value)
 
 const paymentSteps = [
   { number: 1, label: 'Socio' },
@@ -445,6 +448,8 @@ function updateDates() {
 }
 
 async function handleSubmit() {
+  if (paymentLoading.value) return
+
   if (!selectedMember.value) {
     toast.error('Por favor selecciona un socio', { duration: 3000 })
     return
@@ -455,25 +460,25 @@ async function handleSubmit() {
     return
   }
 
-  const paymentPromise = createPayment(formData.value, {
+  const result = await createPayment(formData.value, {
     isClubMember: Boolean(selectedMember.value.es_socio_club)
-  }).then(result => {
-    if (!result.success) {
-      throw new Error(result.error)
-    }
+  })
 
-    return result
-  })
-  
-  toast.promise(paymentPromise, {
-    loading: 'Registrando pago...',
-    success: () => {
-      showSuccessModal.value = true
-      resetForm()
-      return 'Pago registrado correctamente'
-    },
-    error: 'Error al registrar el pago'
-  })
+  if (!result.success) {
+    toast.error(result.error || 'No se pudo registrar el pago', { duration: 5000 })
+    return
+  }
+
+  // El pago ya fue persistido. La actualización de métricas no debe ocultar
+  // una confirmación válida si el dashboard tarda o falla al refrescarse.
+  const statsResult = await gymStore.getStats()
+  if (!statsResult.success) {
+    reportClientError('payments.dashboard_refresh', new Error(statsResult.error || 'No se pudieron actualizar las métricas'))
+  }
+
+  resetForm()
+  showSuccessModal.value = true
+  toast.success('Pago registrado correctamente', { duration: 2500 })
 }
 
 function resetForm() {

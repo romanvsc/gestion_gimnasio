@@ -31,6 +31,7 @@ export function createSupabaseWorkShiftRepository({ client }) {
           .gte('work_date', startDate)
           .lte('work_date', endDate)
           .order('work_date')
+          .order('start_time')
       )
 
       return (data || []).map(mapWorkShift)

@@ -217,7 +217,8 @@ test('el adaptador de jornadas conserva rango, campos y agregado', async () => {
     ['eq', 'staff_id', 'receptionist-1'],
     ['gte', 'work_date', '2026-09-01'],
     ['lte', 'work_date', '2026-09-30'],
-    ['order', 'work_date', undefined]
+    ['order', 'work_date', undefined],
+    ['order', 'start_time', undefined]
   ])
 })
 

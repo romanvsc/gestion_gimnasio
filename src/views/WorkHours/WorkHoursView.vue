@@ -113,7 +113,7 @@
       v-if="showShiftModal"
       v-model="showShiftModal"
       :date="selectedDate"
-      :shift="selectedShift"
+      :shifts="selectedDayShifts"
       :staff-name="selectedStaffName"
       :saving="saving"
       @save="handleSaveShift"
@@ -158,7 +158,7 @@ const selectedStaffId = computed(() => isAdmin.value
 const selectedStaff = computed(() => receptionists.value.find(staff => staff.id === selectedStaffId.value) || null)
 const selectedStaffName = computed(() => selectedStaff.value?.usuario || selectedStaff.value?.email || 'Mi banco de horas')
 const isCurrentMonth = computed(() => currentMonth.value === businessToday.value.slice(0, 7))
-const selectedShift = computed(() => shifts.value.find(shift => shift.work_date === selectedDate.value) || null)
+const selectedDayShifts = computed(() => shifts.value.filter(shift => shift.work_date === selectedDate.value))
 const monthLabel = computed(() => {
   const [year, month] = currentMonth.value.split('-').map(Number)
   const label = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric', timeZone: 'UTC' })

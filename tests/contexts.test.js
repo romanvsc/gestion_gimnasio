@@ -21,7 +21,9 @@ import { registerPayment } from '../src/contexts/billing-cash/application/use-ca
 import { Plan } from '../src/contexts/plans-catalog/domain/entities/Plan.js'
 import { resolvePlanPrice } from '../src/contexts/plans-catalog/presentation/planPricing.js'
 import { WorkShift, calculateWorkMinutes, formatWorkDuration } from '../src/contexts/work-hours/domain/entities/WorkShift.js'
-import { getWorkMonthRange, summarizeWorkShifts } from '../src/contexts/work-hours/domain/services/workMonth.js'
+import { createWorkShift } from '../src/contexts/work-hours/application/use-cases/createWorkShift.js'
+import { updateWorkShift } from '../src/contexts/work-hours/application/use-cases/updateWorkShift.js'
+import { getWorkMonthRange, summarizeWorkShifts, validateWorkShiftOverlaps } from '../src/contexts/work-hours/domain/services/workMonth.js'
 import { BRAND, COLOR_SCALES } from '../src/config/brand.js'
 import { UI_TOKENS } from '../src/config/uiTokens.js'
 
@@ -260,6 +262,103 @@ test('Work Hours resume un mes en minutos sin duplicar reglas de presentacion', 
   ]), { totalMinutes: 390, totalHours: 6.5 })
 })
 
+test('Work Hours permite intervalos contiguos y suma una jornada partida', async () => {
+  const morning = WorkShift.create({
+    id: 'shift-morning',
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '08:00',
+    end_time: '12:00',
+    today: '2026-09-05'
+  })
+  const afternoon = WorkShift.create({
+    id: 'shift-afternoon',
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '14:00',
+    end_time: '18:00',
+    today: '2026-09-05'
+  })
+  let persisted = null
+
+  const repository = {
+    async findByStaffAndMonth() { return [morning] },
+    async create(shift) {
+      persisted = shift
+      return shift
+    }
+  }
+
+  await createWorkShift({
+    workShiftRepository: repository,
+    clock: { today: () => '2026-09-05' },
+    input: afternoon.toPersistence()
+  })
+
+  assert.equal(persisted.duration_minutes, 240)
+  assert.equal(summarizeWorkShifts([morning, afternoon]).totalMinutes, 480)
+  assert.equal(validateWorkShiftOverlaps([morning, afternoon]), true)
+  assert.equal(validateWorkShiftOverlaps([
+    morning,
+    WorkShift.create({
+      id: 'shift-next-day',
+      staff_id: 'receptionist-1',
+      work_date: '2026-09-06',
+      start_time: '08:00',
+      end_time: '12:00',
+      today: '2026-09-06'
+    })
+  ]), true)
+})
+
+test('Work Hours rechaza intervalos superpuestos y permite editar uno existente', async () => {
+  const existing = WorkShift.create({
+    id: 'shift-existing',
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '08:00',
+    end_time: '12:00',
+    today: '2026-09-05'
+  })
+  const overlapping = WorkShift.create({
+    id: 'shift-overlapping',
+    staff_id: 'receptionist-1',
+    work_date: '2026-09-05',
+    start_time: '11:00',
+    end_time: '14:00',
+    today: '2026-09-05'
+  })
+
+  assert.throws(
+    () => validateWorkShiftOverlaps([existing, overlapping]),
+    /no pueden superponerse/i
+  )
+
+  let updatedId = null
+  const repository = {
+    async findByStaffAndMonth() { return [existing] },
+    async update(id, shift) {
+      updatedId = id
+      return shift
+    }
+  }
+
+  const updated = await updateWorkShift({
+    workShiftRepository: repository,
+    clock: { today: () => '2026-09-05' },
+    id: existing.id,
+    input: {
+      staff_id: existing.staff_id,
+      work_date: existing.work_date,
+      start_time: '09:00',
+      end_time: '13:00'
+    }
+  })
+
+  assert.equal(updatedId, existing.id)
+  assert.equal(updated.start_time, '09:00')
+})
+
 async function listJavaScriptFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true })
   const files = []
@@ -312,5 +411,7 @@ test('los flujos de pago y check-in delegan persistencia en sus fachadas', async
   assert.doesNotMatch(paymentView, /from\(['"]@\/lib\/supabase['"]\)/i)
   assert.doesNotMatch(checkInView, /from\(['"]@\/lib\/supabase['"]\)/i)
   assert.match(paymentView, /billingCash|usePayments/i)
+  assert.match(paymentView, /const result = await createPayment/i)
+  assert.doesNotMatch(paymentView, /toast\.promise/i)
   assert.match(checkInView, /useAttendance/i)
 })

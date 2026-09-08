@@ -72,7 +72,7 @@ export function formatWorkDuration(totalMinutes) {
 
 /**
  * Aggregate root del contexto Work Hours.
- * Solo representa una jornada por persona y fecha.
+ * Representa un intervalo de trabajo de una persona en una fecha.
  * No conoce Vue, Supabase ni APIs del navegador.
  */
 export class WorkShift {

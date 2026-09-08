@@ -55,4 +55,9 @@ export const workHours = Object.freeze({
 })
 
 export { formatWorkDuration } from './domain/entities/WorkShift.js'
-export { getWorkMonthRange, normalizeWorkMonth, summarizeWorkShifts } from './domain/services/workMonth.js'
+export {
+  getWorkMonthRange,
+  normalizeWorkMonth,
+  summarizeWorkShifts,
+  validateWorkShiftOverlaps
+} from './domain/services/workMonth.js'

@@ -326,6 +326,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
 import { useAppResume } from '@/composables/useAppResume'
@@ -346,6 +347,7 @@ import TopBar from '@/components/layout/TopBar.vue'
 const router = useRouter()
 const userStore = useUserStore()
 const gymStore = useGymStore()
+const { stats } = storeToRefs(gymStore)
 
 const dashboardDate = computed(() => {
   const value = new Intl.DateTimeFormat('es-AR', {
@@ -368,14 +370,6 @@ const loading = ref(false)
 const showLastAccessModal = ref(false)
 const showNotifications = ref(false)
 const statsUpdatedAt = ref(null)
-const stats = ref({
-  totalMembers: 0,
-  activeMembers: 0,
-  expiredMembers: 0,
-  todayAttendance: 0,
-  monthlyRevenue: 0
-})
-
 const {
   recentCheckIns,
   loadingRecent: loadingCheckIns,
@@ -391,7 +385,6 @@ async function loadStats() {
   loading.value = true
   try {
     await gymStore.getStats()
-    stats.value = gymStore.stats
     statsUpdatedAt.value = new Date()
   } catch (err) {
     reportClientError('dashboard.stats_fetch', err)

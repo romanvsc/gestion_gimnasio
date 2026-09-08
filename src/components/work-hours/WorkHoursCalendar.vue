@@ -33,7 +33,7 @@
           day.isCurrentMonth ? 'text-page-title' : 'text-page-muted opacity-60',
           day.isFuture || !canEdit ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-page-card-hover',
           day.isToday ? 'ring-2 ring-inset ring-primary-500' : '',
-          day.shift ? 'bg-primary-50/40 dark:bg-primary-900/10' : ''
+          day.shifts.length ? 'bg-primary-50/40 dark:bg-primary-900/10' : ''
         ]"
         @click="$emit('select-day', day)"
       >
@@ -47,12 +47,17 @@
           {{ day.dayNumber }}
         </span>
 
-        <div v-if="day.shift" class="min-w-0 space-y-1">
-          <span class="block truncate text-[10px] font-semibold text-page-title sm:text-xs">
-            {{ day.shift.start_time }} – {{ day.shift.end_time }}
-          </span>
-          <span class="inline-flex max-w-full items-center rounded-md bg-primary-100 px-1.5 py-0.5 text-[10px] font-semibold text-primary-800 dark:bg-primary-900/40 dark:text-primary-200 sm:text-xs">
-            {{ day.shift.duration_label }}
+        <div v-if="day.shifts.length" class="min-w-0 space-y-1">
+          <div v-for="shift in day.shifts" :key="shift.id" class="rounded-md bg-page-bg/80 px-1.5 py-1 dark:bg-white/[0.05]">
+            <span class="block truncate text-[10px] font-semibold text-page-title sm:text-xs">
+              {{ shift.start_time }} – {{ shift.end_time }}
+            </span>
+            <span class="block truncate text-[10px] text-primary-700 dark:text-primary-300 sm:text-xs">
+              {{ shift.duration_label }}
+            </span>
+          </div>
+          <span class="block text-[10px] font-semibold text-page-subtitle sm:text-xs">
+            Total: {{ day.totalDurationLabel }}
           </span>
           <span class="block text-[10px] text-page-muted">{{ day.isToday ? 'Hoy' : 'Jornada cargada' }}</span>
         </div>
@@ -75,6 +80,7 @@
 <script setup>
 import { computed } from 'vue'
 import { Plus } from 'lucide-vue-next'
+import { formatWorkDuration } from '@/contexts/work-hours'
 
 const props = defineProps({
   month: { type: String, required: true },
@@ -95,7 +101,17 @@ const monthLabel = computed(() => {
   return label.charAt(0).toUpperCase() + label.slice(1)
 })
 
-const shiftByDate = computed(() => new Map(props.shifts.map(shift => [shift.work_date, shift])))
+const shiftsByDate = computed(() => {
+  const grouped = new Map()
+
+  for (const shift of props.shifts) {
+    const shifts = grouped.get(shift.work_date) || []
+    shifts.push(shift)
+    grouped.set(shift.work_date, shifts)
+  }
+
+  return grouped
+})
 
 function dateKey(date) {
   return date.toISOString().slice(0, 10)
@@ -111,6 +127,8 @@ const calendarDays = computed(() => {
   return Array.from({ length: totalCells }, (_, index) => {
     const date = new Date(Date.UTC(year, monthNumber - 1, 1 - mondayBasedOffset + index))
     const key = dateKey(date)
+    const shifts = shiftsByDate.value.get(key) || []
+    const totalMinutes = shifts.reduce((total, shift) => total + Number(shift.duration_minutes || 0), 0)
 
     return {
       date: key,
@@ -119,14 +137,20 @@ const calendarDays = computed(() => {
       isToday: key === props.today,
       isFuture: key > props.today,
       isWeekend: date.getUTCDay() === 0 || date.getUTCDay() === 6,
-      shift: shiftByDate.value.get(key) || null
+      shifts,
+      totalDurationLabel: formatWorkDuration(totalMinutes)
     }
   })
 })
 
 function getDayAriaLabel(day) {
   const dateLabel = dayFormatter.format(new Date(`${day.date}T00:00:00Z`))
-  if (day.shift) return `${dateLabel}: jornada de ${day.shift.start_time} a ${day.shift.end_time}, ${day.shift.duration_label}`
+  if (day.shifts.length) {
+    const intervals = day.shifts
+      .map(shift => `${shift.start_time} a ${shift.end_time}, ${shift.duration_label}`)
+      .join('; ')
+    return `${dateLabel}: ${intervals}. Total ${day.totalDurationLabel}`
+  }
   if (day.isFuture) return `${dateLabel}: fecha futura`
   return `${dateLabel}: sin jornada cargada`
 }
